@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: dibibase
+  labels:
+    app: dibibase
+spec:
+  serviceName: dibibase
+  replicas: 2
+  selector:
+    matchLabels:
+      app: dibibase
+  template:
+    metadata:
+      labels:
+        app: dibibase
+    spec:
+      terminationGracePeriodSeconds: 180
+      containers:
+        - name: dibibase
+          image: nginx:1.21.3-alpine
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+              name: http
+          resources:
+            limits:
+              cpu: "500m"
+              memory: 1Gi
+            requests:
+              cpu: "500m"
+              memory: 1Gi
+          env:
+            - name: DIBIBASE_SEEDS
+              value: "dibibase-0.dibibase.default.svc.cluster.local"
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
