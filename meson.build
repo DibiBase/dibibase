@@ -7,6 +7,7 @@ inc = include_directories('include')
 
 subdir('include')
 subdir('lib')
+subdir('src')
 subdir('test')
 
 # Make this library usable as a Meson subproject.

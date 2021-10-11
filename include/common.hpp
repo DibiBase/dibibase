@@ -13,17 +13,3 @@
 #define DIBIBASE_PUBLIC
 #endif
 #endif
-
-namespace dibibase {
-
-class DIBIBASE_PUBLIC Dibibase {
-
-public:
-  Dibibase();
-  int get_number() const;
-
-private:
-  int number;
-};
-
-} // namespace dibibase
