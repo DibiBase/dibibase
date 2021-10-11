@@ -3,6 +3,8 @@ project('dibibase', 'cpp',
   license: 'Apache-2.0',
   default_options : ['warning_level=3', 'cpp_std=c++14'])
 
+gtest_proj = subproject('gtest')
+
 inc = include_directories('include')
 
 subdir('include')
