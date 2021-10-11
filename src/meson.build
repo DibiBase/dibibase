@@ -1,4 +1,6 @@
 dibibaseexe = executable('dibibase',
   sources: 'main.cpp',
   include_directories : inc,
-  link_with : dibibaselib)
+  link_with : dibibaselib,
+  install : true,
+)
