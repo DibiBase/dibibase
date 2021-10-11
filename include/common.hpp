@@ -13,3 +13,5 @@
 #define DIBIBASE_PUBLIC
 #endif
 #endif
+
+#define DIBIBASE_PACKED __attribute__((packed))
