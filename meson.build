@@ -10,7 +10,7 @@ inc = include_directories('include')
 subdir('include')
 subdir('lib')
 subdir('src')
-subdir('test')
+subdir('tests')
 
 # Make this library usable as a Meson subproject.
 dibibase_dep = declare_dependency(

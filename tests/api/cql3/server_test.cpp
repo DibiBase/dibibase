@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include <api/cql3/server.hpp>
+#include "api/cql3/server.hpp"
 
 int main(int argc, char **argv) {
   if (argc != 1) {

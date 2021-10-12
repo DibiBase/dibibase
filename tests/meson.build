@@ -5,7 +5,7 @@ test_api_cql3_server = executable('api_cql3_server_test',
   sources : 'api/cql3/server_test.cpp',
   include_directories : inc,
   link_with : dibibaselib)
-test('api/cql3/server', test_api_cql3_server)
+test('cql3/server', test_api_cql3_server, suite: 'api')
 
 test_gtest = executable('gtest_test',
   sources : 'gtest_test.cpp',
@@ -16,4 +16,4 @@ test_gtest = executable('gtest_test',
     gmock_dep
   ],
 )
-test('gtest', test_gtest)
+test('gtest', test_gtest, suite: 'general')
