@@ -70,3 +70,10 @@ executable('greeter_server',
   dependencies: dep_grpc,
   install: true,
 )
+
+executable('logger',
+  sources: 'logger.cpp',
+  include_directories: inc,
+  link_with : dibibaselib,
+  install: false,
+)
