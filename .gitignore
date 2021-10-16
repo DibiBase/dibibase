@@ -3,9 +3,12 @@ build/
 compile_commands.json
 
 # Doxygen Output
-doc/html
-doc/latex
+doc/html/
+doc/latex/
 
 # Meson Wrap
 subprojects/*
 !subprojects/*.wrap
+
+# ANTLR4
+grammars/ebnf/.antlr/

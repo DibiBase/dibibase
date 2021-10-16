@@ -1,12 +1,3 @@
-dibibaseexe = executable('dibibase',
-  sources: 'main.cpp',
-  include_directories : inc,
-  link_with : dibibaselib,
-  install : true,
-)
-
-cppc = meson.get_compiler('cpp')
-
 protoc = find_program('protoc')
 protobuf = dependency('protobuf')
 
@@ -63,6 +54,52 @@ dep_grpc = [
   threadlibs,
 ]
 
+antlr4 = find_program('antlr4')
+
+lexer_gen = generator(antlr4,
+  output : [
+    '@BASENAME@.h',
+    '@BASENAME@.cpp',
+  ],
+  arguments : [
+    '-Dlanguage=Cpp',
+    '-DexportMacro=DIBIBASE_PUBLIC',
+    '-o', '@BUILD_DIR@',
+    '-package', 'dibibase::lang::cql3',
+    '-Xexact-output-dir',
+    '@INPUT@',
+  ]
+)
+
+parser_gen = generator(antlr4,
+  output : [
+    '@BASENAME@.h',
+    '@BASENAME@.cpp',
+    '@BASENAME@Visitor.h',
+    '@BASENAME@BaseVisitor.h',
+  ],
+  arguments : [
+    '-Dlanguage=Cpp',
+    '-DexportMacro=DIBIBASE_PUBLIC',
+    '-visitor',
+    '-lib', project_source_root + '/grammars/ebnf',
+    '-o', '@BUILD_DIR@',
+    '-package', 'dibibase::lang::cql3',
+    '-Xexact-output-dir',
+    '@INPUT@',
+  ]
+)
+
+src_lexer = lexer_gen.process(
+  project_source_root + '/grammars/ebnf/CqlLexer.g4',
+  preserve_path_from : project_source_root + '/grammars/ebnf',
+)
+
+src_parser = parser_gen.process(
+  project_source_root + '/grammars/ebnf/CqlParser.g4',
+  preserve_path_from : project_source_root + '/grammars/ebnf',
+)
+
 executable('greeter_client',
   sources: ['greeter_client.cpp', src_pb, src_grpc],
   include_directories: inc,
@@ -82,4 +119,19 @@ executable('logger',
   include_directories: inc,
   link_with : dibibaselib,
   install: false,
+)
+
+executable('lang',
+  sources: ['lang.cpp', src_lexer, src_parser],
+  include_directories : [inc, '/usr/include/antlr4-runtime'],
+  dependencies: [dep_antlr4],
+  link_with : dibibaselib,
+  install : true,
+)
+
+executable('dibibase',
+  sources: 'main.cpp',
+  include_directories : inc,
+  link_with : dibibaselib,
+  install : true,
 )
