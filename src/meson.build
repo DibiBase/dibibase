@@ -117,7 +117,7 @@ executable('lang',
   sources: ['lang.cpp'],
   include_directories : [inc, '/usr/include/antlr4-runtime'],
   dependencies: [dep_antlr4, idep_grammar],
-  link_with : [dibibaselib, libgrammar],
+  link_with : [dibibaselib],
   install : true,
 )
 
