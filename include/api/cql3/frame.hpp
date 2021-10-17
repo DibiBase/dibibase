@@ -4,9 +4,7 @@
 
 #include "common.hpp"
 
-namespace dibibase {
-namespace api {
-namespace cql3 {
+namespace dibibase::api::cql3 {
 
 /**
  * @brief An enum containing possible Opcodes for Frames.
@@ -107,6 +105,4 @@ public:
   OptionsFrame &operator=(OptionsFrame &&) = default;
 };
 
-} // namespace cql3
-} // namespace api
-} // namespace dibibase
+} // namespace dibibase::api::cql3

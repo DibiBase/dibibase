@@ -17,7 +17,6 @@ grammars/ebnf/.antlr/
 # Misc.
 .github/
 doc/
-grammars/
 k8s/
 .gitignore
 Dockerfile

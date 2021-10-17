@@ -1,8 +1,6 @@
 #include "api/cql3/frame.hpp"
 
-namespace dibibase {
-namespace api {
-namespace cql3 {
+using namespace dibibase::api::cql3;
 
 Frame Frame::from(char *buf) {
   FrameHeader header = FrameHeader(buf);
@@ -15,7 +13,3 @@ Frame Frame::from(char *buf) {
     return Frame(header);
   }
 }
-
-} // namespace cql3
-} // namespace api
-} // namespace dibibase

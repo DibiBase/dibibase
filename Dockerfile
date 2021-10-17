@@ -3,6 +3,8 @@ FROM gcc:11.2.0-bullseye AS builder
 ARG JOBS_NUMBER=2
 
 RUN apt-get -qq update && apt-get -qq install -y \
+    antlr4 \
+    libantlr4-runtime-dev \
     protobuf-compiler-grpc \
     libgrpc++-dev \
     cmake \

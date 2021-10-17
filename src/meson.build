@@ -56,48 +56,40 @@ dep_grpc = [
 
 antlr4 = find_program('antlr4')
 
-lexer_gen = generator(antlr4,
-  output : [
-    '@BASENAME@.h',
-    '@BASENAME@.cpp',
+src_grammar = custom_target('gen-grammar',
+  input : [
+    project_source_root + '/grammars/ebnf/CqlLexer.g4',
+    project_source_root + '/grammars/ebnf/CqlParser.g4',
   ],
-  arguments : [
-    '-Dlanguage=Cpp',
-    '-DexportMacro=DIBIBASE_PUBLIC',
-    '-o', '@BUILD_DIR@',
-    '-package', 'dibibase::lang::cql3',
-    '-Xexact-output-dir',
-    '@INPUT@',
-  ]
-)
-
-parser_gen = generator(antlr4,
   output : [
-    '@BASENAME@.h',
-    '@BASENAME@.cpp',
-    '@BASENAME@Visitor.h',
-    '@BASENAME@BaseVisitor.h',
+    'CqlLexer.h',
+    'CqlLexer.cpp',
+    'CqlParser.h',
+    'CqlParser.cpp',
+    'CqlParserVisitor.h',
+    'CqlParserBaseVisitor.h',
   ],
-  arguments : [
+  command : [
+    antlr4,
     '-Dlanguage=Cpp',
     '-DexportMacro=DIBIBASE_PUBLIC',
     '-visitor',
-    '-lib', project_source_root + '/grammars/ebnf',
-    '-o', '@BUILD_DIR@',
+    '-o', '@OUTDIR@',
     '-package', 'dibibase::lang::cql3',
     '-Xexact-output-dir',
-    '@INPUT@',
+    '@INPUT0@', '@INPUT1@',
   ]
 )
 
-src_lexer = lexer_gen.process(
-  project_source_root + '/grammars/ebnf/CqlLexer.g4',
-  preserve_path_from : project_source_root + '/grammars/ebnf',
+libgrammar = static_library('grammar',
+  sources: [src_grammar],
+  include_directories : [inc, '/usr/include/antlr4-runtime'],
+  dependencies: [dep_antlr4],
 )
 
-src_parser = parser_gen.process(
-  project_source_root + '/grammars/ebnf/CqlParser.g4',
-  preserve_path_from : project_source_root + '/grammars/ebnf',
+idep_grammar = declare_dependency(
+  sources : [src_grammar],
+  link_with : [libgrammar],
 )
 
 executable('greeter_client',
@@ -122,10 +114,10 @@ executable('logger',
 )
 
 executable('lang',
-  sources: ['lang.cpp', src_lexer, src_parser],
+  sources: ['lang.cpp'],
   include_directories : [inc, '/usr/include/antlr4-runtime'],
-  dependencies: [dep_antlr4],
-  link_with : dibibaselib,
+  dependencies: [dep_antlr4, idep_grammar],
+  link_with : [dibibaselib, libgrammar],
   install : true,
 )
 

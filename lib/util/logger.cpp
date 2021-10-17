@@ -5,8 +5,7 @@
 #include "errors.hpp"
 #include "util/factory.hpp"
 
-namespace dibibase {
-namespace util {
+using namespace dibibase::util;
 
 /**
  * @brief Convert string.
@@ -70,6 +69,3 @@ LogLevel Logger::parseVerbosity(const string &name, LogLevel fallback) {
     return fallback;
   }
 }
-
-} // namespace util
-} // namespace dibibase

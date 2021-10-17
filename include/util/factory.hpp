@@ -4,8 +4,7 @@
 #include <unistd.h>
 #include <utility>
 
-namespace dibibase {
-namespace util {
+namespace dibibase::util {
 
 using std::forward;
 using std::make_shared;
@@ -16,5 +15,4 @@ template <class T, class... Deps> shared_ptr<T> get_singleton(Deps &&...deps) {
   return instance;
 }
 
-} // namespace util
-} // namespace dibibase
+} // namespace dibibase::util

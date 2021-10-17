@@ -15,8 +15,7 @@
 #define STDERR_FILENO 2
 #endif
 
-namespace dibibase {
-namespace util {
+namespace dibibase::util {
 
 using std::forward;
 using std::make_pair;
@@ -123,5 +122,4 @@ private:
   std::map<LogLevel, string> m_suffixes; /**< LogLevel specific suffixes. */
 };
 
-} // namespace util
-} // namespace dibibase
+} // namespace dibibase::util

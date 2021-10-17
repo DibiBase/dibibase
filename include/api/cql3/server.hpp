@@ -10,9 +10,7 @@
 #define MAX_EVENTS 128
 #define MAX_MESSAGE_LEN 2048
 
-namespace dibibase {
-namespace api {
-namespace cql3 {
+namespace dibibase::api::cql3 {
 
 inline void error(char const *msg) {
   perror(msg);
@@ -34,6 +32,4 @@ private:
   int epollfd;
 };
 
-} // namespace cql3
-} // namespace api
-} // namespace dibibase
+} // namespace dibibase::api::cql3

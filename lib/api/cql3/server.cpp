@@ -10,9 +10,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-namespace dibibase {
-namespace api {
-namespace cql3 {
+using namespace dibibase::api::cql3;
 
 Server::Server(const int port) {
   struct sockaddr_in server_addr, client_addr;
@@ -92,7 +90,3 @@ Server::Server(const int port) {
     }
   }
 }
-
-} // namespace cql3
-} // namespace api
-} // namespace dibibase
