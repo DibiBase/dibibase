@@ -1,9 +1,9 @@
-#include "util/logger.hpp"
+#include "util/logger.hh"
 
 #include <unistd.h>
 
-#include "errors.hpp"
-#include "util/factory.hpp"
+#include "errors.hh"
+#include "util/factory.hh"
 
 using namespace dibibase::util;
 

@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <sys/epoll.h>
 
-#include "common.hpp"
+#include "common.hh"
 
 #define BACKLOG 512
 #define MAX_EVENTS 128

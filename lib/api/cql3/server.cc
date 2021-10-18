@@ -1,4 +1,4 @@
-#include "api/cql3/server.hpp"
+#include "api/cql3/server.hh"
 
 #include <arpa/inet.h>
 #include <cerrno>

@@ -1,4 +1,4 @@
-#include "api/cql3/frame.hpp"
+#include "api/cql3/frame.hh"
 
 using namespace dibibase::api::cql3;
 

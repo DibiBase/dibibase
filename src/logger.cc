@@ -1,4 +1,4 @@
-#include "util/logger.hpp"
+#include "util/logger.hh"
 
 int main() {
   using namespace dibibase::util;

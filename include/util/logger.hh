@@ -6,7 +6,7 @@
 #include <thread>
 #include <utility>
 
-#include "common.hpp"
+#include "common.hh"
 
 #ifndef STDOUT_FILENO
 #define STDOUT_FILENO 1

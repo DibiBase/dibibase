@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-#include "common.hpp"
+#include "common.hh"
 
 namespace dibibase::api::cql3 {
 
