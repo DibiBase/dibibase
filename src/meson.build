@@ -93,28 +93,28 @@ idep_grammar = declare_dependency(
 )
 
 executable('greeter_client',
-  sources: ['greeter_client.cpp', src_pb, src_grpc],
+  sources: ['greeter_client.cc', src_pb, src_grpc],
   include_directories: inc,
   dependencies: dep_grpc,
   install: true,
 )
 
 executable('greeter_server',
-  sources: ['greeter_server.cpp', src_pb, src_grpc],
+  sources: ['greeter_server.cc', src_pb, src_grpc],
   include_directories: inc,
   dependencies: dep_grpc,
   install: true,
 )
 
 executable('logger',
-  sources: 'logger.cpp',
+  sources: 'logger.cc',
   include_directories: inc,
   link_with : dibibaselib,
   install: false,
 )
 
 executable('lang',
-  sources: ['lang.cpp'],
+  sources: ['lang.cc'],
   include_directories : [inc, '/usr/include/antlr4-runtime'],
   dependencies: [dep_antlr4, idep_grammar],
   link_with : [dibibaselib],
@@ -122,7 +122,7 @@ executable('lang',
 )
 
 executable('dibibase',
-  sources: 'main.cpp',
+  sources: 'main.cc',
   include_directories : inc,
   link_with : dibibaselib,
   install : true,

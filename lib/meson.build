@@ -1,16 +1,16 @@
 dibibaselib_api_cql3_srcs = [
-  'api/cql3/server.cpp',
+  'api/cql3/server.cc',
 ]
 dibibaselib_api_srcs = [dibibaselib_api_cql3_srcs]
 
 # dibibaselib_lang_cql3_srcs = [
-#   'lang/cql3/CqlLexer.cpp',
-#   'lang/cql3/CqlParser.cpp',
+#   'lang/cql3/CqlLexer.cc',
+#   'lang/cql3/CqlParser.cc',
 # ]
 # dibibaselib_lang_srcs = [dibibaselib_lang_cql3_srcs]
 
 dibibaselib_util_srcs = [
-  'util/logger.cpp',
+  'util/logger.cc',
 ]
 
 dibibaselib_srcs = [
