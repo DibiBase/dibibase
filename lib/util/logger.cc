@@ -1,24 +1,22 @@
-#include "util/logger.hpp"
+#include "util/logger.hh"
 
 #include <unistd.h>
 
-#include "errors.hpp"
-#include "util/factory.hpp"
+#include "errors.hh"
+#include "util/factory.hh"
 
 using namespace dibibase::util;
 
 /**
  * @brief Convert string.
  */
-const char *Logger::convert(string &arg) const { return arg.c_str(); }
-
 const char *Logger::convert(const string &arg) const { return arg.c_str(); }
 
 /**
  * @brief Create instance.
  */
-Logger::make_type Logger::make(LogLevel level) {
-  return *get_singleton<std::remove_reference_t<Logger::make_type>>(level);
+const Logger &Logger::make(LogLevel level) {
+  return *get_singleton<std::remove_reference_t<const Logger &>>(level);
 }
 
 /**
@@ -36,14 +34,14 @@ Logger::Logger(LogLevel level) : m_level(level) {
     m_suffixes[LogLevel::WARNING] = "\033[0m";
     m_suffixes[LogLevel::ERROR]   = "\033[0m";
   } else {
-    m_prefixes.emplace(make_pair(LogLevel::INFO,    "dibibase|info: "));
-    m_prefixes.emplace(make_pair(LogLevel::NOTICE,  "dibibase|notice: "));
-    m_prefixes.emplace(make_pair(LogLevel::WARNING, "dibibase|warn: "));
-    m_prefixes.emplace(make_pair(LogLevel::ERROR,   "dibibase|error: "));
-    m_suffixes.emplace(make_pair(LogLevel::INFO,    ""));
-    m_suffixes.emplace(make_pair(LogLevel::NOTICE,  ""));
-    m_suffixes.emplace(make_pair(LogLevel::WARNING, ""));
-    m_suffixes.emplace(make_pair(LogLevel::ERROR,   ""));
+    m_prefixes[LogLevel::INFO]    = "dibibase|info: ";
+    m_prefixes[LogLevel::NOTICE]  = "dibibase|notice: ";
+    m_prefixes[LogLevel::WARNING] = "dibibase|warn: ";
+    m_prefixes[LogLevel::ERROR]   = "dibibase|error: ";
+    m_suffixes[LogLevel::INFO]    = "";
+    m_suffixes[LogLevel::NOTICE]  = "";
+    m_suffixes[LogLevel::WARNING] = "";
+    m_suffixes[LogLevel::ERROR]   = "";
   }
   // clang-format on
 }
@@ -51,12 +49,12 @@ Logger::Logger(LogLevel level) : m_level(level) {
 /**
  * @brief Set output verbosity.
  */
-void Logger::setVerbosity(LogLevel level) { m_level = level; }
+void Logger::set_verbosity(LogLevel level) { m_level = level; }
 
 /**
  * @brief Convert given LogLevel name to its enum type counterpart.
  */
-LogLevel Logger::parseVerbosity(const string &name, LogLevel fallback) {
+LogLevel Logger::parse_verbosity(const string &name, LogLevel fallback) {
   if (name == "error") {
     return LogLevel::ERROR;
   } else if (name == "warning") {

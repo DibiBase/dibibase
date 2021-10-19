@@ -6,7 +6,7 @@
 #include <thread>
 #include <utility>
 
-#include "common.hpp"
+#include "common.hh"
 
 #ifndef STDOUT_FILENO
 #define STDOUT_FILENO 1
@@ -17,8 +17,6 @@
 
 namespace dibibase::util {
 
-using std::forward;
-using std::make_pair;
 using std::string;
 
 enum class LogLevel {
@@ -31,15 +29,14 @@ enum class LogLevel {
 
 class DIBIBASE_PUBLIC Logger {
 public:
-  using make_type = const Logger &;
-  static make_type make(LogLevel level = LogLevel::NONE);
+  static const Logger &make(LogLevel level = LogLevel::INFO);
 
   explicit Logger(LogLevel level);
 
-  static LogLevel parseVerbosity(const string &name,
-                                 LogLevel fallback = LogLevel::NONE);
+  static LogLevel parse_verbosity(const string &name,
+                                  LogLevel fallback = LogLevel::INFO);
 
-  void setVerbosity(LogLevel level);
+  void set_verbosity(LogLevel level);
 
   /**
    * @brief Output an info message.
@@ -75,13 +72,12 @@ public:
 
 protected:
   template <typename T> decltype(auto) convert(T &&arg) const {
-    return forward<T>(arg);
+    return std::forward<T>(arg);
   }
 
   /**
    * @brief Convert string.
    */
-  const char *convert(string &arg) const;
   const char *convert(const string &arg) const;
 
   /**
@@ -94,32 +90,31 @@ protected:
       return;
     }
 
-#if defined(__clang__) // {{{
+#if defined(__clang__)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wformat-security"
 #elif defined(__GNUC__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-security"
-#endif // }}}
+#endif
 
     dprintf(
         m_fd,
         (m_prefixes.at(level) + format + m_suffixes.at(level) + "\n").c_str(),
         convert(values)...);
 
-#if defined(__clang__) // {{{
+#if defined(__clang__)
 #pragma clang diagnostic pop
 #elif defined(__GNUC__)
 #pragma GCC diagnostic pop
-#endif // }}}
+#endif
   }
 
 private:
-  LogLevel m_level{LogLevel::INFO}; /**< Logger verbosity level. */
-  int m_fd{STDERR_FILENO}; /**< File descriptor used when writing the log
-                              messages. */
-  std::map<LogLevel, string> m_prefixes; /**< LogLevel specific prefixes. */
-  std::map<LogLevel, string> m_suffixes; /**< LogLevel specific suffixes. */
+  LogLevel m_level{LogLevel::INFO}; // Logger verbosity level
+  int m_fd{STDERR_FILENO}; // File descriptor used when writing log messages
+  std::map<LogLevel, string> m_prefixes; // LogLevel specific prefixes
+  std::map<LogLevel, string> m_suffixes; // LogLevel specific suffixes
 };
 
 } // namespace dibibase::util

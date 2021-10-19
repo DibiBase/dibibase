@@ -2,7 +2,7 @@
 lexer grammar CqlLexer;
 
 
-@lexer::postinclude {#include "common.hpp"}
+@lexer::postinclude {#include "common.hh"}
 
 
 LR_BRACKET

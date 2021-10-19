@@ -1,3 +1,3 @@
 #!/bin/sh
 
-find . -type f -name '*.hpp' -printf '%P\n'
+find . -type f -name '*.hh' -printf '%P\n'

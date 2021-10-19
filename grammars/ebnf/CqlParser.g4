@@ -26,9 +26,9 @@ parser grammar CqlParser;
 options
    { tokenVocab = CqlLexer; }
 
-@parser::postinclude {#include "common.hpp"}
-@parser::visitorpostinclude {#include "common.hpp"}
-@parser::basevisitorpostinclude {#include "common.hpp"}
+@parser::postinclude {#include "common.hh"}
+@parser::visitorpostinclude {#include "common.hh"}
+@parser::basevisitorpostinclude {#include "common.hh"}
 
 root
    : cqls? MINUSMINUS? eof
