@@ -13,10 +13,17 @@ dibibaselib_util_srcs = [
   'util/logger.cc',
 ]
 
+dibibaselib_db_srcs = [
+  'db/db.cc',
+  'db/sstable_builder.cc',
+  'db/sstable_files.cc',
+]
+
 dibibaselib_srcs = [
   dibibaselib_api_srcs,
   # dibibaselib_lang_srcs,
   dibibaselib_util_srcs,
+  dibibaselib_db_srcs,
 ]
 
 dibibaselib = shared_library('dibibase',

@@ -92,6 +92,13 @@ idep_grammar = declare_dependency(
   link_with : [libgrammar],
 )
 
+executable('engine',
+  sources: 'engine.cc',
+  include_directories: inc,
+  link_with : dibibaselib,
+  install: true,
+)
+
 executable('greeter_client',
   sources: ['greeter_client.cc', src_pb, src_grpc],
   include_directories: inc,
