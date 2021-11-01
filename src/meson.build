@@ -19,12 +19,6 @@ grpc_reflection = cppc.find_library('grpc++_reflection', required: false)
 
 threadlibs = dependency('threads')
 
-if meson.version().version_compare('>=0.56.0')
-  project_source_root = meson.project_source_root()
-else
-  project_source_root = meson.source_root()
-endif
-
 protoc_gen = generator(protoc,
   output    : ['@BASENAME@.pb.cc', '@BASENAME@.pb.h'],
   arguments : ['--proto_path=' + project_source_root + '/protos',
@@ -53,44 +47,6 @@ dep_grpc = [
   protobuf,
   threadlibs,
 ]
-
-antlr4 = find_program('antlr4')
-
-src_grammar = custom_target('gen-grammar',
-  input : [
-    project_source_root + '/grammars/ebnf/CqlLexer.g4',
-    project_source_root + '/grammars/ebnf/CqlParser.g4',
-  ],
-  output : [
-    'CqlLexer.h',
-    'CqlLexer.cpp',
-    'CqlParser.h',
-    'CqlParser.cpp',
-    'CqlParserVisitor.h',
-    'CqlParserBaseVisitor.h',
-  ],
-  command : [
-    antlr4,
-    '-Dlanguage=Cpp',
-    '-DexportMacro=DIBIBASE_PUBLIC',
-    '-visitor',
-    '-o', '@OUTDIR@',
-    '-package', 'dibibase::lang::cql3',
-    '-Xexact-output-dir',
-    '@INPUT0@', '@INPUT1@',
-  ]
-)
-
-libgrammar = static_library('grammar',
-  sources: [src_grammar],
-  include_directories : [inc, '/usr/include/antlr4-runtime'],
-  dependencies: [dep_antlr4],
-)
-
-idep_grammar = declare_dependency(
-  sources : [src_grammar],
-  link_with : [libgrammar],
-)
 
 executable('greeter_client',
   sources: ['greeter_client.cc', src_pb, src_grpc],
