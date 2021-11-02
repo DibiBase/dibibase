@@ -8,12 +8,12 @@
 using namespace dibibase::db;
 
 void DBImpl::write(std::string key, std::string value) {
+  m_memtable.insert({key, value});
 
   // TO DO: use get_memtable_size()
   if (m_memtable.size() >= MAX_MEMTABLE_SIZE) {
     flush();
   }
-  m_memtable.insert({key, value});
 }
 
 std::string DBImpl::read(std::string key) {
@@ -27,9 +27,9 @@ std::string DBImpl::read(std::string key) {
     }
   }
 
-  for (auto const &sstable : m_sstables) {
+  for (int i = m_sstables.size() - 1; i >= 0; --i) {
     std::multimap<std::string, std::string> extracted_data =
-        sstable->decode_data();
+        m_sstables[i]->decode_data();
 
     auto find_key = extracted_data.find(key);
 
@@ -46,8 +46,7 @@ std::string DBImpl::read(std::string key) {
 void DBImpl::remove(std::string key) {}
 
 void DBImpl::flush() {
-  m_sstables.push_back(
-      std::unique_ptr<SSTableBuilder>(new SSTableBuilder(m_memtable)));
+  m_sstables.push_back(std::make_unique<SSTableBuilder>(m_memtable));
   clear_memtable();
 }
 

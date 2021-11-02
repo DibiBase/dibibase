@@ -1,6 +1,11 @@
 #include "db/sstable_builder.hh"
+
+#include "util/logger.hh"
+#include <bitset>
+#include <cinttypes>
 #include <cstddef>
 #include <cstdint>
+#include <cstdio>
 #include <cstring>
 #include <iostream>
 #include <map>
@@ -12,70 +17,101 @@
 
 using namespace dibibase::db;
 
-uint8_t SSTableBuilder::m_total_sstables = 0;
+uint32_t SSTableBuilder::m_total_sstables = 0;
 
 SSTableBuilder::SSTableBuilder(std::multimap<std::string, std::string> memtable)
     : m_memtable(memtable) {
+  // TODO: Possible Race Condition
   ++m_total_sstables;
-  char *buffer = new char[100];
-  encode_data(buffer);
-  m_files =
-      std::unique_ptr<SSTableFiles>(new SSTableFiles(buffer, m_total_sstables));
+
+  char *buffer = new char[4096];
+  size_t allocated_bytes = encode_data(buffer);
+  m_files = std::unique_ptr<SSTableFiles>(
+      new SSTableFiles(buffer, allocated_bytes, m_total_sstables));
+
   delete[] buffer;
 }
 
-void SSTableBuilder::encode_data(char *buffer) {
-  // data format:
-  // first byte represents nu. of entires in memtable.
-  // for each entry: [key length, key characters, value length, value
-  // characters].
+size_t SSTableBuilder::encode_data(char *buffer) {
+  // Data Format:
+  // First 2 bytes represents nu. of entires in memtable.
+  // For each entry:
+  // - 2 bytes for the key length.
+  // - key characters, each takes 1 byte.
+  // - 2 bytes for the value length.
+  // - value characters, each takes 1 byte.
 
-  std::string mem_size = std::to_string(m_memtable.size());
-  std::strcpy(buffer, mem_size.c_str());
+  size_t allocated_bytes = 0;
 
-  buffer += strlen(mem_size.c_str());
+  uint16_t mem_size = m_memtable.size();
+  char mem_buff[2];
+  memset(mem_buff, 0, sizeof(mem_buff));
+  memcpy(mem_buff, reinterpret_cast<char *>(&mem_size), 2);
+  memcpy(buffer, mem_buff, 2);
+
+  buffer += 2;
+  allocated_bytes += 2;
 
   for (auto it : m_memtable) {
-    std::string key_size = std::to_string(it.first.size());
-    std::string value_size = std::to_string(it.second.size());
-    std::string key = it.first;
-    std::string value = it.second;
+    // Storing key size in 2 bytes.
+    uint16_t key_size = it.first.size();
+    char key_buff[2];
+    memset(key_buff, 0, sizeof(key_buff));
+    memcpy(key_buff, reinterpret_cast<char *>(&key_size), 2);
+    memcpy(buffer, key_buff, 2);
 
-    std::strcpy(buffer, key_size.c_str());
-    buffer += strlen(key_size.c_str());
-    std::strcpy(buffer, key.c_str());
-    buffer += strlen(key.c_str());
+    buffer += 2;
+    allocated_bytes += 2;
 
-    std::strcpy(buffer, value_size.c_str());
-    buffer += strlen(value_size.c_str());
-    std::strcpy(buffer, value.c_str());
-    buffer += strlen(value.c_str());
+    // Storing key characters, each character in 1 byte.
+    std::strcpy(buffer, it.first.c_str());
+    buffer += key_size;
+    allocated_bytes += key_size;
+
+    // Storing value size in 2 bytes.
+    uint16_t value_size = it.second.size();
+    char value_buff[2];
+    memset(value_buff, 0, sizeof(value_buff));
+    memcpy(value_buff, reinterpret_cast<char *>(&value_size), 2);
+    memcpy(buffer, value_buff, 2);
+
+    buffer += 2;
+    allocated_bytes += 2;
+
+    // Storing value characters, each character in 1 byte.
+    std::strcpy(buffer, it.second.c_str());
+    buffer += value_size;
+    allocated_bytes += value_size;
   }
+
+  return allocated_bytes;
 }
 
 std::multimap<std::string, std::string> SSTableBuilder::decode_data() {
-  char *buffer = new char[100];
+  char *buffer = new char[4096];
   m_files->read_data_file(buffer);
 
   std::multimap<std::string, std::string> extracted_data;
 
-  uint32_t size = buffer[0] - '0';
+  uint16_t size = buffer[0] + (buffer[1] << 8);
 
-  uint8_t buffer_index = 1;
+  int buffer_index = 2;
 
   for (uint32_t i = 0; i < size; ++i) {
-    uint32_t key_size = buffer[buffer_index] - '0';
-
-    ++buffer_index;
+    // Extracting the key size.
+    uint16_t key_size = buffer[buffer_index] + (buffer[buffer_index + 1] << 8);
+    buffer_index += 2;
+    
+    // Extracting the key.
     std::string key(buffer + buffer_index, key_size);
-
     buffer_index += key_size;
 
-    uint32_t value_size = buffer[buffer_index] - '0';
-    ++buffer_index;
+    // Extracting the key size.
+    uint16_t value_size = buffer[buffer_index] + (buffer[buffer_index + 1] << 8);
+    buffer_index += 2;
 
+    // Extracting the value.
     std::string value(buffer + buffer_index, value_size);
-
     buffer_index += value_size;
 
     extracted_data.insert({key, value});

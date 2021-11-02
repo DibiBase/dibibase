@@ -13,64 +13,63 @@
 
 using namespace dibibase::db;
 
-SSTableFiles::SSTableFiles(char *data, uint8_t sstable_num)
-    : m_data(data), m_sstable_num(sstable_num), m_dbname("dibibase") {
+SSTableFiles::SSTableFiles(char *data, size_t size, uint32_t sstable_num)
+    : m_data(data), m_size(size), m_sstable_num(sstable_num),
+      m_dbname("dibibase"), m_logger(Logger::make()) {
 
-  for (uint8_t index = 0; index < 4; ++index) {
+  for (int index = 0; index < 4; ++index) {
     std::string file_name = get_file_name(index);
 
-    m_file_descriptor[index] =
-        open(file_name.c_str(), O_RDWR | O_CREAT,
-             S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
+    m_file_descriptor[index] = open(file_name.c_str(), O_RDWR | O_CREAT,
+                                    S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 
     if (m_file_descriptor[index] < 0) {
-      std::cout << "Failed to open file: " << m_file_descriptor[index]
-                << std::endl;
+      m_logger.info("Failed to open file: %d", m_file_descriptor[index]);
     }
   }
 
-  m_written_bytes = write_data_file();
+  ssize_t written_bytes = write_data_file();
+  m_logger.info("Written Bytes: %d", written_bytes);
 }
 
-std::string SSTableFiles::get_file_name(std::uint8_t file_num) {
+std::string SSTableFiles::get_file_name(int file_num) {
 
   // TO DO: fix an error results from using m_dbname in the file name.
   switch (file_num) {
-  case dataFile:
+  case DATA:
     return "data" + std::to_string(m_sstable_num) + ".db";
-  case indexFile:
+  case INDEX:
     return "index" + std::to_string(m_sstable_num) + ".db";
-  case indexSummaryFile:
+  case SUMMARY:
     return "summary" + std::to_string(m_sstable_num) + ".db";
-  case compressionInformationFile:
+  case COMPRESSION:
     return "compression_information" + std::to_string(m_sstable_num) + ".db";
   }
 
-  return "";
+  throw "Invalid File Type Error";
 }
 
-size_t SSTableFiles::write_data_file() {
-  uint32_t fd = m_file_descriptor[dataFile];
-  return write(fd, m_data, strlen(m_data));
+ssize_t SSTableFiles::write_data_file() {
+  uint32_t fd = m_file_descriptor[DATA];
+  return write(fd, m_data, m_size);
 }
 
 void SSTableFiles::read_data_file(char *buffer) {
-  uint32_t fd = m_file_descriptor[dataFile];
+  uint32_t fd = m_file_descriptor[DATA];
 
   lseek(fd, 0, SEEK_SET);
 
-  if (read(fd, buffer, m_written_bytes) < 0) {
-    std::cout << "Failed to read data." << std::endl;
+  if (read(fd, buffer, m_size) < 0) {
+    m_logger.err("Failed to read data.");
   }
 }
 
 SSTableFiles::~SSTableFiles() {
   for (uint8_t index = 0; index < 4; ++index) {
     if (close(m_file_descriptor[index]) < 0) {
-      std::cout << "Failed to close file: " << m_file_descriptor[index]
-                << std::endl;
+      m_logger.err("Failed to close file: %d", m_file_descriptor[index]);
     } else {
-      std::cout << "File is closed successfully" << std::endl;
+      m_logger.info("File is closed successfully");
     }
   }
 }
