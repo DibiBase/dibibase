@@ -22,9 +22,10 @@ enum FileType {
 class DIBIBASE_PUBLIC SSTableFiles {
 public:
   explicit SSTableFiles(char *data, size_t size, uint32_t sstable_num);
+  explicit SSTableFiles(uint32_t sstable_num);
   std::string get_file_name(int file_num);
   ssize_t write_data_file();
-  void read_data_file(char *buffer);
+  ssize_t read_data_file(char *buffer);
   ~SSTableFiles();
 
 private:

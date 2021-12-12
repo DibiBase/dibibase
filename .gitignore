@@ -2,6 +2,9 @@
 build/
 compile_commands.json
 
+# SSTable files
+sstables
+
 # Doxygen Output
 doc/html/
 doc/latex/

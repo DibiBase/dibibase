@@ -1,6 +1,7 @@
 #include "db/db.hh"
 
 #include <cstdint>
+#include <cstdio>
 #include <cstring>
 #include <iostream>
 #include <memory>
@@ -17,6 +18,7 @@ void DBImpl::write(std::string key, std::string value) {
 }
 
 std::string DBImpl::read(std::string key) {
+  // Searching for the key value in memtable first.
   if (!m_memtable.empty()) {
     auto find_key = m_memtable.find(key);
 
@@ -27,26 +29,18 @@ std::string DBImpl::read(std::string key) {
     }
   }
 
-  for (int i = m_sstables.size() - 1; i >= 0; --i) {
-    std::multimap<std::string, std::string> extracted_data =
-        m_sstables[i]->decode_data();
+  // Key isn't found in memtable.
+  // Searching for the key value in the existing SSTables.
+  SSTableWrapper sstable_wrapper;
+  std::string value = sstable_wrapper.read_key_value_pair(key);
 
-    auto find_key = extracted_data.find(key);
-
-    // TODO: In case having the same key multiple times, return the value of the
-    // last occurance key.
-    if (find_key != extracted_data.end()) {
-      return find_key->second;
-    }
-  }
-
-  return "";
+  return value;
 }
 
 void DBImpl::remove(std::string key) {}
 
 void DBImpl::flush() {
-  m_sstables.push_back(std::make_unique<SSTableBuilder>(m_memtable));
+  SSTableBuilder sstable_builder(m_memtable);
   clear_memtable();
 }
 

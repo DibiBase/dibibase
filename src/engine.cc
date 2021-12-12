@@ -9,14 +9,14 @@ using namespace dibibase::util;
 int main(int argc, char **argv) {
   Logger logger = Logger::make();
   DBImpl engine;
-  engine.write("name", "ahmed");
+  engine.write("name12", "ahmed");
   engine.write("key", "value");
   engine.write("mariam", "name");
   engine.write("distributedsystems", "goodd");
-  engine.write("testttt", "gg11");
+  engine.write("testttttt", "gg11");
   engine.write("mariam", "name");
 
-  if (engine.read("name") == "ahmed") {
+  if (engine.read("name12") == "ahmed") {
     logger.info("value is correctly extracted");
   } else {
     logger.err("wrong value");
@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
     logger.err("wrong value");
   }
 
-  if (engine.read("testttt") == "gg11") {
+  if (engine.read("testttttt") == "gg11") {
     logger.info("value is correctly extracted");
   } else {
     logger.err("wrong value");
@@ -53,6 +53,13 @@ int main(int argc, char **argv) {
   if (engine.read("essam") == "essam123456789") {
     logger.info("value is correctly extracted");
   } else {
+    logger.err("wrong value");
+  }
+
+  if(engine.read("ayaaya") == "ayaaaaa") {
+    logger.info("value is correctly extracted");
+  }
+  else {
     logger.err("wrong value");
   }
 }

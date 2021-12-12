@@ -7,6 +7,7 @@
 
 #include "common.hh"
 #include "db/sstable_builder.hh"
+#include "db/sstable_wrapper.hh"
 
 #define MAX_MEMTABLE_SIZE 4
 
@@ -37,7 +38,7 @@ public:
 
 private:
   std::multimap<std::string, std::string> m_memtable;
-  std::vector<std::unique_ptr<SSTableBuilder>> m_sstables;
+  //std::vector<std::unique_ptr<SSTableBuilder>> m_sstables;
 };
 
 } // namespace dibibase::db

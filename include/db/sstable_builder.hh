@@ -17,7 +17,6 @@ public:
   explicit SSTableBuilder(std::multimap<std::string, std::string> memtable);
   static uint8_t get_total_sstables();
   size_t encode_data(char *buffer);
-  std::multimap<std::string, std::string> decode_data();
   ~SSTableBuilder();
 
 private:

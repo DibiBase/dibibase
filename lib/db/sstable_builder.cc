@@ -83,45 +83,9 @@ size_t SSTableBuilder::encode_data(char *buffer) {
     buffer += value_size;
     allocated_bytes += value_size;
   }
-
   return allocated_bytes;
-}
-
-std::multimap<std::string, std::string> SSTableBuilder::decode_data() {
-  char *buffer = new char[4096];
-  m_files->read_data_file(buffer);
-
-  std::multimap<std::string, std::string> extracted_data;
-
-  uint16_t size = buffer[0] + (buffer[1] << 8);
-
-  int buffer_index = 2;
-
-  for (uint32_t i = 0; i < size; ++i) {
-    // Extracting the key size.
-    uint16_t key_size = buffer[buffer_index] + (buffer[buffer_index + 1] << 8);
-    buffer_index += 2;
-    
-    // Extracting the key.
-    std::string key(buffer + buffer_index, key_size);
-    buffer_index += key_size;
-
-    // Extracting the key size.
-    uint16_t value_size = buffer[buffer_index] + (buffer[buffer_index + 1] << 8);
-    buffer_index += 2;
-
-    // Extracting the value.
-    std::string value(buffer + buffer_index, value_size);
-    buffer_index += value_size;
-
-    extracted_data.insert({key, value});
-  }
-
-  delete[] buffer;
-
-  return extracted_data;
 }
 
 uint8_t SSTableBuilder::get_total_sstables() { return m_total_sstables; }
 
-SSTableBuilder::~SSTableBuilder() { --m_total_sstables; }
+SSTableBuilder::~SSTableBuilder() {}
