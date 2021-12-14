@@ -1,14 +1,16 @@
 #include "api/cql3/server.hh"
-
+#include "api/cql3/frame.cc"
 #include <arpa/inet.h>
 #include <cerrno>
 #include <cstdio>
 #include <cstring>
+#include <iostream>
 #include <netinet/in.h>
 #include <sys/epoll.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
+using std::cout;
 
 using namespace dibibase::api::cql3;
 
@@ -36,7 +38,7 @@ Server::Server(const int port) {
   if (listen(sock_listen_fd, BACKLOG) < 0) {
     error("Error listening..\n");
   }
-  printf("epoll echo server listening for connections on port: %d\n", port);
+  printf("server listening for connections on port: %d\n", port);
 
   struct epoll_event events[MAX_EVENTS];
   int new_events, sock_conn_fd;
@@ -79,12 +81,25 @@ Server::Server(const int port) {
           epoll_ctl(epollfd, EPOLL_CTL_DEL, newsockfd, NULL);
           shutdown(newsockfd, SHUT_RDWR);
         } else {
-          send(newsockfd, buffer, bytes_received, 0);
+          /////////
+          Frame f(buffer, MAX_MESSAGE_LEN);
+          f.parse();
+          MsgHeader m(f);
+          int bytes_sent = m.CreateResponse();
+
+
           printf("Received: ");
           for (int i = 0; i < bytes_received; i++) {
-            printf("%02X", buffer[i]);
+            printf("%d ", buffer[i]);
           }
           printf(";\n");
+
+          printf("SENT: ");
+          for (int i = 0; i <bytes_sent; i++) {
+            printf("%d ", m.Header[i]);
+          }
+          printf(";\n");
+          send(newsockfd, m.Header , bytes_sent, 0);
         }
       }
     }
