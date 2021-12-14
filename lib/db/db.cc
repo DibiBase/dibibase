@@ -40,7 +40,7 @@ std::string DBImpl::read(std::string key) {
 void DBImpl::remove(std::string key) {}
 
 void DBImpl::flush() {
-  SSTableBuilder sstable_builder(m_memtable);
+  SSTableWrapper sstable_wrapper(m_memtable);
   clear_memtable();
 }
 

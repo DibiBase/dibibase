@@ -13,7 +13,12 @@
 namespace dibibase::db {
 class DIBIBASE_PUBLIC SSTableWrapper {
 public:
+  explicit SSTableWrapper(std::multimap<std::string, std::string> memtable); 
+
   explicit SSTableWrapper();
+
+  // Storing data from buffer into SSTable data file.
+  size_t encode_data(char *buffer);
 
   // Loading SSTable data file into a buffer to read from.
   std::string decode_data(std::string key);
@@ -23,9 +28,11 @@ public:
   ~SSTableWrapper();
 
 private:
-  std::unique_ptr<SSTableFiles> m_fetched_files;
-  int m_last_sstable_id;
+  std::multimap<std::string, std::string> m_memtable;
+  std::unique_ptr<SSTableFiles> m_files;
+  int m_sstable_id;
   int m_fd_metadata;
   Logger m_logger;
+  void fetch_recent_sstable_id();
 };
 } // namespace dibibase::db

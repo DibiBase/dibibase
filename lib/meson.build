@@ -15,7 +15,6 @@ dibibaselib_util_srcs = [
 
 dibibaselib_db_srcs = [
   'db/db.cc',
-  'db/sstable_builder.cc',
   'db/sstable_files.cc',
   'db/sstable_wrapper.cc',
 ]

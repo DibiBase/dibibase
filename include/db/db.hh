@@ -6,7 +6,6 @@
 #include <vector>
 
 #include "common.hh"
-#include "db/sstable_builder.hh"
 #include "db/sstable_wrapper.hh"
 
 #define MAX_MEMTABLE_SIZE 4
