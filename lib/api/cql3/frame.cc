@@ -55,9 +55,9 @@ public:
 };
 
 /*
-* Class MsgHeader actually controls the server-->client msgs .
+* Class ServerMsg actually controls the server-->client msgs .
 */
-class MsgHeader {
+class ServerMsg {
 private:
   enum flag { NONE = 0x00, COMPRESSED = 0x01, TRACING = 0x02 };
   enum Opcode {
@@ -88,7 +88,7 @@ private:
   Frame frame = v();
 
 public:
-  MsgHeader(Frame f) { frame = f; }
+  ServerMsg(Frame f) { frame = f; }
   unsigned char Header[4096];
 
   int SupportedMessage(map<string, list<string>> supportedOptions,unsigned char *Header) {
