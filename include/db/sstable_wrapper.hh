@@ -15,9 +15,6 @@ class DIBIBASE_PUBLIC SSTableWrapper {
 public:
   explicit SSTableWrapper();
 
-  // Fetching the recent/latest SSTable files number.
-  static void set_last_sstable_id(int sstable_number);
-
   // Loading SSTable data file into a buffer to read from.
   std::string decode_data(std::string key);
 
@@ -26,8 +23,9 @@ public:
   ~SSTableWrapper();
 
 private:
-  static int m_last_sstable_id;
   std::unique_ptr<SSTableFiles> m_fetched_files;
+  int m_last_sstable_id;
+  int m_fd_metadata;
   Logger m_logger;
 };
 } // namespace dibibase::db

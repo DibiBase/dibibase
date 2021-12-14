@@ -11,6 +11,7 @@
 #include <sys/types.h>
 #include <tuple>
 #include <unistd.h>
+#include <inttypes.h>
 
 using namespace dibibase::db;
 
@@ -29,6 +30,14 @@ SSTableFiles::SSTableFiles(char *data, size_t size, uint32_t sstable_num)
       m_logger.info("Failed to open file: %d", m_file_descriptor[index]);
     }
   }
+  
+  // Storing the last SSTable ID created in metadata.
+  int fd_metadata = open("sstables/metadata.db", O_RDWR | O_CREAT,
+                                    S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+  char mem_buff[2];
+  memset(mem_buff, 0, sizeof(mem_buff));
+  memcpy(mem_buff, reinterpret_cast<char *>(&m_sstable_num), 2);
+  write(fd_metadata, mem_buff, sizeof(mem_buff));
 
   ssize_t written_bytes = write_data_file();
   m_logger.info("Written Bytes: %d", written_bytes);

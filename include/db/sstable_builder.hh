@@ -15,13 +15,14 @@ namespace dibibase::db {
 class DIBIBASE_PUBLIC SSTableBuilder {
 public:
   explicit SSTableBuilder(std::multimap<std::string, std::string> memtable);
-  static uint8_t get_total_sstables();
   size_t encode_data(char *buffer);
   ~SSTableBuilder();
 
 private:
   std::multimap<std::string, std::string> m_memtable;
   std::unique_ptr<SSTableFiles> m_files;
-  static uint32_t m_total_sstables;
+  int m_sstable_id;
+  int m_fd_metadata;
+  Logger m_logger;
 };
 } // namespace dibibase::db

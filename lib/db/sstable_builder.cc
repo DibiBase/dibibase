@@ -1,33 +1,47 @@
 #include "db/sstable_builder.hh"
 
 #include "util/logger.hh"
-#include <bitset>
 #include <cinttypes>
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
 #include <iostream>
+#include <fcntl.h>
 #include <map>
 #include <memory>
 #include <ostream>
 #include <string>
 #include <type_traits>
 #include <unistd.h>
+#include <inttypes.h>
 
 using namespace dibibase::db;
 
-uint32_t SSTableBuilder::m_total_sstables = 0;
-
 SSTableBuilder::SSTableBuilder(std::multimap<std::string, std::string> memtable)
-    : m_memtable(memtable) {
-  // TODO: Possible Race Condition
-  ++m_total_sstables;
+    : m_memtable(memtable), m_sstable_id(0), m_logger(Logger::make()) {
+
+  // Fetching the last SSTable ID.
+  m_fd_metadata = open("sstables/metadata.db", O_RDONLY);
+
+  if (m_fd_metadata > 0) {
+    char *mem_buff = new char[2];
+
+    ssize_t read_bytes = read(m_fd_metadata, mem_buff, 4096);
+    if (read_bytes < 0) {
+      m_logger.err("Failed to read metadata.");
+    } else {
+      m_sstable_id = mem_buff[0] + (mem_buff[1] << 8);
+      ++m_sstable_id;
+    }
+
+    delete[] mem_buff;
+  }
 
   char *buffer = new char[4096];
   size_t allocated_bytes = encode_data(buffer);
   m_files = std::unique_ptr<SSTableFiles>(
-      new SSTableFiles(buffer, allocated_bytes, m_total_sstables));
+      new SSTableFiles(buffer, allocated_bytes, m_sstable_id));
 
   delete[] buffer;
 }
@@ -85,7 +99,5 @@ size_t SSTableBuilder::encode_data(char *buffer) {
   }
   return allocated_bytes;
 }
-
-uint8_t SSTableBuilder::get_total_sstables() { return m_total_sstables; }
 
 SSTableBuilder::~SSTableBuilder() {}
