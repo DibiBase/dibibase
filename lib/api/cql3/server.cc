@@ -81,15 +81,7 @@ Server::Server(const int port) {
           epoll_ctl(epollfd, EPOLL_CTL_DEL, newsockfd, NULL);
           shutdown(newsockfd, SHUT_RDWR);
         } else {
-          unsigned int msg [10] = {10,10,10,01,10,10,10,10,10};
-          send(newsockfd, msg , 10 , 0);
-          printf("Received: ");
-          for (int i = 0; i < bytes_received; i++) {
-            printf("%c", buffer[i]);
-          }
-          printf(";\n");
-          /*
-          Frame f(buffer, MAX_MESSAGE_LEN);
+          Frame f(buffer, bytes_received);
           f.parse();
           ServerMsg m(f);
           int bytes_sent = m.CreateResponse();
@@ -101,13 +93,17 @@ Server::Server(const int port) {
           }
           printf(";\n");
 
+          if(m.query != ""){
+            query = m.query;
+            std::cout<< " from server.cpp query = "<< query << "\n";
+          }
           printf("SENT: ");
           for (int i = 0; i <bytes_sent; i++) {
             printf("%d ", m.Header[i]);
           }
           printf(";\n");
           send(newsockfd, m.Header , bytes_sent, 0);
-          */
+      
         }
       }
     }

@@ -3,7 +3,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <sys/epoll.h>
-
+#include <string>
 #include "common.hh"
 
 #define BACKLOG 512
@@ -20,6 +20,7 @@ inline void error(char const *msg) {
 class DIBIBASE_PUBLIC Server {
 
 public:
+  std::string query;
   Server(int port);
   Server(const Server &) = delete;
   Server &operator=(const Server &) = delete;

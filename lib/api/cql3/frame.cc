@@ -39,16 +39,19 @@ public:
     length[1] = buffer[6];
     length[2] = buffer[7];
     length[3] = buffer[8];
+
     // if buffer contains something other than header (ie. body of msg)
     if (max_size > 9) {
       body = substr(buffer, 9, max_size - 9);
     }
+
   }
   //re-inventing the substr 
   char *substr(char *arr, int begin, int len) {
     char *res = new char[len + 1];
-    for (int i = 0; i < len; i++)
+    for (int i = 0; i < len; i++){
       res[i] = *(arr + begin + i);
+    }
     res[len] = 0;
     return res;
   }
@@ -90,7 +93,7 @@ private:
 public:
   ServerMsg(Frame f) { frame = f; }
   unsigned char Header[4096];
-
+  string query;
   int SupportedMessage(map<string, list<string>> supportedOptions,unsigned char *Header) {
     int index = 9;
     for (auto it = supportedOptions.begin(); it != supportedOptions.end();++it) {
@@ -178,14 +181,17 @@ public:
       break;
     }
     case QUERY:{
-      // system_schema queries handling
+      int escape_flag = 0;
+      
+      for (int i=0 ; i<frame.max_size-9; i++){
+        if(frame.body[i] == 0) escape_flag = 1;
+        else if (escape_flag==1 && frame.body[i] != 0) escape_flag =0;  
+        else if(escape_flag == 0)
+          query += frame.body[i];
+      
+      }
 
 
-
-
-      //general queries handling
-
-        //move to parser
 
       break;
     }
