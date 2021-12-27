@@ -11,6 +11,7 @@ dibibaselib_api_srcs = [dibibaselib_api_cql3_srcs]
 
 dibibaselib_util_srcs = [
   'util/logger.cc',
+  'util/buffer.cc',
 ]
 
 dibibaselib_srcs = [
