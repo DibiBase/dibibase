@@ -18,12 +18,8 @@ uint64_t MemoryBuffer::get_uint64() {
   if (is_overflow(size)) {
     throw "Buffer Overflow";
   }
-
+  memcpy(reinterpret_cast<unsigned char *>(&data), m_buf.get() + m_offset, size);
   advance(size);
-  for (int i = (int)m_offset - 1; i >= (int)(m_offset - size); --i) {
-    data <<= 8;
-    data |= (uint64_t)m_buf[i];
-  }
   return data;
 }
 
@@ -43,12 +39,8 @@ uint32_t MemoryBuffer::get_uint32() {
   if (is_overflow(size)) {
     throw "Buffer Overflow";
   }
-
+  memcpy(reinterpret_cast<unsigned char *>(&data), m_buf.get() + m_offset, size);
   advance(size);
-  for (int i = (int)m_offset - 1; i >= (int)(m_offset - size); --i) {
-    data <<= 8;
-    data |= (uint32_t)m_buf[i];
-  }
   return data;
 }
 
@@ -68,12 +60,8 @@ uint16_t MemoryBuffer::get_uint16() {
   if (is_overflow(size)) {
     throw "Buffer Overflow";
   }
-
+  memcpy(reinterpret_cast<unsigned char *>(&data), m_buf.get() + m_offset, size);
   advance(size);
-  for (int i = (int)m_offset - 1; i >= (int)(m_offset - size); --i) {
-    data <<= 8;
-    data |= (uint16_t)m_buf[i];
-  }
   return data;
 }
 
@@ -93,9 +81,8 @@ uint8_t MemoryBuffer::get_uint8() {
   if (is_overflow(size)) {
     throw "Buffer Overflow";
   }
-
+  memcpy(reinterpret_cast<unsigned char *>(&data), m_buf.get() + m_offset, size);
   advance(size);
-  data = (uint8_t)m_buf[(int)m_offset - size];
   return data;
 }
 
@@ -115,12 +102,8 @@ int64_t MemoryBuffer::get_int64() {
   if (is_overflow(size)) {
     throw "Buffer Overflow";
   }
-
+  memcpy(reinterpret_cast<unsigned char *>(&data), m_buf.get() + m_offset, size);
   advance(size);
-  for (int i = (int)m_offset - 1; i >= (int)(m_offset - size); --i) {
-    data <<= 8;
-    data |= (int64_t)m_buf[i];
-  }
   return data;
 }
 
@@ -140,12 +123,8 @@ int32_t MemoryBuffer::get_int32() {
   if (is_overflow(size)) {
     throw "Buffer Overflow";
   }
-
+  memcpy(reinterpret_cast<unsigned char *>(&data), m_buf.get() + m_offset, size);
   advance(size);
-  for (int i = (int)m_offset - 1; i >= (int)(m_offset - size); --i) {
-    data <<= 8;
-    data |= (int32_t)m_buf[i];
-  }
   return data;
 }
 
@@ -165,12 +144,8 @@ int16_t MemoryBuffer::get_int16() {
   if (is_overflow(size)) {
     throw "Buffer Overflow";
   }
-
+  memcpy(reinterpret_cast<unsigned char *>(&data), m_buf.get() + m_offset, size);
   advance(size);
-  for (int i = (int)m_offset - 1; i >= (int)(m_offset - size); --i) {
-    data <<= 8;
-    data |= (int16_t)m_buf[i];
-  }
   return data;
 }
 
@@ -190,9 +165,8 @@ int8_t MemoryBuffer::get_int8() {
   if (is_overflow(size)) {
     throw "Buffer Overflow";
   }
-
+  memcpy(reinterpret_cast<unsigned char *>(&data), m_buf.get() + m_offset, size);
   advance(size);
-  data = (int8_t)m_buf[(int)m_offset - size];
   return data;
 }
 
