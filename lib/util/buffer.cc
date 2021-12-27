@@ -18,7 +18,8 @@ uint64_t MemoryBuffer::get_uint64() {
   if (is_overflow(size)) {
     throw "Buffer Overflow";
   }
-  memcpy(reinterpret_cast<unsigned char *>(&data), m_buf.get() + m_offset, size);
+  memcpy(reinterpret_cast<unsigned char *>(&data), m_buf.get() + m_offset,
+         size);
   advance(size);
   return data;
 }
@@ -28,7 +29,8 @@ Buffer &MemoryBuffer::put_uint64(uint64_t data) {
   if (is_overflow(size)) {
     throw "Buffer Overflow";
   }
-  memcpy(m_buf.get() + m_offset, reinterpret_cast<unsigned char *>(&data), size);
+  memcpy(m_buf.get() + m_offset, reinterpret_cast<unsigned char *>(&data),
+         size);
   advance(size);
   return *this;
 }
@@ -39,7 +41,8 @@ uint32_t MemoryBuffer::get_uint32() {
   if (is_overflow(size)) {
     throw "Buffer Overflow";
   }
-  memcpy(reinterpret_cast<unsigned char *>(&data), m_buf.get() + m_offset, size);
+  memcpy(reinterpret_cast<unsigned char *>(&data), m_buf.get() + m_offset,
+         size);
   advance(size);
   return data;
 }
@@ -49,7 +52,8 @@ Buffer &MemoryBuffer::put_uint32(uint32_t data) {
   if (is_overflow(size)) {
     throw "Buffer Overflow";
   }
-  memcpy(m_buf.get() + m_offset, reinterpret_cast<unsigned char *>(&data), size);
+  memcpy(m_buf.get() + m_offset, reinterpret_cast<unsigned char *>(&data),
+         size);
   advance(size);
   return *this;
 }
@@ -60,7 +64,8 @@ uint16_t MemoryBuffer::get_uint16() {
   if (is_overflow(size)) {
     throw "Buffer Overflow";
   }
-  memcpy(reinterpret_cast<unsigned char *>(&data), m_buf.get() + m_offset, size);
+  memcpy(reinterpret_cast<unsigned char *>(&data), m_buf.get() + m_offset,
+         size);
   advance(size);
   return data;
 }
@@ -70,7 +75,8 @@ Buffer &MemoryBuffer::put_uint16(uint16_t data) {
   if (is_overflow(size)) {
     throw "Buffer Overflow";
   }
-  memcpy(m_buf.get() + m_offset, reinterpret_cast<unsigned char *>(&data), size);
+  memcpy(m_buf.get() + m_offset, reinterpret_cast<unsigned char *>(&data),
+         size);
   advance(size);
   return *this;
 }
@@ -81,7 +87,8 @@ uint8_t MemoryBuffer::get_uint8() {
   if (is_overflow(size)) {
     throw "Buffer Overflow";
   }
-  memcpy(reinterpret_cast<unsigned char *>(&data), m_buf.get() + m_offset, size);
+  memcpy(reinterpret_cast<unsigned char *>(&data), m_buf.get() + m_offset,
+         size);
   advance(size);
   return data;
 }
@@ -91,7 +98,8 @@ Buffer &MemoryBuffer::put_uint8(uint8_t data) {
   if (is_overflow(size)) {
     throw "Buffer Overflow";
   }
-  memcpy(m_buf.get() + m_offset, reinterpret_cast<unsigned char *>(&data), size);
+  memcpy(m_buf.get() + m_offset, reinterpret_cast<unsigned char *>(&data),
+         size);
   advance(size);
   return *this;
 }
@@ -102,7 +110,8 @@ int64_t MemoryBuffer::get_int64() {
   if (is_overflow(size)) {
     throw "Buffer Overflow";
   }
-  memcpy(reinterpret_cast<unsigned char *>(&data), m_buf.get() + m_offset, size);
+  memcpy(reinterpret_cast<unsigned char *>(&data), m_buf.get() + m_offset,
+         size);
   advance(size);
   return data;
 }
@@ -112,7 +121,8 @@ Buffer &MemoryBuffer::put_int64(int64_t data) {
   if (is_overflow(size)) {
     throw "Buffer Overflow";
   }
-  memcpy(m_buf.get() + m_offset, reinterpret_cast<unsigned char *>(&data), size);
+  memcpy(m_buf.get() + m_offset, reinterpret_cast<unsigned char *>(&data),
+         size);
   advance(size);
   return *this;
 }
@@ -123,7 +133,8 @@ int32_t MemoryBuffer::get_int32() {
   if (is_overflow(size)) {
     throw "Buffer Overflow";
   }
-  memcpy(reinterpret_cast<unsigned char *>(&data), m_buf.get() + m_offset, size);
+  memcpy(reinterpret_cast<unsigned char *>(&data), m_buf.get() + m_offset,
+         size);
   advance(size);
   return data;
 }
@@ -133,7 +144,8 @@ Buffer &MemoryBuffer::put_int32(int32_t data) {
   if (is_overflow(size)) {
     throw "Buffer Overflow";
   }
-  memcpy(m_buf.get() + m_offset, reinterpret_cast<unsigned char *>(&data), size);
+  memcpy(m_buf.get() + m_offset, reinterpret_cast<unsigned char *>(&data),
+         size);
   advance(size);
   return *this;
 }
@@ -144,7 +156,8 @@ int16_t MemoryBuffer::get_int16() {
   if (is_overflow(size)) {
     throw "Buffer Overflow";
   }
-  memcpy(reinterpret_cast<unsigned char *>(&data), m_buf.get() + m_offset, size);
+  memcpy(reinterpret_cast<unsigned char *>(&data), m_buf.get() + m_offset,
+         size);
   advance(size);
   return data;
 }
@@ -154,7 +167,8 @@ Buffer &MemoryBuffer::put_int16(int16_t data) {
   if (is_overflow(size)) {
     throw "Buffer Overflow";
   }
-  memcpy(m_buf.get() + m_offset, reinterpret_cast<unsigned char *>(&data), size);
+  memcpy(m_buf.get() + m_offset, reinterpret_cast<unsigned char *>(&data),
+         size);
   advance(size);
   return *this;
 }
@@ -165,7 +179,8 @@ int8_t MemoryBuffer::get_int8() {
   if (is_overflow(size)) {
     throw "Buffer Overflow";
   }
-  memcpy(reinterpret_cast<unsigned char *>(&data), m_buf.get() + m_offset, size);
+  memcpy(reinterpret_cast<unsigned char *>(&data), m_buf.get() + m_offset,
+         size);
   advance(size);
   return data;
 }
@@ -175,7 +190,8 @@ Buffer &MemoryBuffer::put_int8(int8_t data) {
   if (is_overflow(size)) {
     throw "Buffer Overflow";
   }
-  memcpy(m_buf.get() + m_offset, reinterpret_cast<unsigned char *>(&data), size);
+  memcpy(m_buf.get() + m_offset, reinterpret_cast<unsigned char *>(&data),
+         size);
   advance(size);
   return *this;
 }
@@ -194,10 +210,79 @@ std::string MemoryBuffer::get_string(int size) {
 
 Buffer &MemoryBuffer::put_string(std::string data) {
   int size = data.size();
-  if(is_overflow(size)) {
+  if (is_overflow(size)) {
     throw "Buffer Overflow";
   }
   memcpy(m_buf.get() + m_offset, data.c_str(), size);
+  advance(size);
+  return *this;
+}
+
+double MemoryBuffer::get_double() {
+  double data = 0;
+  constexpr auto size = sizeof(double);
+  if (is_overflow(size)) {
+    throw "Buffer Overflow";
+  }
+  memcpy(reinterpret_cast<unsigned char *>(&data), m_buf.get() + m_offset,
+         size);
+  advance(size);
+  return data;
+}
+
+Buffer &MemoryBuffer::put_double(double data) {
+  constexpr auto size = sizeof(double);
+  if (is_overflow(size)) {
+    throw "Buffer Overflow";
+  }
+  memcpy(m_buf.get() + m_offset, reinterpret_cast<unsigned char *>(&data),
+         size);
+  advance(size);
+  return *this;
+}
+
+float MemoryBuffer::get_float() {
+  float data = 0;
+  constexpr auto size = sizeof(float);
+  if (is_overflow(size)) {
+    throw "Buffer Overflow";
+  }
+  memcpy(reinterpret_cast<unsigned char *>(&data), m_buf.get() + m_offset,
+         size);
+  advance(size);
+  return data;
+}
+
+Buffer &MemoryBuffer::put_float(float data) {
+  constexpr auto size = sizeof(float);
+  if (is_overflow(size)) {
+    throw "Buffer Overflow";
+  }
+  memcpy(m_buf.get() + m_offset, reinterpret_cast<unsigned char *>(&data),
+         size);
+  advance(size);
+  return *this;
+}
+
+bool MemoryBuffer::get_boolean() {
+  bool data = 0;
+  constexpr auto size = sizeof(bool);
+  if (is_overflow(size)) {
+    throw "Buffer Overflow";
+  }
+  memcpy(reinterpret_cast<unsigned char *>(&data), m_buf.get() + m_offset,
+         size);
+  advance(size);
+  return data;
+}
+
+Buffer &MemoryBuffer::put_boolean(bool data) {
+  constexpr auto size = sizeof(bool);
+  if (is_overflow(size)) {
+    throw "Buffer Overflow";
+  }
+  memcpy(m_buf.get() + m_offset, reinterpret_cast<unsigned char *>(&data),
+         size);
   advance(size);
   return *this;
 }

@@ -43,6 +43,15 @@ public:
   virtual std::string get_string(int size) = 0;
   virtual Buffer &put_string(std::string) = 0;
 
+  virtual double get_double() = 0;
+  virtual Buffer &put_double(double) = 0;
+
+  virtual float get_float() = 0;
+  virtual Buffer &put_float(float) = 0;
+
+  virtual bool get_boolean() = 0;
+  virtual Buffer &put_boolean(bool) = 0;
+
   virtual size_t size() const = 0;
   virtual const std::unique_ptr<unsigned char[]> bytes() const = 0;
 };
@@ -80,6 +89,15 @@ public:
 
   std::string get_string(int size) override;
   Buffer &put_string(std::string) override;
+
+  double get_double() override;
+  Buffer &put_double(double) override;
+
+  float get_float() override;
+  Buffer &put_float(float) override;
+
+  bool get_boolean() override;
+  Buffer &put_boolean(bool data) override;
 
   virtual size_t size() const override { return m_size; };
   const std::unique_ptr<unsigned char[]> bytes() const override;
