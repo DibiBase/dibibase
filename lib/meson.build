@@ -33,6 +33,10 @@ dibibaselib_mem_srcs = [
   'mem/summary.cc',
 ]
 
+dibibaselib_dht_srcs = [
+  'dht/murmur_hash.cc',
+]
+
 dibibaselib_util_srcs = [
   'util/logger.cc',
   'util/buffer.cc',
@@ -45,6 +49,7 @@ dibibaselib_srcs = [
   dibibaselib_io_srcs,
   dibibaselib_mem_srcs,
   dibibaselib_util_srcs,
+  dibibaselib_dht_srcs,
 ]
 if meson.version().version_compare('>=0.56.0')
   project_source_root = meson.project_source_root()
