@@ -23,7 +23,14 @@ public:
   size_t size() const {
     return sizeof(std::uint32_t) + m_name.length() + m_type.size();
   }
-
+  void bytes(util::MemoryBuffer *buf) const {
+    // Util::MemoryBuffer buf(size());
+    buf->put_uint32(m_name.size());
+    buf->put_string(m_name);
+    m_type.bytes(buf);
+    
+    // return buf.bytes();
+  };
 private:
   std::string m_name;
   Data::Type m_type;
@@ -32,7 +39,17 @@ private:
 class DIBIBASE_PUBLIC Schema {
 
 public:
-  static Schema from(util::Buffer);
+  static Schema from(util::MemoryBuffer buf){
+    auto sz = buf.size();
+    while(sz--){
+      auto nameSize = buf.get_uint32();
+      auto name = buf.get_string();
+      auto typePtr = Data::Type.from(&buf);
+      auto type = *typePtr;
+      Field f(name , type);
+      m_fields.push_back(f);
+    }
+  }
 
   Schema &push_back(Field field) {
     m_fields.push_back(field);
@@ -53,9 +70,14 @@ public:
 
     return size;
   };
-  std::unique_ptr<char[]> bytes() const {
-    std::unique_ptr<char[]> buf = std::unique_ptr<char[]>(new char[size()]);
-    // TODO: fill the buffer
+  std::unique_ptr<unsigned char[]> bytes() const {
+      Util::MemoryBuffer buf(size());
+
+      for(auto &field : m_fields){
+          field.bytes(&buf);
+      }
+      return buf.bytes();
+    
   };
 
 private:
