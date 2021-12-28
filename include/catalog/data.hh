@@ -31,18 +31,27 @@ public:
       INT,      /**< 32-bit signed int */
       SMALLINT, /**< 16-bit signed int */
       TINYINT,  /**< 8-bit signed int */
+      BLOB,     /**<Binary large object*/
     };
 
-    Type(Id, size_t);
+    Type(Id id, size_t size) : m_id(id), m_size(size) {}
 
-    static Type from(util::Buffer);
+    static std::unique_ptr<Type> from(util::Buffer *buf) {
+      uint8_t id = buf->get_int8();
+      uint32_t size = buf->get_int32();
+      return std::make_unique<Type>(static_cast<Id>(id), size);
+    }
+    
+    // To be modified.
+    static size_t get_size_from_id(Id) { return 0; }
 
-    static size_t get_size_from_id(Id);
+    Id id() const { return m_id; }
+    size_t size() const { return m_size; }
 
-    Id id() const;
-    size_t size() const;
-
-    std::unique_ptr<char[]> bytes() const;
+    void bytes(util::Buffer *buf) {
+      buf->put_int8(m_id);
+      buf->put_int32(m_size);
+    }
 
   private:
     Id m_id;
@@ -51,14 +60,18 @@ public:
 
 public:
   explicit Data(Type type) : m_type(type) {}
-  virtual ~Data();
+  virtual ~Data() {}
 
+<<<<<<< HEAD
   template <typename T> static std::unique_ptr<Data> from(T, Type);
   template <typename T> static std::unique_ptr<Data> from(T);
+=======
+  static std::unique_ptr<Data> from(util::Buffer *, Type);
+>>>>>>> 8af29e48fa22dffe10b47c30a4cd2ccf615cc3d2
 
-  Type type() const;
+  Type type() const { return m_type; }
 
-  virtual std::unique_ptr<char[]> bytes() const = 0;
+  virtual void bytes(util::Buffer *) = 0;
 
 private:
   Type m_type;
@@ -67,13 +80,12 @@ private:
 class DIBIBASE_PUBLIC ASCIIData : public Data {
 
 public:
-  explicit ASCIIData(std::string data)
-      : Data(Type(Type::ASCII, data.size())), m_data(data) {}
+  explicit ASCIIData(std::string data);
 
   std::string data() const { return m_data; }
   void set_data(std::string data) { m_data = data; }
 
-  std::unique_ptr<char[]> bytes() const override;
+  void bytes(util::Buffer *) override;
 
 private:
   std::string m_data;
@@ -82,16 +94,114 @@ private:
 class DIBIBASE_PUBLIC BigIntData : public Data {
 
 public:
-  explicit BigIntData(uint64_t data)
-      : Data(Type(Type::BIGINT, sizeof(data))), m_data(data) {}
+  explicit BigIntData(int64_t data);
 
-  uint64_t data() const { return m_data; }
-  void set_data(uint64_t data) { m_data = data; }
+  int64_t data() const { return m_data; }
+  void set_data(int64_t data) { m_data = data; }
 
-  std::unique_ptr<char[]> bytes() const override;
+  void bytes(util::Buffer *) override;
 
 private:
-  uint64_t m_data;
+  int64_t m_data;
+};
+
+class DIBIBASE_PUBLIC BooleanData : public Data {
+
+public:
+  explicit BooleanData(bool data);
+
+  bool data() const { return m_data; }
+  void set_data(bool data) { m_data = data; }
+
+  void bytes(util::Buffer *) override;
+
+private:
+  bool m_data;
+};
+
+class DIBIBASE_PUBLIC DoubleData : public Data {
+
+public:
+  explicit DoubleData(double data);
+
+  double data() const { return m_data; }
+  void set_data(double data) { m_data = data; }
+
+  void bytes(util::Buffer *) override;
+
+private:
+  double m_data;
+};
+
+class DIBIBASE_PUBLIC FloatData : public Data {
+
+public:
+  explicit FloatData(float data);
+
+  float data() const { return m_data; }
+  void set_data(float data) { m_data = data; }
+
+  void bytes(util::Buffer *) override;
+
+private:
+  float m_data;
+};
+
+class DIBIBASE_PUBLIC IntData : public Data {
+
+public:
+  explicit IntData(int32_t data);
+
+  int32_t data() const { return m_data; }
+  void set_data(int32_t data) { m_data = data; }
+
+  void bytes(util::Buffer *) override;
+
+private:
+  int32_t m_data;
+};
+
+class DIBIBASE_PUBLIC SmallIntData : public Data {
+
+public:
+  explicit SmallIntData(int16_t data);
+
+  int16_t data() const { return m_data; }
+  void set_data(int16_t data) { m_data = data; }
+
+  void bytes(util::Buffer *) override;
+
+private:
+  int16_t m_data;
+};
+
+class DIBIBASE_PUBLIC TinyIntData : public Data {
+
+public:
+  explicit TinyIntData(int8_t data);
+
+  int8_t data() const { return m_data; }
+  void set_data(int8_t data) { m_data = data; }
+
+  void bytes(util::Buffer *) override;
+
+private:
+  int8_t m_data;
+};
+
+class DIBIBASE_PUBLIC BlobData : public Data {
+
+public:
+  explicit BlobData(std::unique_ptr<unsigned char[]>, size_t);
+
+  std::unique_ptr<unsigned char[]> data() const;
+  void set_data(unsigned char* , size_t);
+
+  void bytes(util::Buffer *) override;
+
+private:
+  size_t m_size;
+  std::unique_ptr<unsigned char[]> m_data;
 };
 
 } // namespace dibibase::catalog

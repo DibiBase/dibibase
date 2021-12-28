@@ -287,6 +287,26 @@ Buffer &MemoryBuffer::put_boolean(bool data) {
   return *this;
 }
 
+std::unique_ptr<unsigned char[]> MemoryBuffer::get_blob(int size) {
+  if (is_overflow(size)) {
+    throw "Buffer Overflow";
+  }
+  std::unique_ptr<unsigned char[]> data =
+      std::make_unique<unsigned char[]>(size);
+  memcpy(data.get(), m_buf.get() + m_offset, size);
+  advance(size);
+  return data;
+}
+
+Buffer &MemoryBuffer::put_blob(unsigned char *data, int size) {
+  if (is_overflow(size)) {
+    throw "Buffer Overflow";
+  }
+  memcpy(m_buf.get() + m_offset, data, size);
+  advance(size);
+  return *this;
+}
+
 const std::unique_ptr<unsigned char[]> MemoryBuffer::bytes() const {
   std::unique_ptr<unsigned char[]> buf =
       std::make_unique<unsigned char[]>(m_size);
