@@ -6,10 +6,11 @@
 #include <vector>
 
 #include "catalog/data.hh"
-#include "catalog/record.hh"
 #include "common.hh"
 #include "util/buffer.hh"
-
+namespace dibibase::catalog {
+class DIBIBASE_PUBLIC Record;
+}
 namespace dibibase::catalog {
 
 class DIBIBASE_PUBLIC Field {
