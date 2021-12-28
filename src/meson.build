@@ -39,11 +39,11 @@ grpc_gen = generator(protoc,
     '@INPUT@'])
 
 src_pb = protoc_gen.process(
-  project_source_root + '/protos/helloworld.proto',
+  project_source_root + '/protos/streamer.proto',
   preserve_path_from : project_source_root + '/protos')
 
 src_grpc = grpc_gen.process(
-  project_source_root + '/protos/helloworld.proto',
+  project_source_root + '/protos/streamer.proto',
   preserve_path_from : project_source_root + '/protos')
 
 dep_grpc = [
@@ -92,27 +92,6 @@ idep_grammar = declare_dependency(
   link_with : [libgrammar],
 )
 
-executable('greeter_client',
-  sources: ['greeter_client.cc', src_pb, src_grpc],
-  include_directories: inc,
-  dependencies: dep_grpc,
-  install: true,
-)
-
-executable('greeter_server',
-  sources: ['greeter_server.cc', src_pb, src_grpc],
-  include_directories: inc,
-  dependencies: dep_grpc,
-  install: true,
-)
-
-executable('logger',
-  sources: 'logger.cc',
-  include_directories: inc,
-  link_with : dibibaselib,
-  install: false,
-)
-
 executable('lang',
   sources: ['lang.cc'],
   include_directories : [inc, '/usr/include/antlr4-runtime'],
@@ -121,9 +100,16 @@ executable('lang',
   install : true,
 )
 
+main_srcs = [
+  'main.cc',
+  src_pb,
+  src_grpc,
+]
+
 executable('dibibase',
-  sources: 'main.cc',
+  sources: main_srcs,
   include_directories : inc,
   link_with : dibibaselib,
+  dependencies: dep_grpc,
   install : true,
 )

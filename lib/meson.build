@@ -1,7 +1,6 @@
 dibibaselib_api_cql3_srcs = [
   'api/cql3/server.cc',
 ]
-dibibaselib_api_srcs = [dibibaselib_api_cql3_srcs]
 
 dibibaselib_catalog_srcs = [
   'catalog/data.cc',
@@ -23,6 +22,10 @@ dibibaselib_io_srcs = [
 
 dibibaselib_mem_srcs = [
   'mem/summary.cc',
+]
+
+dibibaselib_api_srcs = [
+  dibibaselib_api_cql3_srcs,
 ]
 
 dibibaselib_dht_srcs = [

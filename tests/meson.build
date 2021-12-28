@@ -7,6 +7,12 @@ test_api_cql3_server = executable('api_cql3_server_test',
   link_with : dibibaselib)
 test('cql3/server', test_api_cql3_server, suite: 'api')
 
+test_util_logger = executable('util_logger_test',
+  sources : 'util/logger_test.cc',
+  include_directories : inc,
+  link_with : dibibaselib)
+test('util/logger', test_util_logger, suite: 'util')
+
 gtest_srcs = [
   'gtest_test.cc',
   'dht/murmur_hash_test.cc',

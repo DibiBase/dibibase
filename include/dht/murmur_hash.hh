@@ -1,8 +1,9 @@
 #pragma once
 
-#include "util/buffer.hh"
 #include <cstdint>
 #include <memory>
+
+#include "common.hh"
 
 namespace dibibase::dht {
 
@@ -15,9 +16,8 @@ public:
   static uint64_t hash2_64(uint8_t key[], uint32_t offset, uint32_t length,
                            uint64_t seed);
 
-  static std::unique_ptr<uint64_t[]> hash3_x64_128(
-    uint8_t key[], uint32_t offset, uint32_t length, uint64_t seed
-  );
+  static std::unique_ptr<uint64_t[]>
+  hash3_x64_128(uint8_t key[], uint32_t offset, uint32_t length, uint64_t seed);
 
   static std::unique_ptr<uint64_t[]> inv_hash3_x64_128(uint64_t result[]);
 
