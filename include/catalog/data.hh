@@ -31,6 +31,7 @@ public:
       INT,      /**< 32-bit signed int */
       SMALLINT, /**< 16-bit signed int */
       TINYINT,  /**< 8-bit signed int */
+      BLOB,     /**<Binary large object*/
     };
 
     Type(Id id, size_t size) : m_id(id), m_size(size) {}
@@ -181,6 +182,21 @@ public:
 
 private:
   int8_t m_data;
+};
+
+class DIBIBASE_PUBLIC BlobData : public Data {
+
+public:
+  explicit BlobData(std::unique_ptr<unsigned char[]>, size_t);
+
+  std::unique_ptr<unsigned char[]> data() const;
+  void set_data(unsigned char* , size_t);
+
+  void bytes(util::Buffer *) override;
+
+private:
+  size_t m_size;
+  std::unique_ptr<unsigned char[]> m_data;
 };
 
 } // namespace dibibase::catalog

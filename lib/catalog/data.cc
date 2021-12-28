@@ -40,6 +40,10 @@ std::unique_ptr<Data> Data::from(util::Buffer *buf, Type type) {
     int8_t data = buf->get_int8();
     return std::make_unique<TinyIntData>(data);
   }
+  case Type::BLOB: {
+    std::unique_ptr<unsigned char[]> data = buf->get_blob(type.size());
+    return std::make_unique<BlobData>(std::move(data), type.size());
+  }
   }
 
   return nullptr;
@@ -90,3 +94,28 @@ TinyIntData::TinyIntData(int8_t data)
     : Data(Type(Type::TINYINT, sizeof(data))), m_data(data) {}
 
 void TinyIntData::bytes(util::Buffer* buf) { buf->put_int8(m_data); }
+
+BlobData::BlobData(std::unique_ptr<unsigned char[]> data, size_t size)
+: Data(Type(Type::BLOB, size)), m_size(size),  m_data(std::move(data)) {}
+
+std::unique_ptr<unsigned char[]> BlobData::data() const {
+  std::unique_ptr<unsigned char[]> data =
+      std::make_unique<unsigned char[]>(m_size);
+
+  // Copying data content.
+  for (int i = 0; i < (int)m_size; ++i) {
+    data[i] = m_data[i];
+  }
+  return data;
+}
+
+void BlobData::set_data(unsigned char* data, size_t size) {
+  if(size > m_size) {
+    throw "error";
+  }
+  memcpy(m_data.get(), data, size);
+}
+
+void BlobData::bytes(util::Buffer* buf) { 
+  buf->put_blob(m_data.get(), m_size);
+}
