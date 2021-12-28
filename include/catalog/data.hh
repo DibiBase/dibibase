@@ -62,12 +62,7 @@ public:
   explicit Data(Type type) : m_type(type) {}
   virtual ~Data() {}
 
-<<<<<<< HEAD
-  template <typename T> static std::unique_ptr<Data> from(T, Type);
-  template <typename T> static std::unique_ptr<Data> from(T);
-=======
   static std::unique_ptr<Data> from(util::Buffer *, Type);
->>>>>>> 8af29e48fa22dffe10b47c30a4cd2ccf615cc3d2
 
   Type type() const { return m_type; }
 
