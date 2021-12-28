@@ -33,6 +33,10 @@ dibibaselib_mem_srcs = [
   'mem/summary.cc',
 ]
 
+dibibaselib_api_srcs = [
+  dibibaselib_api_cql3_srcs,
+]
+
 dibibaselib_dht_srcs = [
   'dht/murmur_hash.cc',
 ]
