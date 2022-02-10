@@ -53,7 +53,8 @@ Server::Server(const int port) {
   if (epoll_ctl(epollfd, EPOLL_CTL_ADD, sock_listen_fd, &ev) == -1) {
     error("Error adding new listeding socket to epoll..\n");
   }
-
+            int count = 0;
+            int flag =0;
   while (1) {
     new_events = epoll_wait(epollfd, events, MAX_EVENTS, -1);
 
@@ -81,29 +82,45 @@ Server::Server(const int port) {
           epoll_ctl(epollfd, EPOLL_CTL_DEL, newsockfd, NULL);
           shutdown(newsockfd, SHUT_RDWR);
         } else {
+          int no_of_queries = 0;
+          for (int i=0 ; i< bytes_received; i++){
+            if(buffer[i] == buffer[0]) no_of_queries++;
+          }
+          //printf("no_of_Queries : %d \n",no_of_queries);
+          for (int mq=0 ; mq< no_of_queries;mq++){
           Frame f(buffer, bytes_received);
           f.parse();
+
           ServerMsg m(f);
-          int bytes_sent = m.CreateResponse();
 
-
+          std::string columns = "system_schema.columns";
+          int bytes_sent = m.CreateResponse(mq);
+          /*
           printf("Received: ");
           for (int i = 0; i < bytes_received; i++) {
             printf("%d ", buffer[i]);
           }
           printf(";\n");
-
+          */
           if(m.query != ""){
             query = m.query;
             std::cout<< " from server.cpp query = "<< query << "\n";
           }
+          /*
           printf("SENT: ");
           for (int i = 0; i <bytes_sent; i++) {
             printf("%d ", m.Header[i]);
           }
           printf(";\n");
+          */
           send(newsockfd, m.Header , bytes_sent, 0);
-      
+
+          if ((strstr(query.c_str(),columns.c_str() ) ) && count == 0){
+            count ++;
+            flag = 1;
+          }
+          else if (flag==1) count ++;
+          }//no-of_q loop :)
         }
       }
     }

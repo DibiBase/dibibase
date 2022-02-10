@@ -21,6 +21,7 @@ class DIBIBASE_PUBLIC Server {
 
 public:
   std::string query;
+  std::string pquery;
   Server(int port);
   Server(const Server &) = delete;
   Server &operator=(const Server &) = delete;
