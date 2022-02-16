@@ -84,7 +84,7 @@ Server::Server(const int port) {
         } else {
           int no_of_queries = 0;
           for (int i=0 ; i< bytes_received; i++){
-            if(buffer[i] == buffer[0]) no_of_queries++;
+            if(buffer[i] == buffer[0] && buffer[i+1] == buffer[1]) no_of_queries++;
           }
           //printf("no_of_Queries : %d \n",no_of_queries);
           for (int mq=0 ; mq< no_of_queries;mq++){
@@ -106,13 +106,13 @@ Server::Server(const int port) {
             query = m.query;
             std::cout<< " from server.cpp query = "<< query << "\n";
           }
-          /*
+          
           printf("SENT: ");
           for (int i = 0; i <bytes_sent; i++) {
             printf("%d ", m.Header[i]);
           }
           printf(";\n");
-          */
+          
           send(newsockfd, m.Header , bytes_sent, 0);
 
           if ((strstr(query.c_str(),columns.c_str() ) ) && count == 0){
