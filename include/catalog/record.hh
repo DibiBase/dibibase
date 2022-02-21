@@ -14,13 +14,13 @@ namespace dibibase::catalog {
 
 class DIBIBASE_PUBLIC Record {
 public:
-  Record(std::vector<Data> values) : m_values(values){};
+  Record(std::vector<std::unique_ptr<catalog::Data>> values) : m_values(values){};
 
   static std::unique_ptr<Record> from(util::Buffer *, Schema);
 
-  const std::vector<Data> values() const { return m_values; }
+  const std::vector<std::unique_ptr<catalog::Data>> values() const { return m_values; }
 
-  const Data &operator[](std::vector<Data>::size_type idx) const {
+  const std::unique_ptr<catalog::Data> &operator[](std::vector<std::unique_ptr<catalog::Data>>::size_type idx) const {
     return m_values[idx];
   }
 
@@ -34,13 +34,11 @@ public:
     lhs += rhs;
     return lhs;
   }
-
-  size_t size() const;
   
   void bytes(util::Buffer *) const;
 
 private:
-  std::vector<Data> m_values;
+  std::vector<std::unique_ptr<catalog::Data>> m_values;
 };
 
 } // namespace dibibase::catalog

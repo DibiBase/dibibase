@@ -17,19 +17,18 @@ public:
 
   static std::unique_ptr<Summary> from(util::Buffer *);
 
-  Summary &push_back(catalog::Data key) {
+  void push_back(catalog::Data* key) {
     m_sort_keys.push_back(key);
-    return *this;
   }
 
   const catalog::Data &
-  operator[](std::vector<catalog::Data>::size_type index) {
-    return m_sort_keys[index];
+  operator[](std::vector<catalog::Data*>::size_type index) {
+    return *m_sort_keys[index];
   }
 
   // Performing binary search on record key to find the page number which
   // contains this key.
-  off_t find_index_page(catalog::Data);
+  off_t find_index_page(catalog::Data*);
 
   size_t size() const;
 
@@ -38,6 +37,6 @@ public:
 private:
   // Storing summary of clustering keys within an sstable in which
   // the index represents the page number where this key is located.
-  std::vector<catalog::Data> m_sort_keys;
+  std::vector<catalog::Data*> m_sort_keys;
 };
 } // namespace dibibase::mem

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -19,7 +20,7 @@ class DIBIBASE_PUBLIC Field {
 
 public:
   Field(std::string name, Data::Type type) : m_name(name), m_type(type){};
-  
+
   static std::unique_ptr<Field> from(util::Buffer *);
 
   const std::string &name() const { return m_name; }
@@ -54,14 +55,19 @@ public:
   const Field &operator[](std::vector<Field>::size_type index) const {
     return m_fields[index];
   }
-
+  
   const Field get_partition_key() { return m_fields[m_partition_index]; }
   const Field get_sort_key() { return m_fields[m_partition_index]; }
-  
+
+  size_t get_sort_index() { return m_sort_index; }
+  size_t get_partition_index() { return m_partition_index; }
+
   // Checking the given record aganist the schema.
   bool verify(Record record);
 
-  size_t size() const;
+  size_t record_size() const;
+
+  size_t schema_size() const;
 
   void bytes(util::Buffer *) const;
 
