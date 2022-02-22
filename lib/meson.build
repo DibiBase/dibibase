@@ -14,11 +14,7 @@ dibibaselib_catalog_srcs = [
 ]
 
 dibibaselib_db_srcs = [
-  'db/table_manager.cc',
-]
-
-dibibaselib_io_srcs = [
-  'io/table_builder.cc',
+  'db/index_page.cc',
 ]
 
 dibibaselib_util_srcs = [
@@ -32,7 +28,6 @@ dibibaselib_srcs = [
   dibibaselib_util_srcs,
   dibibaselib_catalog_srcs,
   dibibaselib_db_srcs,
-  dibibaselib_io_srcs,
 ]
 
 dibibaselib = shared_library('dibibase',

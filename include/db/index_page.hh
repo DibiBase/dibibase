@@ -18,27 +18,33 @@ namespace dibibase::db {
  */
 class DIBIBASE_PUBLIC IndexPage {
 public:
-  IndexPage() : m_size(4096) {}
+  IndexPage() : m_size(4096), m_current_size(0) {}
 
-  static std::unique_ptr<IndexPage> from(util::Buffer *);
+  static std::unique_ptr<IndexPage> from(util::Buffer *,
+                                         catalog::Data::Type data_type);
 
   // Before adding a new key in the map check that the
   // page has enough space to store (key, offset) in bytes.
-  bool add_sort_key(catalog::Data*, off_t);
+  bool add_sort_key(catalog::Data *, off_t);
 
-  // Performing binary search on record keys to find the exact offset within
-  // the data file.
-  off_t find_key_offset(catalog::Data*);
+  // find the exact offset within the data file.
+  off_t find_key_offset(catalog::Data *);
+
+  std::map<catalog::Data *, off_t> get_index_page() { return m_sort_keys; }
+
+  uint32_t get_current_size() { return m_current_size; }
 
   void clear() { m_sort_keys.clear(); }
 
-  void bytes(util::Buffer *) const;
+  void bytes(util::Buffer *);
 
 private:
-  uint16_t m_size;
+  uint64_t m_size;
+
+  uint64_t m_current_size;
 
   // Mapping each sort key to its offset in the data file.
-  std::map<catalog::Data*, off_t> m_sort_keys;
+  std::map<catalog::Data *, off_t> m_sort_keys;
 
   // TO DO: add padding so that the whole size of a page reach 4096 byte.
 };
