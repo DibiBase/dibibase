@@ -166,56 +166,7 @@ void Summary::bytes(util::Buffer *buff) {
   buff->put_int8(m_sort_keys.size());
 
   for (auto key : m_sort_keys) {
-    // Extracting data type, and getting its id.
-    Data::Type::Id key_id = key->type().id();
-
-    // Filling buffer with catalog::Data bytes.
-    // TO DO: Find a better way. if dynamic_cast fails, a memory leak occurs.
-    switch (key_id) {
-    case Data::Type::ASCII: {
-      ASCIIData *data = dynamic_cast<ASCIIData *>(key);
-      data->bytes(buff);
-      break;
-    }
-    case Data::Type::BIGINT: {
-      BigIntData *data = dynamic_cast<BigIntData *>(key);
-      data->bytes(buff);
-      break;
-    }
-    case Data::Type::BOOLEAN: {
-      BooleanData *data = dynamic_cast<BooleanData *>(key);
-      data->bytes(buff);
-      break;
-    }
-    case Data::Type::DOUBLE: {
-      DoubleData *data = dynamic_cast<DoubleData *>(key);
-      data->bytes(buff);
-      break;
-    }
-    case Data::Type::FLOAT: {
-      FloatData *data = dynamic_cast<FloatData *>(key);
-      data->bytes(buff);
-      break;
-    }
-    case Data::Type::INT: {
-      IntData *data = dynamic_cast<IntData *>(key);
-      data->bytes(buff);
-      break;
-    }
-    case Data::Type::SMALLINT: {
-      SmallIntData *data = dynamic_cast<SmallIntData *>(key);
-      data->bytes(buff);
-      break;
-    }
-    case Data::Type::TINYINT: {
-      TinyIntData *data = dynamic_cast<TinyIntData *>(key);
-      data->bytes(buff);
-      break;
-    }
-    case Data::Type::BLOB: {
-      BlobData *data = dynamic_cast<BlobData *>(key);
-      data->bytes(buff);
-    }
-    }
+    // Filling buffer with data in bytes.
+    key->bytes(buff);
   }
 }
