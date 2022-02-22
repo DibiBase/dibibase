@@ -17,6 +17,10 @@ dibibaselib_db_srcs = [
   'db/index_page.cc',
 ]
 
+dibibaselib_mem_srcs = [
+  'mem/summary.cc',
+]
+
 dibibaselib_util_srcs = [
   'util/logger.cc',
   'util/buffer.cc',
@@ -28,6 +32,7 @@ dibibaselib_srcs = [
   dibibaselib_util_srcs,
   dibibaselib_catalog_srcs,
   dibibaselib_db_srcs,
+  dibibaselib_mem_srcs,
 ]
 
 dibibaselib = shared_library('dibibase',

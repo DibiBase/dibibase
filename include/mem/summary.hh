@@ -15,28 +15,23 @@ class DIBIBASE_PUBLIC Summary {
 public:
   Summary() {}
 
-  static std::unique_ptr<Summary> from(util::Buffer *);
+  static std::unique_ptr<Summary> from(util::Buffer *, catalog::Data::Type);
 
-  void push_back(catalog::Data* key) {
-    m_sort_keys.push_back(key);
-  }
+  void push_back(catalog::Data *key) { m_sort_keys.push_back(key); }
 
-  const catalog::Data &
-  operator[](std::vector<catalog::Data*>::size_type index) {
-    return *m_sort_keys[index];
-  }
+  int8_t size() { return m_sort_keys.size(); }
+
+  std::vector<catalog::Data *> get_summary() { return m_sort_keys; }
 
   // Performing binary search on record key to find the page number which
   // contains this key.
-  off_t find_index_page(catalog::Data*);
+  off_t find_index_page(catalog::Data *);
 
-  size_t size() const;
-
-  void bytes(util::Buffer *) const;
+  void bytes(util::Buffer *);
 
 private:
   // Storing summary of clustering keys within an sstable in which
   // the index represents the page number where this key is located.
-  std::vector<catalog::Data*> m_sort_keys;
+  std::vector<catalog::Data *> m_sort_keys;
 };
 } // namespace dibibase::mem
