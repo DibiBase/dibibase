@@ -7,47 +7,46 @@
 using namespace dibibase::db;
 using namespace dibibase::catalog;
 
-std::unique_ptr<IndexPage> IndexPage::from(util::Buffer *buff,
-                                           Data::Type data_type) {
-  // Creating an IndexPage from the buffer.
-  std::unique_ptr<IndexPage> index_page = std::make_unique<IndexPage>();
+std::unique_ptr<IndexPage> IndexPage::from(util::Buffer *buf) {
+  auto sort_keys_length = buf->get_uint8();
+  auto read_type = catalog::Data::Type::from(buf);
+  auto type = catalog::Data::Type(read_type->id(), read_type->length());
 
-  uint64_t actual_page_size = buff->get_int64();
-
-  // TODO: some extra bytes are extracted which isn't part of the actual data.
-  while (buff->current_offset() < actual_page_size) {
-    std::unique_ptr<Data> data = Data::from(buff, data_type);
-    off_t offset = buff->get_int32();
-
-    index_page->add_sort_key(data.release(), offset);
+  std::map<std::unique_ptr<catalog::Data>, off_t> sort_keys;
+  while(sort_keys_length > 0) {
+    auto key = catalog::Data::from(buf, type);
+    auto offset = buf->get_uint64();
+    sort_keys[std::move(key)] = offset;
   }
 
-  return index_page;
+  return std::make_unique<IndexPage>(sort_keys, type);
+}
+
+off_t IndexPage::find_key_offset(catalog::Data *key) {
+  return m_sort_keys[std::unique_ptr<catalog::Data>(key)];
 }
 
 bool IndexPage::add_sort_key(catalog::Data *key, off_t offset) {
-  // Checking if the size of (key + offset) exceeds the remaining size of the
-  // index page.
-  size_t key_size = key->type().size();
-  if (key_size + sizeof(offset) > m_size - m_current_size) {
+  if (size() + m_type.length() + sizeof(offset) > 4096)
     return false;
-  }
 
-  m_current_size += (key_size + sizeof(offset));
-  m_sort_keys[key] = offset;
+  m_sort_keys[std::unique_ptr<catalog::Data>(key)] = offset;
   return true;
 }
 
-off_t IndexPage::find_key_offset(catalog::Data *d) { return m_sort_keys[d]; }
+size_t IndexPage::size() const {
+  return m_type.size() + m_sort_keys.size() * (m_type.length() + sizeof(off_t));
+}
 
-void IndexPage::bytes(util::Buffer *buff) {
-  // Storing the actual size of data.
-  buff->put_int64(m_current_size);
+void IndexPage::bytes(util::Buffer *buf) {
+  // Filling buffer with total number of keys.
+  buf->put_uint8(m_sort_keys.size());
+  m_type.bytes(buf);
 
-  for (auto key : m_sort_keys) {
-    // Filling buffer with data in bytes.
-    key.first->bytes(buff);
-    // Filling buffer with offset bytes.
-    buff->put_int32(key.second);
+  for (const auto &key : m_sort_keys) {
+    // Filling buffer with key in bytes.
+    key.first->bytes(buf);
+    // Filling buffer with offset in bytes.
+    buf->put_uint64(key.second);
   }
 }
