@@ -21,7 +21,7 @@ std::unique_ptr<Summary> Summary::from(util::Buffer *buf) {
     values.push_back(std::move(field));
   }
 
-  return std::make_unique<Summary>(values, type);
+  return std::make_unique<Summary>(std::move(values), type);
 }
 
 uint8_t Summary::find_page_number(catalog::Data *key) {

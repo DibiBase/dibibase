@@ -15,7 +15,7 @@ namespace dibibase::catalog {
 class DIBIBASE_PUBLIC Record {
 public:
   Record(std::vector<std::unique_ptr<catalog::Data>> values)
-      : m_values(values){};
+      : m_values(std::move(values)){};
 
   static std::unique_ptr<Record> from(util::Buffer *, Schema);
 

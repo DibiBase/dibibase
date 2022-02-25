@@ -11,15 +11,18 @@ dibibaselib_api_srcs = [dibibaselib_api_cql3_srcs]
 
 dibibaselib_catalog_srcs = [
   'catalog/data.cc',
+  'catalog/record.cc',
+  'catalog/schema.cc',
+  'catalog/table.cc',
 ]
 
-#dibibaselib_db_srcs = [
-  #'db/index_page.cc',
-#]
+dibibaselib_db_srcs = [
+  'db/index_page.cc',
+]
 
-#dibibaselib_mem_srcs = [
-  #'mem/summary.cc',
-#]
+dibibaselib_mem_srcs = [
+  'mem/summary.cc',
+]
 
 dibibaselib_util_srcs = [
   'util/logger.cc',
@@ -31,8 +34,8 @@ dibibaselib_srcs = [
   # dibibaselib_lang_srcs,
   dibibaselib_util_srcs,
   dibibaselib_catalog_srcs,
-  #dibibaselib_db_srcs,
-  #dibibaselib_mem_srcs,
+  dibibaselib_db_srcs,
+  dibibaselib_mem_srcs,
 ]
 
 dibibaselib = shared_library('dibibase',

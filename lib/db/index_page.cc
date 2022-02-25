@@ -19,7 +19,7 @@ std::unique_ptr<IndexPage> IndexPage::from(util::Buffer *buf) {
     sort_keys[std::move(key)] = offset;
   }
 
-  return std::make_unique<IndexPage>(sort_keys, type);
+  return std::make_unique<IndexPage>(std::move(sort_keys), type);
 }
 
 off_t IndexPage::find_key_offset(catalog::Data *key) {

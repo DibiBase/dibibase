@@ -14,7 +14,7 @@ std::unique_ptr<Record> Record::from(util::Buffer *buf, Schema schema) {
     values.push_back(std::move(field));
   }
 
-  return std::make_unique<Record>(values);
+  return std::make_unique<Record>(std::move(values));
 }
 
 void Record::bytes(util::Buffer *buf) {
