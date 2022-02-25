@@ -13,22 +13,22 @@ namespace dibibase::catalog {
 class DIBIBASE_PUBLIC Table {
 
 public:
-  Table(std::string name, catalog::Schema schema, size_t sstable_id)
-      : m_name(name), m_schema(schema), m_last_sstable_id(sstable_id) {}
+  Table(std::string name, catalog::Schema schema, size_t last_sstable_id)
+      : m_name(name), m_schema(schema), m_last_sstable_id(last_sstable_id) {}
 
   static std::unique_ptr<Table> from(util::Buffer *);
 
-  std::string get_table_name() { return m_name; }
+  const std::string &name() { return m_name; }
+  const catalog::Schema &schema() { return m_schema; }
+  size_t last_sstable_id() { return m_last_sstable_id; }
 
-  catalog::Schema get_table_schema() { return m_schema; }
-
-  size_t get_last_sstable_id() { return m_last_sstable_id; }
-
-  void bytes(util::Buffer *) const;
+  size_t size() const;
+  void bytes(util::Buffer *);
 
 private:
   std::string m_name;
   catalog::Schema m_schema;
   size_t m_last_sstable_id;
 };
+
 } // namespace dibibase::catalog

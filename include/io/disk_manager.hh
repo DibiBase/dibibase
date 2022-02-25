@@ -1,6 +1,5 @@
 #pragma once
 
-#include "common.hh"
 #include <cstdint>
 #include <map>
 #include <memory>
@@ -10,23 +9,28 @@
 
 #include "catalog/record.hh"
 #include "catalog/schema.hh"
+#include "common.hh"
 #include "db/index_page.hh"
 #include "mem/summary.hh"
 
 namespace dibibase::io {
+
 class DIBIBASE_PUBLIC DiskManager {
+
 public:
-  static DiskManager *get_instance() {
-    if (!m_manager)
-      m_manager = new DiskManager();
-    return m_manager;
+  static DiskManager &get_instance() {
+    static DiskManager instance;
+    return instance;
   }
+
+  DiskManager(DiskManager const &) = delete;
+  void operator=(DiskManager const &) = delete;
 
   // Loading database_path/table_name/summary_sstable_id.db into Summary by
   // using mem::Summary::from()
   std::unique_ptr<mem::Summary> load_summary(std::string database_path,
-                                            std::string table_name,
-                                            size_t sstable_id);
+                                             std::string table_name,
+                                             size_t sstable_id);
 
   // Getting a record from database_path/table_name/data_sstable_id.db
   // indicating the record offset within the data file.
@@ -43,9 +47,7 @@ public:
                                                  int page_num);
 
 private:
-  static DiskManager *m_manager;
-
   DiskManager() {}
-  ~DiskManager() { delete m_manager; }
 };
+
 } // namespace dibibase::io

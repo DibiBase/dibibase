@@ -12,6 +12,8 @@
 namespace dibibase::catalog {
 
 DEFINE_ERROR(undefined_data_type_error);
+DEFINE_ERROR(incompatible_data_types_error);
+DEFINE_ERROR(uncomparable_type_error);
 
 class DIBIBASE_PUBLIC Data {
 
@@ -34,7 +36,7 @@ public:
       BLOB,     /**<Binary large object*/
     };
 
-    Type(Id id, size_t size) : m_id(id), m_size(size) {}
+    Type(Id id, uint32_t length) : m_id(id), m_length(length) {}
 
     static std::unique_ptr<Type> from(util::Buffer *buf) {
       uint8_t id = buf->get_int8();
@@ -42,20 +44,18 @@ public:
       return std::make_unique<Type>(static_cast<Id>(id), size);
     }
 
-    // To be modified.
-    static size_t get_size_from_id(Id) { return 0; }
-
     Id id() const { return m_id; }
-    size_t size() const { return m_size; }
+    size_t length() const { return m_length; }
 
+    size_t size() const { return sizeof(uint8_t) + sizeof(uint32_t); }
     void bytes(util::Buffer *buf) {
       buf->put_int8(m_id);
-      buf->put_int32(m_size);
+      buf->put_uint32(m_length);
     }
 
   private:
     Id m_id;
-    size_t m_size;
+    uint32_t m_length;
   };
 
 public:
@@ -63,6 +63,8 @@ public:
   virtual ~Data() {}
 
   static std::unique_ptr<Data> from(util::Buffer *, Type);
+
+  virtual bool compare(Data *other) = 0;
 
   Type type() const { return m_type; }
 
@@ -72,10 +74,20 @@ private:
   Type m_type;
 };
 
+constexpr bool operator==(const Data::Type &lhs, const Data::Type &rhs) {
+  return lhs.id() == rhs.id() && lhs.length() == rhs.length();
+}
+
+constexpr bool operator!=(const Data::Type &lhs, const Data::Type &rhs) {
+  return !(lhs == rhs);
+}
+
 class DIBIBASE_PUBLIC ASCIIData : public Data {
 
 public:
   explicit ASCIIData(std::string data);
+
+  bool compare(Data *other) override;
 
   std::string data() const { return m_data; }
   void set_data(std::string data) { m_data = data; }
@@ -91,6 +103,8 @@ class DIBIBASE_PUBLIC BigIntData : public Data {
 public:
   explicit BigIntData(int64_t data);
 
+  bool compare(Data *other) override;
+
   int64_t data() const { return m_data; }
   void set_data(int64_t data) { m_data = data; }
 
@@ -104,6 +118,8 @@ class DIBIBASE_PUBLIC BooleanData : public Data {
 
 public:
   explicit BooleanData(bool data);
+
+  bool compare(Data *other) override;
 
   bool data() const { return m_data; }
   void set_data(bool data) { m_data = data; }
@@ -119,6 +135,8 @@ class DIBIBASE_PUBLIC DoubleData : public Data {
 public:
   explicit DoubleData(double data);
 
+  bool compare(Data *other) override;
+
   double data() const { return m_data; }
   void set_data(double data) { m_data = data; }
 
@@ -132,6 +150,8 @@ class DIBIBASE_PUBLIC FloatData : public Data {
 
 public:
   explicit FloatData(float data);
+
+  bool compare(Data *other) override;
 
   float data() const { return m_data; }
   void set_data(float data) { m_data = data; }
@@ -147,6 +167,8 @@ class DIBIBASE_PUBLIC IntData : public Data {
 public:
   explicit IntData(int32_t data);
 
+  bool compare(Data *other) override;
+
   int32_t data() const { return m_data; }
   void set_data(int32_t data) { m_data = data; }
 
@@ -160,6 +182,8 @@ class DIBIBASE_PUBLIC SmallIntData : public Data {
 
 public:
   explicit SmallIntData(int16_t data);
+
+  bool compare(Data *other) override;
 
   int16_t data() const { return m_data; }
   void set_data(int16_t data) { m_data = data; }
@@ -175,6 +199,8 @@ class DIBIBASE_PUBLIC TinyIntData : public Data {
 public:
   explicit TinyIntData(int8_t data);
 
+  bool compare(Data *other) override;
+
   int8_t data() const { return m_data; }
   void set_data(int8_t data) { m_data = data; }
 
@@ -188,6 +214,8 @@ class DIBIBASE_PUBLIC BlobData : public Data {
 
 public:
   explicit BlobData(std::unique_ptr<unsigned char[]>, size_t);
+
+  bool compare(Data *other) override;
 
   std::unique_ptr<unsigned char[]> data() const;
   void set_data(unsigned char *, size_t);
