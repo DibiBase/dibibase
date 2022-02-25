@@ -44,8 +44,8 @@ public:
       return std::make_unique<Type>(static_cast<Id>(id), size);
     }
 
-    Id id() const { return m_id; }
-    size_t length() const { return m_length; }
+    constexpr Id id() const { return m_id; }
+    constexpr size_t length() const { return m_length; }
 
     size_t size() const { return sizeof(uint8_t) + sizeof(uint32_t); }
     void bytes(util::Buffer *buf) {

@@ -51,8 +51,6 @@ ASCIIData::ASCIIData(std::string data)
     : Data(Type(Type::ASCII, data.size())), m_data(data) {}
 
 bool ASCIIData::compare(Data *other) {
-  Data::compare(other);
-
   if (ASCIIData *rhs = dynamic_cast<ASCIIData *>(other); rhs != nullptr) {
     if (m_data <= rhs->data())
       return false;
@@ -69,8 +67,6 @@ BigIntData::BigIntData(int64_t data)
     : Data(Type(Type::BIGINT, sizeof(data))), m_data(data) {}
 
 bool BigIntData::compare(Data *other) {
-  Data::compare(other);
-
   if (BigIntData *rhs = dynamic_cast<BigIntData *>(other); rhs != nullptr) {
     if (m_data <= rhs->data())
       return false;
@@ -96,8 +92,6 @@ DoubleData::DoubleData(double data)
     : Data(Type(Type::DOUBLE, sizeof(data))), m_data(data) {}
 
 bool DoubleData::compare(Data *other) {
-  Data::compare(other);
-
   if (DoubleData *rhs = dynamic_cast<DoubleData *>(other); rhs != nullptr) {
     if (m_data <= rhs->data())
       return false;
@@ -114,8 +108,6 @@ FloatData::FloatData(float data)
     : Data(Type(Type::FLOAT, sizeof(data))), m_data(data) {}
 
 bool FloatData::compare(Data *other) {
-  Data::compare(other);
-
   if (FloatData *rhs = dynamic_cast<FloatData *>(other); rhs != nullptr) {
     if (m_data <= rhs->data())
       return false;
@@ -132,8 +124,6 @@ IntData::IntData(int32_t data)
     : Data(Type(Type::INT, sizeof(data))), m_data(data) {}
 
 bool IntData::compare(Data *other) {
-  Data::compare(other);
-
   if (IntData *rhs = dynamic_cast<IntData *>(other); rhs != nullptr) {
     if (m_data <= rhs->data())
       return false;
@@ -150,8 +140,6 @@ SmallIntData::SmallIntData(int16_t data)
     : Data(Type(Type::SMALLINT, sizeof(data))), m_data(data) {}
 
 bool SmallIntData::compare(Data *other) {
-  Data::compare(other);
-
   if (SmallIntData *rhs = dynamic_cast<SmallIntData *>(other); rhs != nullptr) {
     if (m_data <= rhs->data())
       return false;
@@ -168,8 +156,6 @@ TinyIntData::TinyIntData(int8_t data)
     : Data(Type(Type::TINYINT, sizeof(data))), m_data(data) {}
 
 bool TinyIntData::compare(Data *other) {
-  Data::compare(other);
-
   if (TinyIntData *rhs = dynamic_cast<TinyIntData *>(other); rhs != nullptr) {
     if (m_data <= rhs->data())
       return false;
