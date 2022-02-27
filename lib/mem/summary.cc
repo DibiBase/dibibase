@@ -1,5 +1,4 @@
 #include "mem/summary.hh"
-#include "catalog/data.hh"
 
 #include <cstddef>
 #include <cstdint>
@@ -7,6 +6,8 @@
 #include <memory>
 #include <string>
 #include <sys/types.h>
+
+#include "catalog/data.hh"
 
 using namespace dibibase::mem;
 
@@ -16,7 +17,7 @@ std::unique_ptr<Summary> Summary::from(util::Buffer *buf) {
   auto type = catalog::Data::Type(read_type->id(), read_type->length());
 
   std::vector<std::unique_ptr<catalog::Data>> values;
-  for (std::vector<catalog::Data>::size_type i = 0; i < sort_keys_length; i++) {
+  for (uint8_t i = 0; i < sort_keys_length; i++) {
     auto field = catalog::Data::from(buf, type);
     values.push_back(std::move(field));
   }

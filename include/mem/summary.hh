@@ -11,6 +11,7 @@
 #include "common.hh"
 
 namespace dibibase::mem {
+
 class DIBIBASE_PUBLIC Summary {
 
 public:

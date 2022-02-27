@@ -43,6 +43,21 @@ std::unique_ptr<Schema> Schema::from(util::Buffer *buf) {
   return std::make_unique<Schema>(sort_index, partition_index, fields);
 }
 
+bool Schema::verify(const catalog::Record &record) const {
+  auto &values = record.values();
+
+  if (values.size() != m_fields.size())
+    return false;
+
+  for (std::vector<std::unique_ptr<catalog::Data>>::size_type i = 0;
+       i < values.size(); i++) {
+    if (values[i]->type() != m_fields[i].type())
+      return false;
+  }
+
+  return true;
+}
+
 Schema &Schema::push_back(Field field) {
   m_fields.push_back(field);
   return *this;

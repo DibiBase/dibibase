@@ -1,19 +1,20 @@
 #include "db/index_page.hh"
+#include "catalog/data.hh"
+
 #include <cstdint>
 #include <iostream>
 #include <memory>
 #include <sys/types.h>
 
 using namespace dibibase::db;
-using namespace dibibase::catalog;
 
 std::unique_ptr<IndexPage> IndexPage::from(util::Buffer *buf) {
   auto sort_keys_length = buf->get_uint8();
   auto read_type = catalog::Data::Type::from(buf);
   auto type = catalog::Data::Type(read_type->id(), read_type->length());
 
-  std::map<std::unique_ptr<catalog::Data>, off_t> sort_keys;
-  while(sort_keys_length > 0) {
+  std::map<std::unique_ptr<catalog::Data>, off_t, catalog::DataCmp> sort_keys;
+  for (uint8_t i = 0; i < sort_keys_length; i++) {
     auto key = catalog::Data::from(buf, type);
     auto offset = buf->get_uint64();
     sort_keys[std::move(key)] = offset;
@@ -22,11 +23,20 @@ std::unique_ptr<IndexPage> IndexPage::from(util::Buffer *buf) {
   return std::make_unique<IndexPage>(std::move(sort_keys), type);
 }
 
-off_t IndexPage::find_key_offset(catalog::Data *key) {
-  return m_sort_keys[std::unique_ptr<catalog::Data>(key)];
+off_t IndexPage::find_offset(catalog::Data *key) {
+  auto private_key = std::unique_ptr<catalog::Data>(key);
+
+  if (m_sort_keys.find(private_key) == m_sort_keys.end())
+    return -1;
+
+  off_t res = m_sort_keys[private_key];
+
+  private_key.release();
+
+  return res;
 }
 
-bool IndexPage::add_sort_key(catalog::Data *key, off_t offset) {
+bool IndexPage::push_back(catalog::Data *key, off_t offset) {
   if (size() + m_type.length() + sizeof(offset) > 4096)
     return false;
 
@@ -35,7 +45,8 @@ bool IndexPage::add_sort_key(catalog::Data *key, off_t offset) {
 }
 
 size_t IndexPage::size() const {
-  return m_type.size() + m_sort_keys.size() * (m_type.length() + sizeof(off_t));
+  return sizeof(uint8_t) + m_type.size() +
+         m_sort_keys.size() * (m_type.length() + sizeof(uint64_t));
 }
 
 void IndexPage::bytes(util::Buffer *buf) {

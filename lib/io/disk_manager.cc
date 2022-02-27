@@ -16,8 +16,8 @@
 using namespace dibibase;
 
 std::unique_ptr<mem::Summary>
-io::DiskManager::load_summary(std::string database_path, std::string table_name,
-                              size_t sstable_id) {
+io::DiskManager::load_summary(std::string &database_path,
+                              std::string &table_name, size_t sstable_id) {
   int fd = open((database_path + "/" + table_name + "/summary_" +
                  std::to_string(sstable_id) + ".db")
                     .c_str(),
@@ -42,9 +42,9 @@ io::DiskManager::load_summary(std::string database_path, std::string table_name,
 }
 
 std::unique_ptr<db::IndexPage>
-io::DiskManager::load_index_page(std::string database_path,
-                                 std::string table_name, size_t sstable_id,
-                                 int page_num) {
+io::DiskManager::load_index_page(std::string &database_path,
+                                 std::string &table_name, size_t sstable_id,
+                                 uint8_t page_num) {
   int fd = open((database_path + "/" + table_name + "/index_" +
                  std::to_string(sstable_id) + ".db")
                     .c_str(),
@@ -70,11 +70,9 @@ io::DiskManager::load_index_page(std::string database_path,
   return index_page;
 }
 
-catalog::Record io::DiskManager::get_record_from_data(std::string database_path,
-                                                      std::string table_name,
-                                                      size_t sstable_id,
-                                                      catalog::Schema schema,
-                                                      off_t offset) {
+catalog::Record io::DiskManager::get_record_from_data(
+    std::string &database_path, std::string &table_name, size_t sstable_id,
+    catalog::Schema &schema, off_t offset) {
   int fd = open((database_path + "/" + table_name + "/data_" +
                  std::to_string(sstable_id) + ".db")
                     .c_str(),

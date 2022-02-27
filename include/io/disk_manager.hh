@@ -28,23 +28,23 @@ public:
 
   // Loading database_path/table_name/summary_sstable_id.db into Summary by
   // using mem::Summary::from()
-  std::unique_ptr<mem::Summary> load_summary(std::string database_path,
-                                             std::string table_name,
+  std::unique_ptr<mem::Summary> load_summary(std::string &database_path,
+                                             std::string &table_name,
                                              size_t sstable_id);
-
-  // Getting a record from database_path/table_name/data_sstable_id.db
-  // indicating the record offset within the data file.
-  catalog::Record get_record_from_data(std::string database_path,
-                                       std::string table_name,
-                                       size_t sstable_id, catalog::Schema,
-                                       off_t offset);
 
   // Loading a specific page from database_path/table_name/index_sstable_id.db
   // by using db::IndexPage::from()
-  std::unique_ptr<db::IndexPage> load_index_page(std::string database_path,
-                                                 std::string table_name,
+  std::unique_ptr<db::IndexPage> load_index_page(std::string &database_path,
+                                                 std::string &table_name,
                                                  size_t sstable_id,
-                                                 int page_num);
+                                                 uint8_t page_num);
+
+  // Getting a record from database_path/table_name/data_sstable_id.db
+  // indicating the record offset within the data file.
+  catalog::Record get_record_from_data(std::string &database_path,
+                                       std::string &table_name,
+                                       size_t sstable_id, catalog::Schema &,
+                                       off_t offset);
 
 private:
   DiskManager() {}

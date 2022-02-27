@@ -42,6 +42,8 @@ public:
 
   static std::unique_ptr<Schema> from(util::Buffer *);
 
+  bool verify(const catalog::Record &record) const;
+
   Schema &push_back(Field field);
 
   const std::vector<Field> &fields() const { return m_fields; }

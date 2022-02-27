@@ -1,4 +1,5 @@
 #include "io/table_builder.hh"
+
 #include <fcntl.h>
 #include <memory>
 #include <string>
@@ -16,8 +17,8 @@ TableBuilder::TableBuilder(
     std::string directory_path, std::string table_name, catalog::Schema schema,
     size_t sstable_id,
     std::map<std::unique_ptr<catalog::Data>, catalog::Record> records)
-    : m_directory_path(directory_path), m_table_name(table_name),
-      m_schema(schema), m_new_sstable_id(sstable_id + 1), m_records(records),
+    : m_base_path(directory_path), m_table_name(table_name), m_schema(schema),
+      m_new_sstable_id(sstable_id + 1), m_records(records),
       m_summary(std::make_unique<mem::Summary>()),
       m_index_page(std::make_unique<IndexPage>()) {
 

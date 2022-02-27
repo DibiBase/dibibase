@@ -227,4 +227,16 @@ private:
   std::unique_ptr<unsigned char[]> m_data;
 };
 
+struct DataCmp {
+  bool operator()(const std::unique_ptr<Data> &lhs,
+                  const std::unique_ptr<Data> &rhs) const {
+    return lhs->compare(rhs.get());
+  }
+
+  bool operator()(const std::shared_ptr<Data> &lhs,
+                  const std::shared_ptr<Data> &rhs) const {
+    return lhs->compare(rhs.get());
+  }
+};
+
 } // namespace dibibase::catalog

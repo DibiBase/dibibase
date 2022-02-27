@@ -1,6 +1,5 @@
 #pragma once
 
-#include "common.hh"
 #include <cstdint>
 #include <fcntl.h>
 #include <map>
@@ -12,12 +11,15 @@
 
 #include "catalog/record.hh"
 #include "catalog/schema.hh"
+#include "common.hh"
 #include "db/index_page.hh"
 #include "mem/summary.hh"
 #include "util/buffer.hh"
 
 namespace dibibase::io {
+
 class DIBIBASE_PUBLIC TableBuilder {
+
 public:
   TableBuilder(
       std::string directory_path, std::string table_name,
@@ -38,11 +40,12 @@ private:
   void fill_index_buffer(catalog::Data *record_key, off_t offset);
 
 private:
-  std::string m_directory_path;
-  std::string m_table_name;
-  catalog::Schema m_schema;
-  size_t m_new_sstable_id;
+  std::string &m_base_path;
+  std::string &m_table_name;
+  catalog::Schema &m_schema;
   std::map<std::unique_ptr<catalog::Data>, catalog::Record> m_records;
+
+  size_t m_new_sstable_id;
 
   std::unique_ptr<mem::Summary> m_summary;
   std::unique_ptr<db::IndexPage> m_index_page;
@@ -53,4 +56,5 @@ private:
   std::unique_ptr<util::Buffer> m_index_buffer;
   std::unique_ptr<util::Buffer> m_summary_buffer;
 };
+
 } // namespace dibibase::io

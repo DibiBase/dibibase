@@ -1,6 +1,5 @@
 #pragma once
 
-#include "common.hh"
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -10,6 +9,7 @@
 #include "catalog/data.hh"
 #include "catalog/record.hh"
 #include "catalog/schema.hh"
+#include "common.hh"
 #include "db/index_page.hh"
 #include "errors.hh"
 #include "io/disk_manager.hh"
@@ -18,19 +18,15 @@
 
 namespace dibibase::db {
 
-DEFINE_ERROR(dismatch_record_with_schema_error);
+DEFINE_ERROR(schema_mismatch_error);
+DEFINE_ERROR(non_existent_record_error);
 
 class DIBIBASE_PUBLIC TableManager {
-public:
-  TableManager(std::string directory_path, std::string table_name,
-               catalog::Schema schema,
-               std::vector<std::unique_ptr<mem::Summary>> summary);
 
-  // Check if memtable has enough space to store new record, otherwise flush the
-  // memtable into disk and clear the memtable then store the new one. Check the
-  // given record aganist schema, then get the sort key from the schema then
-  // insert the new record in the memtable.
-  void write_record(catalog::Record);
+public:
+  TableManager(std::string &base_path, std::string table_name,
+               std::unique_ptr<catalog::Schema> schema,
+               std::vector<std::unique_ptr<mem::Summary>> summary);
 
   // It checks if memtable contains the record, otherwise it gets the page
   // number which contains the record key from summay, this is done by calling
@@ -40,6 +36,12 @@ public:
   // io::DiskManager and returns it.
   catalog::Record read_record(std::unique_ptr<catalog::Data>);
 
+  // Check if memtable has enough space to store new record, otherwise flush the
+  // memtable into disk and clear the memtable then store the new one. Check the
+  // given record aganist schema, then get the sort key from the schema then
+  // insert the new record in the memtable.
+  void write_record(catalog::Record);
+
 private:
   // Flushing memtable into disk by creating an instance of io::TableBuilder
   // then calling TableBuilder::construct_sstable_files(), then getting the new
@@ -47,16 +49,21 @@ private:
   void flush();
 
 private:
-  std::string m_directory_path;
+  std::string &m_base_path;
   std::string m_table_name;
-  catalog::Schema m_schema;
-  size_t m_current_sstable_id;
-  std::map<std::unique_ptr<catalog::Data>, catalog::Record> m_memtable;
+  std::unique_ptr<catalog::Schema> m_schema;
 
+  size_t m_current_sstable_id;
+  std::unique_ptr<mem::Summary> m_current_summary;
+  std::unique_ptr<db::IndexPage> m_current_index_page;
+
+  // TODO: adding a vector of bloom filters.
   // Storing summary for sort key offsets for each sstable, in which
   // the index represents the sstable_id.
-  std::vector<std::unique_ptr<mem::Summary>> m_summary;
+  std::vector<std::unique_ptr<mem::Summary>> m_summaries;
 
-  // TO DO: adding a vector of bloom filters.
+  std::map<std::shared_ptr<catalog::Data>, catalog::Record, catalog::DataCmp>
+      m_memtable;
 };
+
 } // namespace dibibase::db

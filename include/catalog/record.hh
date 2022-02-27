@@ -14,24 +14,24 @@ namespace dibibase::catalog {
 
 class DIBIBASE_PUBLIC Record {
 public:
-  Record(std::vector<std::unique_ptr<catalog::Data>> values)
+  Record(std::vector<std::shared_ptr<catalog::Data>> values)
       : m_values(std::move(values)){};
 
   static std::unique_ptr<Record> from(util::Buffer *, Schema);
 
-  const std::vector<std::unique_ptr<catalog::Data>> &values() const {
+  const std::vector<std::shared_ptr<catalog::Data>> &values() const {
     return m_values;
   }
 
-  const catalog::Data &operator[](
-      std::vector<std::unique_ptr<catalog::Data>>::size_type index) const {
-    return *m_values[index];
+  const std::shared_ptr<catalog::Data> &operator[](
+      std::vector<std::shared_ptr<catalog::Data>>::size_type index) const {
+    return m_values[index];
   }
 
   void bytes(util::Buffer *);
 
 private:
-  std::vector<std::unique_ptr<catalog::Data>> m_values;
+  std::vector<std::shared_ptr<catalog::Data>> m_values;
 };
 
 } // namespace dibibase::catalog
