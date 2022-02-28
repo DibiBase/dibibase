@@ -63,6 +63,7 @@ public:
   virtual ~Data() {}
 
   static std::unique_ptr<Data> from(util::Buffer *, Type);
+  static std::unique_ptr<Data> from(catalog::Data *);
 
   virtual bool compare(Data *other) = 0;
 
@@ -219,6 +220,8 @@ public:
 
   std::unique_ptr<unsigned char[]> data() const;
   void set_data(unsigned char *, size_t);
+
+  size_t length() const;
 
   void bytes(util::Buffer *) override;
 

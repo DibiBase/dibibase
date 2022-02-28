@@ -1,6 +1,8 @@
 #include "catalog/data.hh"
+
 #include <cstdint>
 #include <iostream>
+#include <memory>
 
 using namespace dibibase::catalog;
 
@@ -47,6 +49,67 @@ std::unique_ptr<Data> Data::from(util::Buffer *buf, Type type) {
   }
 
   return nullptr;
+}
+
+std::unique_ptr<Data> Data::from(catalog::Data *data) {
+  switch (data->type().id()) {
+  case Type::ASCII: {
+    if (ASCIIData *rhs = dynamic_cast<ASCIIData *>(data); rhs != nullptr)
+      return std::make_unique<ASCIIData>(rhs->data());
+
+    throw undefined_data_type_error("");
+  }
+  case Type::BIGINT: {
+    if (BigIntData *rhs = dynamic_cast<BigIntData *>(data); rhs != nullptr)
+      return std::make_unique<BigIntData>(rhs->data());
+
+    throw undefined_data_type_error("");
+  }
+  case Type::BOOLEAN: {
+    if (BooleanData *rhs = dynamic_cast<BooleanData *>(data); rhs != nullptr)
+      return std::make_unique<BooleanData>(rhs->data());
+
+    throw undefined_data_type_error("");
+  }
+  case Type::DOUBLE: {
+    if (DoubleData *rhs = dynamic_cast<DoubleData *>(data); rhs != nullptr)
+      return std::make_unique<DoubleData>(rhs->data());
+
+    throw undefined_data_type_error("");
+  }
+  case Type::FLOAT: {
+    if (FloatData *rhs = dynamic_cast<FloatData *>(data); rhs != nullptr)
+      return std::make_unique<FloatData>(rhs->data());
+
+    throw undefined_data_type_error("");
+  }
+  case Type::INT: {
+    if (IntData *rhs = dynamic_cast<IntData *>(data); rhs != nullptr)
+      return std::make_unique<IntData>(rhs->data());
+
+    throw undefined_data_type_error("");
+  }
+  case Type::SMALLINT: {
+    if (SmallIntData *rhs = dynamic_cast<SmallIntData *>(data); rhs != nullptr)
+      return std::make_unique<SmallIntData>(rhs->data());
+
+    throw undefined_data_type_error("");
+  }
+  case Type::TINYINT: {
+    if (TinyIntData *rhs = dynamic_cast<TinyIntData *>(data); rhs != nullptr)
+      return std::make_unique<TinyIntData>(rhs->data());
+
+    throw undefined_data_type_error("");
+  }
+  case Type::BLOB: {
+    if (BlobData *rhs = dynamic_cast<BlobData *>(data); rhs != nullptr)
+      return std::make_unique<BlobData>(rhs->data(), rhs->length());
+
+    throw undefined_data_type_error("");
+  }
+  }
+
+  throw undefined_data_type_error("");
 }
 
 ASCIIData::ASCIIData(std::string data)
@@ -194,5 +257,7 @@ void BlobData::set_data(unsigned char *data, size_t size) {
   }
   memcpy(m_data.get(), data, size);
 }
+
+size_t BlobData::length() const { return m_size; }
 
 void BlobData::bytes(util::Buffer *buf) { buf->put_blob(m_data.get(), m_size); }

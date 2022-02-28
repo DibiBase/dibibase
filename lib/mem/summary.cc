@@ -36,11 +36,11 @@ uint8_t Summary::find_page_number(catalog::Data *key) {
   return m_sort_keys.size() - 1;
 }
 
-bool Summary::push_back(catalog::Data *sort_key) {
+bool Summary::push_back(catalog::Data *key) {
   if (size() + m_type.length() > 4096)
     return false;
 
-  m_sort_keys.push_back(std::unique_ptr<catalog::Data>(sort_key));
+  m_sort_keys.push_back(catalog::Data::from(key));
   return true;
 }
 

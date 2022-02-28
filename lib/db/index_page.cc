@@ -42,7 +42,7 @@ bool IndexPage::push_back(catalog::Data *key, off_t offset) {
   if (size() + m_type.length() + sizeof(offset) > 4096)
     return false;
 
-  m_sort_keys[std::unique_ptr<catalog::Data>(key)] = offset;
+  m_sort_keys[catalog::Data::from(key)] = offset;
   return true;
 }
 
