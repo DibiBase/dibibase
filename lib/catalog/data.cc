@@ -1,5 +1,6 @@
 #include "catalog/data.hh"
 #include <cstdint>
+#include <iostream>
 
 using namespace dibibase::catalog;
 
@@ -8,7 +9,7 @@ std::unique_ptr<Data> Data::from(util::Buffer *buf, Type type) {
 
   switch (id) {
   case Type::ASCII: {
-    std::string data = buf->get_string(type.size());
+    std::string data = buf->get_string(type.length());
     return std::make_unique<ASCIIData>(data);
   }
   case Type::BIGINT: {
@@ -40,8 +41,8 @@ std::unique_ptr<Data> Data::from(util::Buffer *buf, Type type) {
     return std::make_unique<TinyIntData>(data);
   }
   case Type::BLOB: {
-    std::unique_ptr<unsigned char[]> data = buf->get_blob(type.size());
-    return std::make_unique<BlobData>(std::move(data), type.size());
+    std::unique_ptr<unsigned char[]> data = buf->get_blob(type.length());
+    return std::make_unique<BlobData>(std::move(data), type.length());
   }
   }
 
