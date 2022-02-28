@@ -19,6 +19,8 @@ public:
           catalog::Data::Type type)
       : m_sort_keys(std::move(sort_keys)), m_type(type) {}
 
+  Summary(catalog::Data::Type type) : m_type(type) {}
+
   static std::unique_ptr<Summary> from(util::Buffer *);
 
   // Performing binary search on record key to find the page number which

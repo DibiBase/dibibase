@@ -21,10 +21,10 @@ namespace dibibase::io {
 class DIBIBASE_PUBLIC TableBuilder {
 
 public:
-  TableBuilder(
-      std::string directory_path, std::string table_name,
-      catalog::Schema schema, size_t sstable_id,
-      std::map<std::unique_ptr<catalog::Data>, catalog::Record> records);
+  TableBuilder(std::string &base_path, std::string &table_name,
+               catalog::Schema &schema, size_t sstable_id,
+               std::map<std::shared_ptr<catalog::Data>, catalog::Record,
+                        catalog::DataCmp> records);
 
   std::unique_ptr<mem::Summary> get_new_summary() {
     return std::move(m_summary);
@@ -33,28 +33,26 @@ public:
   ~TableBuilder();
 
 private:
-  // Path is: directory_path/table_name/[file-type]_new_sstable_id.db
+  void construct_sstable_files();
 
-  void fill_data_buffer();
-
-  void fill_index_buffer(catalog::Data *record_key, off_t offset);
+  bool write_index_file();
+  void write_summary_file();
 
 private:
   std::string &m_base_path;
   std::string &m_table_name;
   catalog::Schema &m_schema;
-  std::map<std::unique_ptr<catalog::Data>, catalog::Record> m_records;
-
   size_t m_new_sstable_id;
+
+  std::map<std::shared_ptr<catalog::Data>, catalog::Record, catalog::DataCmp>
+      m_records;
+
+  int m_summary_fd;
+  int m_index_fd;
+  int m_data_fd;
 
   std::unique_ptr<mem::Summary> m_summary;
   std::unique_ptr<db::IndexPage> m_index_page;
-
-  int m_file_descriptors[3];
-
-  std::unique_ptr<util::Buffer> m_data_buffer;
-  std::unique_ptr<util::Buffer> m_index_buffer;
-  std::unique_ptr<util::Buffer> m_summary_buffer;
 };
 
 } // namespace dibibase::io

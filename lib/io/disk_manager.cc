@@ -59,7 +59,7 @@ io::DiskManager::load_index_page(std::string &database_path,
     util::Logger::make().err("Error reading Index file: %d", errno);
   else if (rc != 4096)
     util::Logger::make().err(
-        "Malformed Summary file: File length isn't a mulitple of 4096");
+        "Malformed Index file: File length isn't a mulitple of 4096");
 
   util::Buffer *index_buffer = new util::MemoryBuffer(std::move(buf), 4096);
 

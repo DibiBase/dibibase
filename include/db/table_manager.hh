@@ -54,10 +54,9 @@ private:
   std::unique_ptr<catalog::Schema> m_schema;
 
   size_t m_current_sstable_id;
-  std::unique_ptr<mem::Summary> m_current_summary;
-  std::unique_ptr<db::IndexPage> m_current_index_page;
 
   // TODO: adding a vector of bloom filters.
+
   // Storing summary for sort key offsets for each sstable, in which
   // the index represents the sstable_id.
   std::vector<std::unique_ptr<mem::Summary>> m_summaries;

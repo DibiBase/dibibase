@@ -26,10 +26,12 @@ std::unique_ptr<IndexPage> IndexPage::from(util::Buffer *buf) {
 off_t IndexPage::find_offset(catalog::Data *key) {
   auto private_key = std::unique_ptr<catalog::Data>(key);
 
-  if (m_sort_keys.find(private_key) == m_sort_keys.end())
+  auto find_key = m_sort_keys.find(private_key);
+
+  if (find_key == m_sort_keys.end())
     return -1;
 
-  off_t res = m_sort_keys[private_key];
+  off_t res = find_key->second;
 
   private_key.release();
 

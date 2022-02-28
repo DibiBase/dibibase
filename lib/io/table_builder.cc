@@ -7,6 +7,8 @@
 #include <unistd.h>
 #include <utility>
 
+#include "util/logger.hh"
+
 using namespace dibibase::io;
 using namespace dibibase::util;
 using namespace dibibase::catalog;
@@ -14,99 +16,117 @@ using namespace dibibase::db;
 using namespace dibibase::mem;
 
 TableBuilder::TableBuilder(
-    std::string directory_path, std::string table_name, catalog::Schema schema,
+    std::string &base_path, std::string &table_name, catalog::Schema &schema,
     size_t sstable_id,
-    std::map<std::unique_ptr<catalog::Data>, catalog::Record> records)
-    : m_base_path(directory_path), m_table_name(table_name), m_schema(schema),
-      m_new_sstable_id(sstable_id + 1), m_records(records),
-      m_summary(std::make_unique<mem::Summary>()),
-      m_index_page(std::make_unique<IndexPage>()) {
+    std::map<std::shared_ptr<catalog::Data>, catalog::Record, catalog::DataCmp>
+        records)
+    : m_base_path(base_path), m_table_name(table_name), m_schema(schema),
+      m_new_sstable_id(sstable_id + 1), m_records(records) {
 
-  std::string root_dir = directory_path + "/" + table_name;
+  // Creating summary, index and data file in disk.
+  m_summary_fd = open((m_base_path + "/" + table_name + "/summary_" +
+                       std::to_string(m_new_sstable_id) + ".db")
+                          .c_str(),
+                      O_WRONLY | O_CREAT);
 
-  std::string data_path =
-      root_dir + "/data" + std::to_string(m_new_sstable_id) + ".db";
+  m_index_fd = open((m_base_path + "/" + table_name + "/index_" +
+                     std::to_string(m_new_sstable_id) + ".db")
+                        .c_str(),
+                    O_WRONLY | O_CREAT);
 
-  std::string index_path =
-      root_dir + "/index" + std::to_string(m_new_sstable_id) + ".db";
+  m_data_fd = open((m_base_path + "/" + table_name + "/data_" +
+                    std::to_string(m_new_sstable_id) + ".db")
+                       .c_str(),
+                   O_WRONLY | O_CREAT);
 
-  std::string summary_path =
-      root_dir + "/summary" + std::to_string(m_new_sstable_id) + ".db";
-
-  // Creating data file.
-  m_file_descriptors[0] = open(data_path.c_str(), O_RDWR | O_CREAT,
-                               S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-
-  // Creating index file.
-  m_file_descriptors[1] = open(index_path.c_str(), O_RDWR | O_CREAT,
-                               S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-
-  // Creating summary file.
-  m_file_descriptors[2] = open(summary_path.c_str(), O_RDWR | O_CREAT,
-                               S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-
-  size_t total_size = m_schema.record_size() * m_records.size();
-
-  m_data_buffer = std::make_unique<MemoryBuffer>(total_size);
-
-  m_index_buffer = std::make_unique<MemoryBuffer>(409600);
-
-  m_summary_buffer = std::make_unique<MemoryBuffer>(4800);
-
-  // Filling SSTable buffers.
-  fill_data_buffer();
-
-  // constructing SSTable data file.
-  std::unique_ptr<unsigned char[]> data = m_data_buffer->bytes();
-  write(m_file_descriptors[0], data.get(), m_data_buffer->size());
-
-  // constructing SSTable index file.
-  std::unique_ptr<unsigned char[]> index = m_index_buffer->bytes();
-  write(m_file_descriptors[1], index.get(), m_index_buffer->size());
-
-  // Filling summary buffer.
-  m_summary->bytes(m_summary_buffer.get());
-
-  // constructing SSTable summary file.
-  std::unique_ptr<unsigned char[]> summary = m_summary_buffer->bytes();
-  write(m_file_descriptors[2], summary.get(), m_summary_buffer->size());
+  construct_sstable_files();
 }
 
-void TableBuilder::fill_data_buffer() {
+void TableBuilder::construct_sstable_files() {
   auto record_iterator = m_records.begin();
 
-  // Storing the first key in summary.
-  m_summary->push_back(record_iterator->first.get());
+  // Getting record key type.
+  catalog::Data::Type key_type = record_iterator->first->type();
 
-  // Storing key offset within the data file.
+  m_summary = std::make_unique<Summary>(key_type);
+  m_index_page = std::make_unique<IndexPage>(key_type);
+
+  // Key offset in data file.
   off_t key_offset = 0;
 
+  // Storing the first record key in summary.
+  m_summary->push_back(record_iterator->first.get());
+
   while (record_iterator != m_records.end()) {
-    // Filling buffer with the record data bytes.
-    record_iterator->second.bytes(m_data_buffer.get());
-    fill_index_buffer(record_iterator->first.get(), key_offset);
-    key_offset += m_data_buffer->current_offset();
+    // Storing record bytes in a buffer.
+    util::Buffer *record_buffer =
+        new util::MemoryBuffer(m_schema.record_size());
+    record_iterator->second.bytes(record_buffer);
+
+    // Storing record bytes in data file.
+    std::unique_ptr<unsigned char[]> r_buf = record_buffer->bytes();
+    int data_wc = write(m_data_fd, r_buf.get(), m_schema.record_size());
+    delete record_buffer;
+
+    if (data_wc < 0) {
+      util::Logger::make().err("Error writing in Data file: %d", errno);
+      return;
+    }
+
+    if (!m_index_page->push_back(record_iterator->first.get(), key_offset)) {
+      // Storing the first key allocated in a new page.
+      m_summary->push_back(record_iterator->first.get());
+
+      if (!write_index_file())
+        return;
+
+      m_index_page->clear();
+      m_index_page->push_back(record_iterator->first.get(), key_offset);
+    }
+
+    key_offset += m_schema.record_size();
     record_iterator++;
   }
+
+  if (!write_index_file())
+    return;
+  write_summary_file();
 }
 
-void TableBuilder::fill_index_buffer(Data *record_key, off_t offset) {
-  if (m_index_page->add_sort_key(record_key, offset))
-    return;
+bool TableBuilder::write_index_file() {
+  // Storing the index page in buffer.
+  util::Buffer *index_page_buffer = new util::MemoryBuffer(4096);
+  m_index_page->bytes(index_page_buffer);
 
-  // Storing the initial record key in a summary.
-  m_summary->push_back(record_key);
+  // Storing index page bytes in index file.
+  std::unique_ptr<unsigned char[]> i_buf = index_page_buffer->bytes();
+  int wc = write(m_index_fd, i_buf.get(), 4096);
+  delete index_page_buffer;
 
-  // Filling index buffer.
-  m_index_page->bytes(m_index_buffer.get());
+  if (wc < 0) {
+    util::Logger::make().err("Error writing in index file: %d", errno);
+    return false;
+  }
+  return true;
+}
 
-  m_index_page->clear();
+void TableBuilder::write_summary_file() {
+  // Storing summary in buffer.
+  util::Buffer *summary_buffer = new util::MemoryBuffer(4096);
+  m_summary->bytes(summary_buffer);
 
-  m_index_page->add_sort_key(record_key, offset);
+  // Storing summary bytes in summary file.
+  std::unique_ptr<unsigned char[]> s_buf = summary_buffer->bytes();
+  int wc = write(m_summary_fd, s_buf.get(), 4096);
+  delete summary_buffer;
+
+  if (wc < 0) {
+    util::Logger::make().err("Error writing in summary file: %d", errno);
+  }
 }
 
 TableBuilder::~TableBuilder() {
-  for (int i = 0; i < 3; i++) {
-    close(i);
-  }
+  close(m_summary_fd);
+  close(m_index_fd);
+  close(m_data_fd);
 }

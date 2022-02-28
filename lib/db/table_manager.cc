@@ -40,7 +40,7 @@ TableManager::read_record(std::unique_ptr<catalog::Data> sort_key) {
     // Finding record key offset within the data file.
     key_offset = index_page->find_offset(shared_sort_key.get());
 
-    if (key_offset == 1)
+    if (key_offset != -1)
       return disk_manager.get_record_from_data(
           m_base_path, m_table_name, sstable_id, *m_schema, key_offset);
 
@@ -56,7 +56,7 @@ void TableManager::write_record(catalog::Record record) {
     throw schema_mismatch_error("");
 
   auto sort_index = m_schema->sort_key_index();
-  m_memtable[record[sort_index]] = record;
+  m_memtable.insert({record[sort_index], record});
 
   // Assuming that (record key size + offset in data file) = 48 bytes.
   // and IndexPage max size is 4096, then we can store 100 record key per single
@@ -72,8 +72,8 @@ void TableManager::write_record(catalog::Record record) {
 }
 
 void TableManager::flush() {
-  TableBuilder table_builder(m_base_path, m_table_name, m_schema,
-                             m_current_sstable_id++, m_memtable);
+  io::TableBuilder table_builder(m_base_path, m_table_name, *m_schema,
+                                 m_current_sstable_id, m_memtable);
   m_summaries.push_back(table_builder.get_new_summary());
   m_memtable.clear();
 }

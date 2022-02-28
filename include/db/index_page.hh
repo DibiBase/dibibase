@@ -24,6 +24,8 @@ public:
             catalog::Data::Type type)
       : m_sort_keys(std::move(sort_keys)), m_type(type) {}
 
+  IndexPage(catalog::Data::Type type) : m_type(type) {}
+
   static std::unique_ptr<IndexPage> from(util::Buffer *);
 
   // find the exact offset within the data file.
