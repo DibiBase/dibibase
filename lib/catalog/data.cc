@@ -1,4 +1,5 @@
 #include "catalog/data.hh"
+#include <cstdint>
 
 using namespace dibibase::catalog;
 
@@ -64,7 +65,7 @@ bool ASCIIData::compare(Data *other) {
 void ASCIIData::bytes(util::Buffer *buf) { buf->put_string(m_data); }
 
 BigIntData::BigIntData(int64_t data)
-    : Data(Type(Type::BIGINT, sizeof(data))), m_data(data) {}
+    : Data(Type(Type::BIGINT, sizeof(int64_t))), m_data(data) {}
 
 bool BigIntData::compare(Data *other) {
   if (BigIntData *rhs = dynamic_cast<BigIntData *>(other); rhs != nullptr) {
@@ -80,7 +81,7 @@ bool BigIntData::compare(Data *other) {
 void BigIntData::bytes(util::Buffer *buf) { buf->put_int64(m_data); }
 
 BooleanData::BooleanData(bool data)
-    : Data(Type(Type::BOOLEAN, sizeof(data))), m_data(data) {}
+    : Data(Type(Type::BOOLEAN, sizeof(bool))), m_data(data) {}
 
 bool BooleanData::compare(Data *other __attribute__((unused))) {
   throw uncomparable_type_error("");
@@ -89,7 +90,7 @@ bool BooleanData::compare(Data *other __attribute__((unused))) {
 void BooleanData::bytes(util::Buffer *buf) { buf->put_boolean(m_data); }
 
 DoubleData::DoubleData(double data)
-    : Data(Type(Type::DOUBLE, sizeof(data))), m_data(data) {}
+    : Data(Type(Type::DOUBLE, sizeof(double))), m_data(data) {}
 
 bool DoubleData::compare(Data *other) {
   if (DoubleData *rhs = dynamic_cast<DoubleData *>(other); rhs != nullptr) {
@@ -105,7 +106,7 @@ bool DoubleData::compare(Data *other) {
 void DoubleData::bytes(util::Buffer *buf) { buf->put_double(m_data); }
 
 FloatData::FloatData(float data)
-    : Data(Type(Type::FLOAT, sizeof(data))), m_data(data) {}
+    : Data(Type(Type::FLOAT, sizeof(float))), m_data(data) {}
 
 bool FloatData::compare(Data *other) {
   if (FloatData *rhs = dynamic_cast<FloatData *>(other); rhs != nullptr) {
@@ -121,7 +122,7 @@ bool FloatData::compare(Data *other) {
 void FloatData::bytes(util::Buffer *buf) { buf->put_float(m_data); }
 
 IntData::IntData(int32_t data)
-    : Data(Type(Type::INT, sizeof(data))), m_data(data) {}
+    : Data(Type(Type::INT, sizeof(int32_t))), m_data(data) {}
 
 bool IntData::compare(Data *other) {
   if (IntData *rhs = dynamic_cast<IntData *>(other); rhs != nullptr) {
@@ -137,7 +138,7 @@ bool IntData::compare(Data *other) {
 void IntData::bytes(util::Buffer *buf) { buf->put_int32(m_data); }
 
 SmallIntData::SmallIntData(int16_t data)
-    : Data(Type(Type::SMALLINT, sizeof(data))), m_data(data) {}
+    : Data(Type(Type::SMALLINT, sizeof(int16_t))), m_data(data) {}
 
 bool SmallIntData::compare(Data *other) {
   if (SmallIntData *rhs = dynamic_cast<SmallIntData *>(other); rhs != nullptr) {
@@ -153,7 +154,7 @@ bool SmallIntData::compare(Data *other) {
 void SmallIntData::bytes(util::Buffer *buf) { buf->put_int16(m_data); }
 
 TinyIntData::TinyIntData(int8_t data)
-    : Data(Type(Type::TINYINT, sizeof(data))), m_data(data) {}
+    : Data(Type(Type::TINYINT, sizeof(int8_t))), m_data(data) {}
 
 bool TinyIntData::compare(Data *other) {
   if (TinyIntData *rhs = dynamic_cast<TinyIntData *>(other); rhs != nullptr) {
