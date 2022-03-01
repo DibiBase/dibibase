@@ -7,7 +7,7 @@
 using namespace dibibase;
 using namespace dibibase::db;
 
-TableManager::TableManager(std::string &base_path, std::string table_name,
+TableManager::TableManager(std::string base_path, std::string table_name,
                            std::unique_ptr<catalog::Schema> schema,
                            std::vector<std::unique_ptr<mem::Summary>> summary)
     : m_base_path(base_path), m_table_name(table_name),
@@ -74,7 +74,7 @@ void TableManager::write_record(catalog::Record record) {
 void TableManager::flush() {
   io::TableBuilder table_builder(m_base_path, m_table_name, *m_schema,
                                  m_current_sstable_id, m_memtable);
-  
+
   // Storing the summary of the new sstable.
   m_summaries.push_back(table_builder.get_new_summary());
   m_current_sstable_id = m_summaries.size();

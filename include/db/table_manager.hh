@@ -24,7 +24,7 @@ DEFINE_ERROR(non_existent_record_error);
 class DIBIBASE_PUBLIC TableManager {
 
 public:
-  TableManager(std::string &base_path, std::string table_name,
+  TableManager(std::string base_path, std::string table_name,
                std::unique_ptr<catalog::Schema> schema,
                std::vector<std::unique_ptr<mem::Summary>> summary);
 
@@ -42,6 +42,9 @@ public:
   // insert the new record in the memtable.
   void write_record(catalog::Record);
 
+  const std::unique_ptr<catalog::Schema> &schema() { return m_schema; }
+  size_t current_sstable_id() { return m_current_sstable_id; }
+
 private:
   // Flushing memtable into disk by creating an instance of io::TableBuilder
   // then calling TableBuilder::construct_sstable_files(), then getting the new
@@ -49,7 +52,7 @@ private:
   void flush();
 
 private:
-  std::string &m_base_path;
+  std::string m_base_path;
   std::string m_table_name;
   std::unique_ptr<catalog::Schema> m_schema;
 

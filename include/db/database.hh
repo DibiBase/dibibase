@@ -37,15 +37,10 @@ public:
 
   void flush_metadata();
 
-private:
-  // Assuming path of metadata: m_base_path/metadata.md
-  void open_metadata();
-  void read_metadata(util::Buffer *);
-  void write_metadata(util::Buffer *);
+  ~Database() { flush_metadata(); }
 
 private:
   std::string m_base_path;
-  int m_metadata_descriptor;
   std::map<std::string, TableManager> m_table_managers;
 };
 
