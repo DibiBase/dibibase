@@ -21,23 +21,33 @@ TableBuilder::TableBuilder(
     std::map<std::shared_ptr<catalog::Data>, catalog::Record, catalog::DataCmp>
         records)
     : m_base_path(base_path), m_table_name(table_name), m_schema(schema),
-      m_new_sstable_id(sstable_id + 1), m_records(records) {
+      m_new_sstable_id(sstable_id), m_records(records) {
 
   // Creating summary, index and data file in disk.
-  m_summary_fd = open((m_base_path + "/" + table_name + "/summary_" +
-                       std::to_string(m_new_sstable_id) + ".db")
-                          .c_str(),
-                      O_WRONLY | O_CREAT);
+  m_summary_fd =
+      open((m_base_path + "/" + table_name + "/summary_" +
+            std::to_string(m_new_sstable_id) + ".db")
+               .c_str(),
+           O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+
+  if (m_summary_fd < 0)
+    std::perror("open");
 
   m_index_fd = open((m_base_path + "/" + table_name + "/index_" +
                      std::to_string(m_new_sstable_id) + ".db")
                         .c_str(),
-                    O_WRONLY | O_CREAT);
+                    O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+
+  if (m_index_fd < 0)
+    std::perror("open");
 
   m_data_fd = open((m_base_path + "/" + table_name + "/data_" +
                     std::to_string(m_new_sstable_id) + ".db")
                        .c_str(),
-                   O_WRONLY | O_CREAT);
+                   O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+
+  if (m_data_fd < 0)
+    std::perror("open");
 
   construct_sstable_files();
 }
