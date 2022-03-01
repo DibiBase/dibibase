@@ -1,14 +1,12 @@
 #pragma once
 
-#include <cstdint>
-#include <map>
-#include <memory>
-#include <string>
-#include <vector>
-
 #include "catalog/record.hh"
 #include "catalog/schema.hh"
 #include "table_manager.hh"
+
+#include <dirent.h>
+#include <memory>
+#include <unistd.h>
 
 namespace dibibase::db {
 
@@ -25,14 +23,15 @@ public:
   //    b- get summary file of each table from io::DiskManager.
   //    c- construct a db::TableManager for each table.
   //    Otherwise: metadata is empty then there is no tables.
-  Database(std::string base_path) : m_base_path(base_path) {}
+  Database(std::string base_path);
 
   // Creating a new table in the database by creating catalog::Table instance
   // and then store its information into the metadata file using
   // catalog::Table::bytes, and add db::TableManager for it.
   void create_table(std::string table_name, catalog::Schema);
 
-  catalog::Record read_record(std::string table_name, catalog::Data);
+  catalog::Record read_record(std::string table_name,
+                              std::unique_ptr<catalog::Data>);
 
   void write_record(std::string table_name, catalog::Record);
 
@@ -47,7 +46,7 @@ private:
 private:
   std::string m_base_path;
   int m_metadata_descriptor;
-  std::map<std::string, std::unique_ptr<TableManager>> m_table_managers;
+  std::map<std::string, TableManager> m_table_managers;
 };
 
 } // namespace dibibase::db

@@ -11,6 +11,7 @@ dibibaselib_catalog_srcs = [
 ]
 
 dibibaselib_db_srcs = [
+  'db/database.cc',
   'db/index_page.cc',
   'db/table_manager.cc',
 ]

@@ -1,7 +1,5 @@
 #include "db/database.hh"
 
-#include <memory>
-
 #include "catalog/data.hh"
 #include "catalog/schema.hh"
 #include "catalog/table.hh"
@@ -14,65 +12,14 @@ using namespace dibibase::catalog;
 using namespace dibibase::util;
 using namespace dibibase::mem;
 
-void Database::create_table(std::string table_name, catalog::Schema schema) {
-  size_t sstable_id = 0;
-  Table table(table_name, schema, sstable_id);
-  size_t table_size = table.get_table_size(table, schema);
-  std::unique_ptr<Buffer> buf = std::make_unique<MemoryBuffer>(table_size);
-  table.bytes(buf.get());
-  write_metadata(buf.get());
-
-  // making table_mgr map
-  std::vector<std::unique_ptr<mem::Summary>> summary_vec;
-  TableManager tablemanager(m_directory_path, table.get_table_name(),
-                            table.get_table_schema(), std::move(summary_vec));
-  m_table_managers.insert({table.get_table_name(), std::move(tablemanager)});
-}
-
-void Database::write_record(std::string table_name, catalog::Record record) {
-
-  TableManager tablemanager =
-      std::move(m_table_managers.find(table_name)->second);
-  tablemanager.write_record(record);
-}
-Record Database::read_record(std::string table_name,
-                             std::unique_ptr<catalog::Data> data) {
-  TableManager tablemanager =
-      std::move(m_table_managers.find(table_name)->second);
-  Record record = tablemanager.read_record(std::move(data));
-  return record;
-}
-
-void Database::write_metadata(util::Buffer *buffer) {
-  std::unique_ptr<unsigned char[]> bytes = buffer->bytes();
-  size_t size = buffer->size();
-  // opening metadata file
-  string filename = m_directory_path + "/" + "metadata.md";
-  int fd = open(filename.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
-  if (fd < 0) {
-    perror("cann't create/open metadata.md");
-    close(fd);
-    exit(1);
-  }
-  int writing = write(fd, bytes.get(), size);
-  if (writing < 0) {
-    perror("writing error");
-    close(fd);
-    exit(1);
-  }
-}
-
-void Database::flush_metadata() {}
-
-Database::Database(std::string directory_path)
-    : m_directory_path(directory_path) {
+Database::Database(std::string directory_path) : m_base_path(directory_path) {
 
   std::unique_ptr<Buffer> buffer = std::make_unique<MemoryBuffer>(9000);
 
-  string filename = directory_path + "/" + "metadata.md";
+  string filename = m_base_path + "/" + "metadata.md";
   // case existing directory
   DIR *dr;
-  dr = opendir(directory_path.c_str());
+  dr = opendir(m_base_path.c_str());
   if (dr) {
     int fd = open(filename.c_str(), O_RDONLY, 0);
 
@@ -100,33 +47,36 @@ Database::Database(std::string directory_path)
       std::unique_ptr<Table> table = Table::from(buffer.get());
 
       // iterate over buffer
-      while (buffer->current_offset() < rc) {
+      while (buffer->offset() < rc) {
 
         std::unique_ptr<Table> table = Table::from(buffer.get());
         //-->offset += table.size();
-        int no_of_ssts = table->get_last_sstable_id();
+        int no_of_ssts = table->last_sstable_id();
         std::vector<std::unique_ptr<mem::Summary>> summary_vec;
-        io::DiskManager diskmgr;
+        io::DiskManager &diskmgr = io::DiskManager::get_instance();
 
         for (int i = 0; i < no_of_ssts; i++) {
+          std::string s = table->name();
+          std::string ss = nullptr;
+          std::string table_name = table->name();
           std::unique_ptr<mem::Summary> summary =
-              diskmgr.load_summary(directory_path, table->get_table_name(), i);
+              diskmgr.load_summary(m_base_path, table_name, i);
           summary_vec.push_back(std::move(summary));
         }
 
         // inst of table mgr
-        TableManager tablemanager(m_directory_path, table->get_table_name(),
-                                  table->get_table_schema(),
-                                  std::move(summary_vec));
+        TableManager tablemanager(
+            m_base_path, table->name(),
+            std::make_unique<catalog::Schema>(table->schema()),
+            std::move(summary_vec));
         // save it in map
-        m_table_managers.insert(
-            {table->get_table_name(), std::move(tablemanager)});
+        m_table_managers.insert({table->name(), std::move(tablemanager)});
       }
     }
     closedir(dr);
   } else {
     // create a new directory
-    int check = mkdir(directory_path.c_str(), 0777);
+    int check = mkdir(m_base_path.c_str(), 0777);
     if (check)
       printf("Couldn't create the directory an Error ocurred\n");
     // create new metadata.md file
@@ -135,3 +85,57 @@ Database::Database(std::string directory_path)
       printf("ERR couldn't create new metadata file");
   }
 }
+
+void Database::create_table(std::string table_name, catalog::Schema schema) {
+  size_t sstable_id = 0;
+  Table table(table_name, schema, sstable_id);
+  size_t table_size = table.size();
+  std::unique_ptr<Buffer> buf = std::make_unique<MemoryBuffer>(table_size);
+  table.bytes(buf.get());
+  write_metadata(buf.get());
+
+  // making table_mgr map
+  std::vector<std::unique_ptr<mem::Summary>> summary_vec;
+  TableManager tablemanager(m_base_path, table.name(),
+                            std::make_unique<catalog::Schema>(table.schema()),
+                            std::move(summary_vec));
+  m_table_managers.insert({table.name(), std::move(tablemanager)});
+
+  // create a new directory for the table
+  int check = mkdir((m_base_path + "/" + table_name).c_str(), 0777);
+  if (check)
+    printf("Couldn't create the directory an Error ocurred\n");
+}
+
+void Database::write_record(std::string table_name, catalog::Record record) {
+  m_table_managers.find(table_name)->second.write_record(record);
+}
+
+Record Database::read_record(std::string table_name,
+                             std::unique_ptr<catalog::Data> data) {
+  TableManager tablemanager =
+      std::move(m_table_managers.find(table_name)->second);
+  Record record = tablemanager.read_record(std::move(data));
+  return record;
+}
+
+void Database::write_metadata(util::Buffer *buffer) {
+  std::unique_ptr<unsigned char[]> bytes = buffer->bytes();
+  size_t size = buffer->size();
+  // opening metadata file
+  string filename = m_base_path + "/" + "metadata.md";
+  int fd = open(filename.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
+  if (fd < 0) {
+    perror("cann't create/open metadata.md");
+    close(fd);
+    exit(1);
+  }
+  int writing = write(fd, bytes.get(), size);
+  if (writing < 0) {
+    perror("writing error");
+    close(fd);
+    exit(1);
+  }
+}
+
+void Database::flush_metadata() {}
