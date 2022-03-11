@@ -1,10 +1,5 @@
 #pragma once
 
-#include <cstdio>
-#include <map>
-#include <string>
-#include <thread>
-#include <utility>
 
 #include "common.hh"
 
@@ -118,3 +113,6 @@ private:
 };
 
 } // namespace dibibase::util
+
+using dibibase::util::Logger;
+using dibibase::util::LogLevel;
