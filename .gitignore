@@ -1,5 +1,6 @@
 # Build Files
 build/
+builddir/
 compile_commands.json
 
 # Doxygen Output
