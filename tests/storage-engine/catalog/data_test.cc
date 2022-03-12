@@ -26,8 +26,6 @@ std::unique_ptr<Buffer> buf = std::make_unique<MemoryBuffer>(255);
     std::string out = child_data->data();  
     EXPECT_EQ(t.id(), Data::Type::ASCII); 
     EXPECT_EQ(out, expected);
-    //always return 5 i guess
-    EXPECT_EQ(t.size(),expected.size());
 }
 TEST(Type , biginttype){
     std::unique_ptr<Buffer> buf = std::make_unique<MemoryBuffer>(255);
