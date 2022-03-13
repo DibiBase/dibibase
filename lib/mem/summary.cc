@@ -6,6 +6,7 @@
 #include <memory>
 #include <string>
 #include <sys/types.h>
+#include <stdexcept>
 
 #include "catalog/data.hh"
 
@@ -26,7 +27,10 @@ std::unique_ptr<Summary> Summary::from(util::Buffer *buf) {
 }
 
 uint8_t Summary::find_page_number(catalog::Data *key) {
-  // In case having only one page in summary.
+  
+  if (m_sort_keys.size() == 0)
+    throw std::invalid_argument("Empty summary");
+  
   if (m_sort_keys.size() == 1)
     return 0;
 
