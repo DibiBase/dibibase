@@ -102,28 +102,21 @@ TEST(Summary, from_and_bytes_works_properly) {
 
     test_summary.bytes(buff);
 
-    std::unique_ptr < unsigned char[] > testt = buff -> bytes();
+    std::unique_ptr < unsigned char[] > buff_bytes = buff -> bytes();
 
-    Buffer * buf1 = new MemoryBuffer(std::move(testt), 36);
+    Buffer * buff1 = new MemoryBuffer(std::move(buff_bytes), 36);
 
-    std::unique_ptr < Summary > s1 = Summary::from(buf1);
-    const std::vector < std::unique_ptr < Data >> & extracted_keys = s1 -> sort_keys();
+    std::unique_ptr < Summary > new_test_summary = Summary::from(buff1);
+    const std::vector < std::unique_ptr < Data >> & extracted_keys = new_test_summary -> sort_keys();
 
     for (size_t i = 0; i < extracted_keys.size(); i++) {
 
         Data::Type type = extracted_keys[i] -> type();
 
+        auto child_data = (dynamic_cast <ASCIIData *> (extracted_keys[i].get()));
         if (type.id() == Data::Type::ASCII) {
-            std::unique_ptr < ASCIIData > child_data(
-                dynamic_cast < ASCIIData * > (extracted_keys[i].get()));
-            std::string r = child_data -> data();
-            std::cout << r << std::endl;
-            std::cout << values[i] << std::endl;
-            /** 
-             * See the output, both are identical
-             * However test fails!
-             */
-            EXPECT_EQ(r, values[i]);
+            std::string val = child_data -> data();
+            EXPECT_EQ(val, values[i]);
         }
     }
 }
