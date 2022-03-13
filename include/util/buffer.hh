@@ -54,6 +54,8 @@ public:
   virtual std::unique_ptr<unsigned char[]> get_blob(int) = 0;
   virtual Buffer &put_blob(unsigned char *, int) = 0;
 
+  virtual size_t offset() = 0;
+
   virtual size_t size() const = 0;
   virtual const std::unique_ptr<unsigned char[]> bytes() const = 0;
 };
@@ -103,7 +105,9 @@ public:
   std::unique_ptr<unsigned char[]> get_blob(int) override;
   Buffer &put_blob(unsigned char *, int) override;
 
-  virtual size_t size() const override { return m_size; };
+  size_t offset() override { return m_offset; }
+
+  size_t size() const override { return m_size; }
   const std::unique_ptr<unsigned char[]> bytes() const override;
 
   virtual ~MemoryBuffer() override {}
