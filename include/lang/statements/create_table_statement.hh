@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -21,6 +22,11 @@ public:
                        std::string table, catalog::Schema schema)
       : Statement(Type::CREATE_TABLE), m_if_not_exists(if_not_exists),
         m_keyspace(keyspace), m_table(table), m_schema(schema) {}
+
+  std::optional<catalog::Record> execute(db::Database &db) override {
+    db.create_table(m_table, m_schema);
+    return std::nullopt;
+  }
 
 public:
   bool m_if_not_exists;

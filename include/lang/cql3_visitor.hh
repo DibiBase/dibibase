@@ -383,7 +383,7 @@ public:
           ctx->stringLiteral()->STRING_LITERAL()->getText());
       return constant;
     } else if (ctx->decimalLiteral()) {
-      constant = new catalog::BigIntData(
+      constant = new catalog::IntData(
           strtoll(ctx->decimalLiteral()->DECIMAL_LITERAL()->getText().c_str(),
                   nullptr, 10));
       return constant;

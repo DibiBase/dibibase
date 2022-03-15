@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "catalog/data.hh"
+#include "catalog/record.hh"
 #include "common.hh"
 #include "lang/statements/batch.hh"
 #include "lang/statements/statement.hh"
@@ -28,6 +29,17 @@ public:
     for (auto value : m_values) {
       delete value;
     }
+  }
+
+  std::optional<catalog::Record> execute(db::Database &db) override {
+    std::vector<std::shared_ptr<catalog::Data>> values;
+
+    for (auto value : m_values) {
+      values.push_back(catalog::Data::from(value));
+    }
+
+    db.write_record(m_table, catalog::Record(values));
+    return std::nullopt;
   }
 
 public:
