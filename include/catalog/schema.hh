@@ -54,6 +54,13 @@ public:
   size_t sort_key_index() const { return m_sort_key_index; }
   size_t partition_key_index() const { return m_partition_key_index; }
 
+  void set_sort_key_index(size_t sort_key_index) {
+    m_sort_key_index = sort_key_index;
+  }
+  void set_partition_key_index(size_t sort_key_index) {
+    m_sort_key_index = sort_key_index;
+  }
+
   size_t record_size() const;
 
   size_t size() const;
