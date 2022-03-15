@@ -1,7 +1,7 @@
 CREATE TABLE race_winners (
-   race_name ascii(15),
+   race_name ascii(17),
    race_position int,
-   cyclist_name ascii(5),
+   cyclist_name ascii(7),
    PRIMARY KEY (race_name, race_position)
 );
 
