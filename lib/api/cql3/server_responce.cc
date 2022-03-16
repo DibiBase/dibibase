@@ -239,7 +239,11 @@ using namespace dibibase::api::cql3;
         int i=0;
         while(i<(15638)){ Header[i] = body[i]; i++; }
         msg_length = 15638;
-      }             
+      }
+      else{
+          //use the result from query_result class//
+          
+      }            
       break;
     }
     case AUTHENTICATE:

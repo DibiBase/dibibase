@@ -1,6 +1,7 @@
 #pragma once
 
 #include "api/cql3/frame.hh"
+#include "api/cql3/query_result.hh"
 #include "common.hh"
 #include <arpa/inet.h>
 #include <cerrno>
