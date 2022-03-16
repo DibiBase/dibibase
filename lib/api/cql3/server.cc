@@ -1,15 +1,5 @@
 #include "api/cql3/server.hh"
-#include "api/cql3/frame.cc"
-#include <arpa/inet.h>
-#include <cerrno>
-#include <cstdio>
-#include <cstring>
-#include <iostream>
-#include <netinet/in.h>
-#include <sys/epoll.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <unistd.h>
+
 using std::cout;
 
 using namespace dibibase::api::cql3;

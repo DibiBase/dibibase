@@ -5,6 +5,18 @@
 #include <sys/epoll.h>
 #include <string>
 #include "common.hh"
+#include "api/cql3/frame.hh"
+#include "api/cql3/server_responce.hh"
+#include <arpa/inet.h>
+#include <cerrno>
+#include <cstdio>
+#include <cstring>
+#include <iostream>
+#include <netinet/in.h>
+#include <sys/epoll.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #define BACKLOG 512
 #define MAX_EVENTS 128
