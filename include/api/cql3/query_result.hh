@@ -19,27 +19,27 @@
 #include <unistd.h>
 #include <utility>
 #include <vector>
-
+#include "catalog/record.hh"
+#include "catalog/schema.hh"
 namespace dibibase::api::cql3 {
 
 class DIBIBASE_PUBLIC QueryResult {
 public:
-  QueryResult(std::string keyspace,std::string table,unsigned char *);
-  /*
-    Putting initial Kind , flag  , and metadata_flags of the given keyspace.table
-  */
-  void put_ascii(std::string,unsigned char *);
-  void put_boolean(bool,unsigned char *);
-  void put_bigint(int64_t,unsigned char *);
-  void put_int (int, unsigned char *);
-  void put_double(double,unsigned char *);
-  void put_float(float,unsigned char *);
-  void put_varchar(std::string,unsigned char *);
-  void put_smallint(int16_t,unsigned char *);
-  void put_tinyint(int8_t,unsigned char *);
-  void put_map(std::map<std::string,std::string>,unsigned char *);  //Not implemented yet (might need it for meta tables) //
+  QueryResult(std::string keyspace,char *buff){
+    body = buff;
+    this->keyspace = keyspace;
+  }
+  int select_result(std::string table,catalog::Schema schema,std::vector<catalog::Record> record);
+  char * get_buffer(){return body;}
 
 private:
+  int size;
+  char *body={nullptr};
+  std::string keyspace;
+  int count(char *,int start,int breadth,int size);
+  int append_string(char*,int start,int size,std::string);
+  int append_field(char *,int start,int size,std::string,catalog::Data::Type);
+  int append_record(char *,int start,int size,std::string,catalog::Data::Type::Id);
   enum kind {
     Void = 0x0001,
     Rows = 0x0002,
@@ -48,7 +48,6 @@ private:
     Schema_change = 0x0005
   };
 
-  enum flag { NONE = 0x00, COMPRESSED = 0x01, TRACING = 0x02 };
   enum metadata_flags {
     Global_tables_spec = 0x0001,
     Has_more_pages = 0x0002,    /**<not the last page of results. */
