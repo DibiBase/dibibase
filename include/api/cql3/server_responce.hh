@@ -24,14 +24,17 @@ namespace dibibase::api::cql3 {
 
 class DIBIBASE_PUBLIC ServerMsg {
 public:
+
+  std::string get_query(){return pquery;}
   ServerMsg(Frame f);
   int SupportedMessage(std::map<std::string, std::list<std::string>>,
                        unsigned char *);
   int CreateResponse(int);
   std::string query;
   unsigned char Header[71680];
-
+  
 private:
+  std::string pquery;
   enum flag { NONE = 0x00, COMPRESSED = 0x01, TRACING = 0x02 };
   enum Opcode {
     ERROR = 0x00,          /**< enum value ERROR. */

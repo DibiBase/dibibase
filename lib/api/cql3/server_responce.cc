@@ -1,6 +1,13 @@
 #include "api/cql3/server_responce.hh"
 
 
+#include "lang/statements/create_table_statement.hh"
+#include "lang/statements/insert_statement.hh"
+#include "lang/statements/select_statement.hh"
+#include "lang/statements/statement.hh"
+
+
+
 using namespace dibibase::api::cql3;
   ServerMsg::ServerMsg(Frame f) { frame = f; }
   int ServerMsg::SupportedMessage(std::map<std::string, std::list<std::string>> supportedOptions,unsigned char *Header) {
@@ -114,6 +121,7 @@ using namespace dibibase::api::cql3;
       std::string v_keyspaces = "system_virtual_schema.keyspaces";
       std::string v_columns = "system_virtual_schema.columns";
       std::string v_tables = "system_virtual_schema.tables";
+      std::string cyclists = "khaled";
       for (int i=0 ; i<frame.max_size-9; i++){
         if(frame.body[i] <= 0) escape_flag = 1;
         else if (escape_flag==1 && frame.body[i] != 0) escape_flag =0;  
@@ -240,9 +248,20 @@ using namespace dibibase::api::cql3;
         while(i<(15638)){ Header[i] = body[i]; i++; }
         msg_length = 15638;
       }
-      else{
+      else if (strstr(query.c_str(),cyclists.c_str()) && count == 0){
           //use the result from query_result class//
+          //size = 60 //
+          pquery = query;
+          //std::cout << "pquery = " << pquery ;
+          int size = 69;
+          char body[1500]; 
           
+          // test table in system_virual_schema //
+          unsigned char bb [69] = {0,0,0,65,0,0,0,2,0,0,0,1,0,0,0,1,0,21,115,121,115,116,101,109,95,118,105,114,116,117,97,108,95,115,99,104,101,109,97,0,6,107,104,97,108,101,100,0,5,102,49,49,49,49,0,1,0,0,0,1,0,0,0,5,100,97,116,97,49};
+          for (int i=5;i<size+5;i++){
+            Header[i] = bb[i-5];
+          }
+          msg_length = 75;
       }            
       break;
     }

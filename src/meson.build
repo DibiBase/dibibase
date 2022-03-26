@@ -123,7 +123,8 @@ executable('lang',
 
 executable('dibibase',
   sources: 'main.cc',
-  include_directories : inc,
+  include_directories : [inc, '/usr/include/antlr4-runtime'],
+  dependencies: [dep_antlr4, idep_grammar],
   link_with : dibibaselib,
   install : true,
 )
