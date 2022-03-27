@@ -126,6 +126,17 @@ bool ASCIIData::compare(Data *other) {
   throw incompatible_data_types_error("");
 }
 
+bool ASCIIData::is_equal(Data *other) {
+  if (ASCIIData *rhs = dynamic_cast<ASCIIData *>(other); rhs != nullptr) {
+    if (m_data != rhs->data())
+      return false;
+
+    return true;
+  }
+
+  throw incompatible_data_types_error("");
+}
+
 void ASCIIData::bytes(util::Buffer *buf) { buf->put_string(m_data); }
 
 BigIntData::BigIntData(int64_t data)
@@ -134,6 +145,17 @@ BigIntData::BigIntData(int64_t data)
 bool BigIntData::compare(Data *other) {
   if (BigIntData *rhs = dynamic_cast<BigIntData *>(other); rhs != nullptr) {
     if (m_data <= rhs->data())
+      return false;
+
+    return true;
+  }
+
+  throw incompatible_data_types_error("");
+}
+
+bool BigIntData::is_equal(Data *other) {
+  if (BigIntData *rhs = dynamic_cast<BigIntData *>(other); rhs != nullptr) {
+    if (m_data != rhs->data())
       return false;
 
     return true;
@@ -151,6 +173,10 @@ bool BooleanData::compare(Data *other __attribute__((unused))) {
   throw uncomparable_type_error("");
 }
 
+bool BooleanData::is_equal(Data *other __attribute__((unused))) {
+  throw uncomparable_type_error("");
+}
+
 void BooleanData::bytes(util::Buffer *buf) { buf->put_boolean(m_data); }
 
 DoubleData::DoubleData(double data)
@@ -159,6 +185,17 @@ DoubleData::DoubleData(double data)
 bool DoubleData::compare(Data *other) {
   if (DoubleData *rhs = dynamic_cast<DoubleData *>(other); rhs != nullptr) {
     if (m_data <= rhs->data())
+      return false;
+
+    return true;
+  }
+
+  throw incompatible_data_types_error("");
+}
+
+bool DoubleData::is_equal(Data *other) {
+  if (DoubleData *rhs = dynamic_cast<DoubleData *>(other); rhs != nullptr) {
+    if (m_data != rhs->data())
       return false;
 
     return true;
@@ -183,6 +220,17 @@ bool FloatData::compare(Data *other) {
   throw incompatible_data_types_error("");
 }
 
+bool FloatData::is_equal(Data *other) {
+  if (FloatData *rhs = dynamic_cast<FloatData *>(other); rhs != nullptr) {
+    if (m_data != rhs->data())
+      return false;
+
+    return true;
+  }
+
+  throw incompatible_data_types_error("");
+}
+
 void FloatData::bytes(util::Buffer *buf) { buf->put_float(m_data); }
 
 IntData::IntData(int32_t data)
@@ -191,6 +239,17 @@ IntData::IntData(int32_t data)
 bool IntData::compare(Data *other) {
   if (IntData *rhs = dynamic_cast<IntData *>(other); rhs != nullptr) {
     if (m_data <= rhs->data())
+      return false;
+
+    return true;
+  }
+
+  throw incompatible_data_types_error("");
+}
+
+bool IntData::is_equal(Data *other) {
+  if (IntData *rhs = dynamic_cast<IntData *>(other); rhs != nullptr) {
+    if (m_data != rhs->data())
       return false;
 
     return true;
@@ -215,6 +274,17 @@ bool SmallIntData::compare(Data *other) {
   throw incompatible_data_types_error("");
 }
 
+bool SmallIntData::is_equal(Data *other) {
+  if (SmallIntData *rhs = dynamic_cast<SmallIntData *>(other); rhs != nullptr) {
+    if (m_data != rhs->data())
+      return false;
+
+    return true;
+  }
+
+  throw incompatible_data_types_error("");
+}
+
 void SmallIntData::bytes(util::Buffer *buf) { buf->put_int16(m_data); }
 
 TinyIntData::TinyIntData(int8_t data)
@@ -231,12 +301,27 @@ bool TinyIntData::compare(Data *other) {
   throw incompatible_data_types_error("");
 }
 
+bool TinyIntData::is_equal(Data *other) {
+  if (TinyIntData *rhs = dynamic_cast<TinyIntData *>(other); rhs != nullptr) {
+    if (m_data != rhs->data())
+      return false;
+
+    return true;
+  }
+
+  throw incompatible_data_types_error("");
+}
+
 void TinyIntData::bytes(util::Buffer *buf) { buf->put_int8(m_data); }
 
 BlobData::BlobData(std::unique_ptr<unsigned char[]> data, size_t size)
     : Data(Type(Type::BLOB, size)), m_size(size), m_data(std::move(data)) {}
 
 bool BlobData::compare(Data *other __attribute__((unused))) {
+  throw uncomparable_type_error("");
+}
+
+bool BlobData::is_equal(Data *other __attribute__((unused))) {
   throw uncomparable_type_error("");
 }
 

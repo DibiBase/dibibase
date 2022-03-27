@@ -98,3 +98,16 @@ catalog::Record io::DiskManager::get_record_from_data(
 
   return record;
 }
+
+off_t get_sstable_data_size(std::string &database_path, std::string &table_name,
+                            size_t sstable_id) {
+  int fd = open((database_path + "/" + table_name + "/data_" +
+                 std::to_string(sstable_id) + ".db")
+                    .c_str(),
+                O_RDONLY);
+
+  if (fd < 0)
+    std::perror("open");
+
+  return lseek(fd, 0, SEEK_END);
+}
