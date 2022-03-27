@@ -75,7 +75,7 @@ void TableManager::write_record(catalog::Record record) {
 }
 
 void TableManager::flush() {
-  io::TableBuilder table_builder(m_base_path, m_table_name, *m_schema,
+  io::MemoryBuilder table_builder(m_base_path, m_table_name, *m_schema,
                                  m_current_sstable_id, m_memtable);
 
   // Storing the summary of the new sstable.
