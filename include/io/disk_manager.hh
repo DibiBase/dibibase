@@ -6,6 +6,7 @@
 #include <string>
 #include <sys/types.h>
 #include <vector>
+#include <iostream>
 
 #include "catalog/record.hh"
 #include "catalog/schema.hh"
@@ -46,7 +47,10 @@ public:
                                        size_t sstable_id, catalog::Schema &,
                                        off_t offset);
 
-  off_t get_sstable_data_size(std::string &database_path,
+  off_t get_data_file_size(std::string &database_path,
+                              std::string &table_name, size_t sstable_id);
+
+  void remove_sstable(std::string &database_path,
                               std::string &table_name, size_t sstable_id);
 
 private:

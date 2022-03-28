@@ -37,6 +37,7 @@ io::DiskManager::load_summary(std::string &database_path,
   auto summary = mem::Summary::from(summary_buffer);
 
   delete summary_buffer;
+  close(fd);
 
   return summary;
 }
@@ -66,6 +67,7 @@ io::DiskManager::load_index_page(std::string &database_path,
   auto index_page = db::IndexPage::from(index_buffer);
 
   delete index_buffer;
+  close(fd);
 
   return index_page;
 }
@@ -95,12 +97,15 @@ catalog::Record io::DiskManager::get_record_from_data(
   auto record = catalog::Record(read_record->values());
 
   delete record_buffer;
+  close(fd);
 
   return record;
 }
 
-off_t get_sstable_data_size(std::string &database_path, std::string &table_name,
-                            size_t sstable_id) {
+off_t io::DiskManager::get_data_file_size(std::string &database_path,
+                                          std::string &table_name,
+                                          size_t sstable_id) {
+
   int fd = open((database_path + "/" + table_name + "/data_" +
                  std::to_string(sstable_id) + ".db")
                     .c_str(),
@@ -109,5 +114,34 @@ off_t get_sstable_data_size(std::string &database_path, std::string &table_name,
   if (fd < 0)
     std::perror("open");
 
-  return lseek(fd, 0, SEEK_END);
+  off_t size = lseek(fd, 0, SEEK_END);
+
+  close(fd);
+
+  return size;
+}
+
+void io::DiskManager::remove_sstable(std::string &database_path,
+                                     std::string &table_name,
+                                     size_t sstable_id) {
+
+  int rc = remove((database_path + "/" + table_name + "/data_" +
+                   std::to_string(sstable_id) + ".db")
+                      .c_str());
+  if (rc < 0)
+    util::Logger::make().err("Error removing data file: %d", errno);
+
+  rc = remove((database_path + "/" + table_name + "/index_" +
+               std::to_string(sstable_id) + ".db")
+                  .c_str());
+
+  if (rc < 0)
+    util::Logger::make().err("Error removing index file: %d", errno);
+
+  rc = remove((database_path + "/" + table_name + "/summary_" +
+               std::to_string(sstable_id) + ".db")
+                  .c_str());
+
+  if (rc < 0)
+    util::Logger::make().err("Error removing summary file: %d", errno);
 }

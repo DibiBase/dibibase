@@ -17,6 +17,7 @@ dibibaselib_db_srcs = [
 ]
 
 dibibaselib_io_srcs = [
+  'io/compaction.cc',
   'io/disk_manager.cc',
   'io/table_builder.cc',
 ]

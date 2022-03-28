@@ -26,6 +26,10 @@ public:
 
   virtual void construct_sstable_files() = 0;
 
+  std::unique_ptr<mem::Summary> get_new_summary() {
+    return std::move(m_summary);
+  }
+
   virtual ~TableBuilder();
 
 protected:
@@ -53,13 +57,10 @@ public:
   MemoryBuilder(std::string &base_path, std::string &table_name,
                 catalog::Schema &schema, size_t sstable_id,
                 std::map<std::shared_ptr<catalog::Data>, catalog::Record,
-                         catalog::DataCmp> records);
+                         catalog::DataCmp>
+                    records);
 
-  std::unique_ptr<mem::Summary> get_new_summary() {
-    return std::move(m_summary);
-  }
-
-private: 
+private:
   void construct_sstable_files() override;
 
 private:
@@ -71,10 +72,10 @@ class DIBIBASE_PUBLIC CompactionBuilder : public TableBuilder {
 
 public:
   CompactionBuilder(std::string &base_path, std::string &table_name,
-                catalog::Schema &schema, size_t sstable_id,
-                std::vector<catalog::Record> records);
+                    catalog::Schema &schema, size_t sstable_id,
+                    std::vector<catalog::Record> records);
 
-private: 
+private:
   void construct_sstable_files() override;
 
 private:
