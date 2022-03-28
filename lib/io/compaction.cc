@@ -93,17 +93,3 @@ void Compaction::compact_sstables() {
 
   m_summary = new_sstable.get_new_summary();
 }
-
-/*if (m_summaries.size() == 3) {
-    io::Compaction compact(m_base_path, m_table_name, *m_schema,
-                           m_summaries.size() - 1);
-
-    m_summaries.clear();
-    m_summaries.push_back(compact.get_new_summary());
-  }*/
-
-/*TableManager::~TableManager() {
-/*if (!m_memtable.empty()) {
-  flush();
-}
-}*/
