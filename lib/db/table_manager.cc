@@ -66,7 +66,7 @@ void TableManager::write_record(catalog::Record record) {
   // page. then memtable can store up to 10000 keys, which will be stored in 100
   // pages when flushing into disk.
   // TODO: supporting dynamic size for the record key.
-  if (m_memtable.size() >= 2) {
+  if (m_memtable.size() >= 3) {
     // TODO: It is supposed that flushing memtable into disk is asynchronous,
     // it is running in the background. Memtable must be ready to store new
     // records while flushing.
@@ -75,11 +75,21 @@ void TableManager::write_record(catalog::Record record) {
 }
 
 void TableManager::flush() {
-  io::TableBuilder table_builder(m_base_path, m_table_name, *m_schema,
+  io::MemoryBuilder table_builder(m_base_path, m_table_name, *m_schema,
                                  m_current_sstable_id, m_memtable);
 
   // Storing the summary of the new sstable.
   m_summaries.push_back(table_builder.get_new_summary());
+  
+  // Compact sstables when the table contains three sstables.
+  if (m_summaries.size() == 3) {
+    io::Compaction compact(m_base_path, m_table_name, *m_schema,
+                           m_summaries.size() - 1);
+
+    m_summaries.clear();
+    m_summaries.push_back(compact.get_new_summary());
+  }
+
   m_current_sstable_id = m_summaries.size();
 
   m_memtable.clear();

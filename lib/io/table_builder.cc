@@ -15,13 +15,10 @@ using namespace dibibase::catalog;
 using namespace dibibase::db;
 using namespace dibibase::mem;
 
-TableBuilder::TableBuilder(
-    std::string &base_path, std::string &table_name, catalog::Schema &schema,
-    size_t sstable_id,
-    std::map<std::shared_ptr<catalog::Data>, catalog::Record, catalog::DataCmp>
-        records)
+TableBuilder::TableBuilder(std::string &base_path, std::string &table_name,
+                           catalog::Schema &schema, size_t sstable_id)
     : m_base_path(base_path), m_table_name(table_name), m_schema(schema),
-      m_new_sstable_id(sstable_id), m_records(records) {
+      m_new_sstable_id(sstable_id) {
 
   // Creating summary, index and data file in disk.
   m_summary_fd =
@@ -48,11 +45,58 @@ TableBuilder::TableBuilder(
 
   if (m_data_fd < 0)
     std::perror("open");
+}
+
+bool TableBuilder::write_index_file() {
+  // Storing the index page in buffer.
+  util::Buffer *index_page_buffer = new util::MemoryBuffer(4096);
+  m_index_page->bytes(index_page_buffer);
+
+  // Storing index page bytes in index file.
+  std::unique_ptr<unsigned char[]> i_buf = index_page_buffer->bytes();
+  int wc = write(m_index_fd, i_buf.get(), 4096);
+  delete index_page_buffer;
+
+  if (wc < 0) {
+    util::Logger::make().err("Error writing in index file: %d", errno);
+    return false;
+  }
+  return true;
+}
+
+void TableBuilder::write_summary_file() {
+  // Storing summary in buffer.
+  util::Buffer *summary_buffer = new util::MemoryBuffer(4096);
+  m_summary->bytes(summary_buffer);
+
+  // Storing summary bytes in summary file.
+  std::unique_ptr<unsigned char[]> s_buf = summary_buffer->bytes();
+  int wc = write(m_summary_fd, s_buf.get(), 4096);
+  delete summary_buffer;
+
+  if (wc < 0) {
+    util::Logger::make().err("Error writing in summary file: %d", errno);
+  }
+}
+
+TableBuilder::~TableBuilder() {
+  close(m_summary_fd);
+  close(m_index_fd);
+  close(m_data_fd);
+}
+
+MemoryBuilder::MemoryBuilder(
+    std::string &base_path, std::string &table_name, catalog::Schema &schema,
+    size_t sstable_id,
+    std::map<std::shared_ptr<catalog::Data>, catalog::Record, catalog::DataCmp>
+        records)
+    : TableBuilder(base_path, table_name, schema, sstable_id),
+      m_records(records) {
 
   construct_sstable_files();
 }
 
-void TableBuilder::construct_sstable_files() {
+void MemoryBuilder::construct_sstable_files() {
   auto record_iterator = m_records.begin();
 
   // Getting record key type.
@@ -103,40 +147,63 @@ void TableBuilder::construct_sstable_files() {
   write_summary_file();
 }
 
-bool TableBuilder::write_index_file() {
-  // Storing the index page in buffer.
-  util::Buffer *index_page_buffer = new util::MemoryBuffer(4096);
-  m_index_page->bytes(index_page_buffer);
+CompactionBuilder::CompactionBuilder(std::string &base_path,
+                                     std::string &table_name,
+                                     catalog::Schema &schema, size_t sstable_id,
+                                     std::vector<catalog::Record> records)
+    : TableBuilder(base_path, table_name, schema, sstable_id),
+      m_records(records) {
 
-  // Storing index page bytes in index file.
-  std::unique_ptr<unsigned char[]> i_buf = index_page_buffer->bytes();
-  int wc = write(m_index_fd, i_buf.get(), 4096);
-  delete index_page_buffer;
-
-  if (wc < 0) {
-    util::Logger::make().err("Error writing in index file: %d", errno);
-    return false;
-  }
-  return true;
+  construct_sstable_files();
 }
 
-void TableBuilder::write_summary_file() {
-  // Storing summary in buffer.
-  util::Buffer *summary_buffer = new util::MemoryBuffer(4096);
-  m_summary->bytes(summary_buffer);
+void CompactionBuilder::construct_sstable_files() {
+  // Get sort key index from schema.
+  auto sort_index = m_schema.sort_key_index();
 
-  // Storing summary bytes in summary file.
-  std::unique_ptr<unsigned char[]> s_buf = summary_buffer->bytes();
-  int wc = write(m_summary_fd, s_buf.get(), 4096);
-  delete summary_buffer;
+  // Get sort key type.
+  catalog::Data::Type key_type = m_schema[sort_index].type();
 
-  if (wc < 0) {
-    util::Logger::make().err("Error writing in summary file: %d", errno);
+  m_summary = std::make_unique<Summary>(key_type);
+  m_index_page = std::make_unique<IndexPage>(key_type);
+
+  // Key offset in data file.
+  off_t key_offset = 0;
+
+  // Storing the first record key in summary.
+  m_summary->push_back(m_records[0][sort_index].get());
+
+  for (auto &record : m_records) {
+    // Storing record bytes in a buffer.
+    util::Buffer *record_buffer =
+        new util::MemoryBuffer(m_schema.record_size());
+    record.bytes(record_buffer);
+
+    // Storing record bytes in data file.
+    std::unique_ptr<unsigned char[]> r_buf = record_buffer->bytes();
+    int data_wc = write(m_data_fd, r_buf.get(), m_schema.record_size());
+    delete record_buffer;
+
+    if (data_wc < 0) {
+      util::Logger::make().err("Error writing in Data file: %d", errno);
+      return;
+    }
+
+    if (!m_index_page->push_back(record[sort_index].get(), key_offset)) {
+      // Storing the first key allocated in a new page.
+      m_summary->push_back(record[sort_index].get());
+
+      if (!write_index_file())
+        return;
+
+      m_index_page->clear();
+      m_index_page->push_back(record[sort_index].get(), key_offset);
+    }
+
+    key_offset += m_schema.record_size();
   }
-}
 
-TableBuilder::~TableBuilder() {
-  close(m_summary_fd);
-  close(m_index_fd);
-  close(m_data_fd);
+  if (!write_index_file())
+    return;
+  write_summary_file();
 }

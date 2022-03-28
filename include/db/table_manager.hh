@@ -14,6 +14,7 @@
 #include "errors.hh"
 #include "io/disk_manager.hh"
 #include "io/table_builder.hh"
+#include "io/compaction.hh"
 #include "mem/summary.hh"
 
 namespace dibibase::db {
