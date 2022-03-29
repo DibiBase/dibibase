@@ -1,55 +1,59 @@
 #pragma once
 
-#include <cstdint>
-#include <memory>
-#include <string>
-#include <vector>
-
-#include <grpcpp/grpcpp.h>
-
 #include "common.hh"
-#include "state_store.hh"
 #include "murmur_hash.hh"
-
-#include "streamer.pb.h"
-#include "streamer.grpc.pb.h"
-
-using dibibase::grpc::Query;
+#include "query_executer.hh"
+#include "state_store.hh"
 
 namespace dibibase::dht {
 
 class DIBIBASE_PUBLIC Partitioner {
 
 public:
-  uint64_t get_token(const std::string &key) const {
-    return MurmurHash::hash2_64((uint8_t *)key.c_str(), 0, key.size(), 0);
+  std::optional<std::string> get_address(const std::string &key) const {
+
+    uint64_t token =
+        MurmurHash::hash2_x64((uint8_t *)key.c_str(), 0, key.size(), 0);
+    return StateStore::instance().get_address(token);
   }
 
-  uint64_t send_query(const Query& query) const {
-    std::string partition_key = query.predicates[0].value();
-    uint64_t token = get_token(partition_key);
-    std::string address = get_address(token);
+  bool is_local(const std::string &key) const {
+    std::optional<std::string> address = get_address(key);
+    if (!address.has_value()) {
+      return true; // key is not in any range try to insert it locally
+    }
+    return address == StateStore::instance().local_address();
+  }
 
-    if (address == StateStore::get_local_address()) {
-      return m_query_processor->execute(&query);
+  string send(const string &query) const {
+
+    StateStore state = StateStore::instance();
+    std::string partition_key = "no"; // TODO: get partition key from query
+
+    std::optional<std::string> opt_address = get_address(partition_key);
+
+    if (!opt_address.has_value() || opt_address == state.local_address()) {
+      return QueryExecuter(query).execute();
     }
 
-    auto streamer = StateStore::get_streamer(address);
-    return streamer->execute(&query);
+    std::string address = opt_address.value();
+    auto streamer = state.get_streamer(address);
+    logger.info("sending to %s, %s", address.c_str(), query.c_str());
+
+    return streamer->execute(query);
+  }
+
+  void send_all(const string &query) const {
+    StateStore state = StateStore::instance();
+
+    for (const auto &[address, streamer] : state.available_streamers()) {
+      logger.info("sending to %s, %s", address.c_str(), query.c_str());
+      streamer->execute(query);
+    }
   }
 
 private:
-  std::string get_address(uint64_t token) const {
-    for(const auto &range : StateStore::get_available_ranges()) {
-      if(range.contains(token)) {
-        return range.address();
-      }
-    }
-    return "";
-  }
-
-
-  std::shared_ptr<QueryProcessor> m_query_processor;
+  Logger logger = Logger::make();
 };
 
 } // namespace dibibase::dht
