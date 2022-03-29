@@ -35,6 +35,10 @@ public:
         catalog::Data::from(m_where_spec.m_relation_elements[0].m_operand));
   }
 
+  virtual std::optional<std::string> partition_key() const override {
+    return m_where_spec.m_relation_elements[0].m_operand->print();
+  }
+
 public:
   bool m_distinct;
   bool m_json;

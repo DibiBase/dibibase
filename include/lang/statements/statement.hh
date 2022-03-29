@@ -59,6 +59,10 @@ public:
 
   virtual std::optional<catalog::Record> execute(db::Database &db) = 0;
 
+  virtual std::optional<std::string> partition_key() const {
+    return std::nullopt;
+  }
+
   Type type() const { return m_type; }
 
 private:
