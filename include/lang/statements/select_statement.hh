@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 
+#include "catalog/data.hh"
 #include "common.hh"
 #include "lang/statements/batch.hh"
 #include "lang/statements/from_spec.hh"
@@ -27,6 +28,12 @@ public:
         m_select_elements(select_elements), m_from_spec(from_spec),
         m_where_spec(where_spec), m_order_sepc(order_spec), m_limit(limit),
         m_allow_filtering(allow_filtering) {}
+
+  std::optional<catalog::Record> execute(db::Database &db) override {
+    return db.read_record(
+        m_from_spec.m_table,
+        catalog::Data::from(m_where_spec.m_relation_elements[0].m_operand));
+  }
 
 public:
   bool m_distinct;

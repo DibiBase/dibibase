@@ -1,6 +1,9 @@
 #pragma once
 
+#include "catalog/record.hh"
 #include "common.hh"
+#include "db/database.hh"
+#include <optional>
 
 namespace dibibase::lang {
 
@@ -53,6 +56,8 @@ public:
 public:
   explicit Statement(Type type) : m_type(type) {}
   virtual ~Statement() {}
+
+  virtual std::optional<catalog::Record> execute(db::Database &db) = 0;
 
   Type type() const { return m_type; }
 

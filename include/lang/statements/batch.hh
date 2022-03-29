@@ -42,7 +42,7 @@ public:
     batch.m_valid = true;
     batch.m_type = type;
     batch.m_timestamp_spec = timestamp_spec;
-
+    
     return batch;
   }
 

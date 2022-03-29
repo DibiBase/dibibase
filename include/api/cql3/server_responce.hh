@@ -20,16 +20,21 @@
 #include <unistd.h>
 #include <utility>
 #include <vector>
+
+#include "lang/statements/create_table_statement.hh"
+#include "lang/statements/insert_statement.hh"
+#include "lang/statements/select_statement.hh"
+#include "lang/statements/statement.hh"
 namespace dibibase::api::cql3 {
 
 class DIBIBASE_PUBLIC ServerMsg {
 public:
 
-  std::string get_query(){return pquery;}
+  std::string get_query();
   ServerMsg(Frame f);
   int SupportedMessage(std::map<std::string, std::list<std::string>>,
                        unsigned char *);
-  int CreateResponse(int);
+  int CreateResponse(int,std::shared_ptr<dibibase::db::Database>);
   std::string query;
   unsigned char Header[71680];
   

@@ -1,12 +1,21 @@
 #include "api/cql3/server_responce.hh"
 
+#include "antlr4-runtime.h"
 
+#include "CqlLexer.h"
+#include "CqlParser.h"
+
+#include "lang/cql3_visitor.hh"
 #include "lang/statements/create_table_statement.hh"
 #include "lang/statements/insert_statement.hh"
 #include "lang/statements/select_statement.hh"
 #include "lang/statements/statement.hh"
+#include <tuple>
 
 
+using namespace antlr4;
+using namespace dibibase;
+using namespace dibibase::lang::cql3;
 
 using namespace dibibase::api::cql3;
   ServerMsg::ServerMsg(Frame f) { frame = f; }
@@ -53,7 +62,7 @@ using namespace dibibase::api::cql3;
     return index;
   }
 
-  int ServerMsg::CreateResponse(int count) {
+  int ServerMsg::CreateResponse(int count,std::shared_ptr<dibibase::db::Database> db) {
     int opcode = int(frame.opcode);
     int msg_length = 9;   //default minimum is 9 decimals (HEADER ONLY NO DATA)
     int responce_version = frame.version + 0x80;
@@ -130,7 +139,7 @@ using namespace dibibase::api::cql3;
       }
       if  (query != "" && strstr(query.c_str(), ";") && query.back() != ';')
       {
-        query = query.substr(0, query.find(';'));
+        query = query.substr(0, query.find(';')+1);
 
       }
       std::cout << "\n\nCOUNT = " << count << "\n";
@@ -248,20 +257,81 @@ using namespace dibibase::api::cql3;
         while(i<(15638)){ Header[i] = body[i]; i++; }
         msg_length = 15638;
       }
-      else if (strstr(query.c_str(),cyclists.c_str()) && count == 0){
+      else if (query != "" && query.back() == ';') {
           //use the result from query_result class//
           //size = 60 //
-          pquery = query;
-          //std::cout << "pquery = " << pquery ;
-          int size = 69;
+
+          if(query[0] == 'N' || query[0] == 'n') query = "I" + query;
+          else if(query[0] == 'R' || query[0] == 'r') query = "C" + query;
+          else if(query[0] == 'E' || query[0] == 'e') query = "S" + query;
+          //std::cout << "query = " << query ;
+
           char body[1500]; 
           
-          // test table in system_virual_schema //
-          unsigned char bb [69] = {0,0,0,65,0,0,0,2,0,0,0,1,0,0,0,1,0,21,115,121,115,116,101,109,95,118,105,114,116,117,97,108,95,115,99,104,101,109,97,0,6,107,104,97,108,101,100,0,5,102,49,49,49,49,0,1,0,0,0,1,0,0,0,5,100,97,116,97,49};
-          for (int i=5;i<size+5;i++){
-            Header[i] = bb[i-5];
+          ANTLRInputStream input(query);
+          CqlLexer lexer(&input);
+          CommonTokenStream tokens(&lexer);
+          CqlParser parser(&tokens);
+          CqlParser::RootContext *tree = parser.root();
+          CQL3Visitor visitor;
+          std::vector<lang::Statement *> statements = visitor.visitRoot(tree).as<std::vector<lang::Statement *>>();
+
+
+       
+
+      for (auto statement : statements) {
+        switch (statement->type()) {
+          case lang::Statement::Type::CREATE_TABLE:
+            if (lang::CreateTableStatement *create_table_statement =
+                  dynamic_cast<lang::CreateTableStatement *>(statement);
+              create_table_statement != nullptr) {
+            create_table_statement->execute(*db);
+            std::cout << create_table_statement->m_table << std::endl;
+            }
+            break;
+          case lang::Statement::Type::INSERT:
+            if (lang::InsertStatement *insert_statement =
+                  dynamic_cast<lang::InsertStatement *>(statement);
+              insert_statement != nullptr) {
+            insert_statement->execute(*db);
+            std::cout << insert_statement->m_table << std::endl;
+            }
+            break;
+          case lang::Statement::Type::SELECT:
+            if (lang::SelectStatement *select_statement =
+                  dynamic_cast<lang::SelectStatement *>(statement);
+              select_statement != nullptr) {
+              
+              std::cout << select_statement->m_from_spec.m_table<< std::endl;
+              auto result = select_statement->execute(*db);
+              if (result)
+                for (auto value : result.value().values())
+                  std::cout << value->print() << std::endl;
+              std::vector<catalog::Record> record_v;
+              record_v.push_back(result.value());
+
+              //catalog::Schema s(0, 0);
+              const std::unique_ptr<catalog::Schema> &s = db->read_schema(select_statement->m_from_spec.m_table);
+              QueryResult q(select_statement->m_from_spec.m_keyspace,body);
+              int size = q.select_result(select_statement->m_from_spec.m_table, *s, record_v);
+              std::cout << "size:=" << size;
+              //table name -> DB:: method {return schema;}
+              // m_table_managers[tablename].schema;
+               Header[5] = 0;Header[6]=0;Header[7]=0;Header[8]=size;
+              for (int i=9;i<size+9;i++)
+                Header[i] = body[i-9];
+                
+              msg_length = size+9;
+            
+
+             }
+            break;
+          default:
+            break;
           }
-          msg_length = 75;
+
+         delete statement; 
+        }
       }            
       break;
     }
@@ -271,5 +341,9 @@ using namespace dibibase::api::cql3;
     }
     return msg_length;
   }
+
+std::string ServerMsg::get_query(){
+  return query;
+}
 
 

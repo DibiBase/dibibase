@@ -36,7 +36,10 @@ public:
   void write_record(std::string table_name, catalog::Record);
 
   void flush_metadata();
-
+    const std::unique_ptr<catalog::Schema> &read_schema(std::string table_name){
+      const std::unique_ptr<catalog::Schema> &s = m_table_managers.find(table_name)->second.schema();
+      return s;
+    }
   ~Database() { flush_metadata(); }
 
 private:

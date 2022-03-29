@@ -42,8 +42,8 @@ int QueryResult::select_result(std::string table, catalog::Schema schema,
 
     catalog::Field f = schema.fields()[i];
     const catalog::Data::Type t = f.type();
-    index = count(body, index, 2, t.size());
-    index = append_field(body, index, t.size(), f.name(), t);
+    index = count(body, index, 2, f.name().length());
+    index = append_field(body, index, f.name().length(), f.name(), t);
   }
   // records serializatio //
   index = count(body, index, 4, rows);

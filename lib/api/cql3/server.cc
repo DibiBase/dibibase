@@ -1,10 +1,13 @@
 #include "api/cql3/server.hh"
+#include "db/database.hh"
+#include <memory>
 
 using std::cout;
 
 using namespace dibibase::api::cql3;
 
 Server::Server(const int port) {
+  std::shared_ptr<db::Database> db = std::make_shared<db::Database>("database");
   struct sockaddr_in server_addr, client_addr;
   socklen_t client_len = sizeof(client_addr);
 
@@ -82,9 +85,8 @@ Server::Server(const int port) {
           f.parse();
 
           ServerMsg m(f);
-
           std::string columns = "system_schema.columns";
-          int bytes_sent = m.CreateResponse(mq);
+          int bytes_sent = m.CreateResponse(mq,db);
           /*
           printf("Received: ");
           for (int i = 0; i < bytes_received; i++) {
