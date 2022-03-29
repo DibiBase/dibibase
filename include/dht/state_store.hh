@@ -27,13 +27,22 @@ public:
 
   std::string local_address() { return m_local_address; }
 
-  std::shared_ptr<StreamerClient> get_streamer(const uint32_t token) {
+  std::optional<std::string> get_address(const uint32_t token) {
     for (const auto &range : m_ranges) {
       if (range.contains(token)) {
-        return get_streamer(range.address());
+        return range.address();
       }
     }
-    return nullptr;
+    return std::nullopt;
+  }
+
+  std::optional<std::shared_ptr<StreamerClient>>
+  get_streamer(const uint32_t token) {
+    std::optional<std::string> address = get_address(token);
+    return address.has_value()
+               ? static_cast<std::optional<std::shared_ptr<StreamerClient>>>(
+                     get_streamer(address.value()))
+               : std::nullopt;
   }
 
   std::shared_ptr<StreamerClient> get_streamer(const std::string &address) {
@@ -48,9 +57,12 @@ public:
 
 private:
   StateStore() {
+    logger.info("loading local configurations");
     YAML::Node node_config = YAML::LoadFile(LOCAL_CONFIG_FILE);
     m_local_address = node_config["address"].as<std::string>();
+    logger.info("local address: %s", m_local_address.c_str());
 
+    logger.info("loading remote configurations");
     YAML::Node remote_config = YAML::LoadFile(REMOTE_CONFIG_FILE);
     YAML::Node ranges = remote_config["ranges"];
     for (const auto &range : ranges) {
@@ -60,6 +72,8 @@ private:
 
       m_ranges.push_back(Range(start, end, address));
       m_streamers[address] = make_streamer(address);
+
+      logger.info("node %s, from: %9d, to: %9d", address.c_str(), start, end);
     }
   }
 
@@ -72,6 +86,8 @@ private:
   std::map<std::string, std::shared_ptr<StreamerClient>> m_streamers;
   std::string m_local_address;
   std::vector<Range> m_ranges;
+
+  Logger logger = Logger::make();
 };
 
 } // namespace dibibase::dht
