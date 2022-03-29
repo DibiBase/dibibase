@@ -114,8 +114,8 @@ executable('lang',
 
 executable('streamer',
   sources: ['streamer.cc', src_pb, src_grpc,],
-  include_directories : [inc],
-  dependencies: [dep_grpc, yaml_cpp],
+  include_directories : [inc, '/usr/include/antlr4-runtime'],
+  dependencies: [dep_grpc, yaml_cpp, dep_antlr4, idep_grammar],
   link_with : [dibibaselib],
   install : true,
 )
