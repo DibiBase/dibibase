@@ -2,53 +2,12 @@ syntax = "proto3";
 
 package dibibase.grpc;
 
-enum PredicateOp {
-  EQUAL = 0;
-  NOT_EQUAL = 1;
-  GREATER_THAN = 2;
-  GREATER_THAN_OR_EQUAL = 3;
-  LESS_THAN = 4;
-  LESS_THAN_OR_EQUAL = 5;
-  IN = 6;
-  NOT_IN = 7;
-  CONTAINS = 8;
-  NOT_CONTAINS = 9;
-  STARTS_WITH = 10;
-  NOT_STARTS_WITH = 11;
-  ENDS_WITH = 12;
-  NOT_ENDS_WITH = 13;
-  BETWEEN = 14;
-  NOT_BETWEEN = 15;
-  IS_NULL = 16;
-  IS_NOT_NULL = 17;
-  IS_EMPTY = 18;
-  IS_NOT_EMPTY = 19;
-  IS_TRUE = 20;
-  IS_FALSE = 21;
-  IS_DEFAULT = 22;
-  IS_NOT_DEFAULT = 23;
-}
-
-message Predicate {
-  PredicateOp op = 5;
-  string column = 3;
-  string value = 4;
-}
-
 message Query {
-  string keyspace = 1;
-  string table = 2;
- 
-  repeated Predicate predicates = 3;
-  repeated string projection_columns = 4;
-
-  int64 limit = 5;
-  int64 offset = 6;
-  string order_by = 7;
+  string str = 1;
 }
 
 message Result {
-  repeated bytes records = 1;
+  string str = 1;
 }
 
 service StreamerRPC {
