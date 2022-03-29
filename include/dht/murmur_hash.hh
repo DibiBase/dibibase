@@ -1,8 +1,5 @@
 #pragma once
 
-#include <cstdint>
-#include <memory>
-
 #include "common.hh"
 
 namespace dibibase::dht {
@@ -10,10 +7,10 @@ namespace dibibase::dht {
 class DIBIBASE_PUBLIC MurmurHash {
 
 public:
-  static uint32_t hash2_32(uint8_t key[], uint32_t offset, uint32_t length,
+  static uint32_t hash2_x32(uint8_t key[], uint32_t offset, uint32_t length,
                            uint32_t seed);
 
-  static uint64_t hash2_64(uint8_t key[], uint32_t offset, uint32_t length,
+  static uint64_t hash2_x64(uint8_t key[], uint32_t offset, uint32_t length,
                            uint64_t seed);
 
   static std::unique_ptr<uint64_t[]>

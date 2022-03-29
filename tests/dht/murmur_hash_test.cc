@@ -7,14 +7,14 @@ using namespace dibibase::dht;
 
 TEST(MurmurHash, hash2_32) {
   uint8_t key[] = "hello";
-  uint32_t result = MurmurHash::hash2_32(key, 0, 5, 0x982);
+  uint32_t result = MurmurHash::hash2_x32(key, 0, 5, 0x982);
   uint32_t expected_result = 0x1E65961D;
   EXPECT_EQ(result, expected_result);
 }
 
 TEST(MurmurHash, hash2_64) {
   uint8_t key[] = "We are here";
-  uint64_t result = MurmurHash::hash2_64(key, 0, 11, 0x14F);
+  uint64_t result = MurmurHash::hash2_x64(key, 0, 11, 0x14F);
   uint64_t expected_result = 0x7A647FDF36B1E653;
   EXPECT_EQ(result, expected_result);
 }

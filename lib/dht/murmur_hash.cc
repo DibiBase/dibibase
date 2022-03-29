@@ -5,7 +5,7 @@
 
 namespace dibibase::dht {
 
-uint32_t MurmurHash::hash2_32(uint8_t key[], uint32_t offset, uint32_t length,
+uint32_t MurmurHash::hash2_x32(uint8_t key[], uint32_t offset, uint32_t length,
                               uint32_t seed) {
   uint32_t m = 0x5bd1e995;
   uint32_t r = 24;
@@ -55,7 +55,7 @@ uint32_t MurmurHash::hash2_32(uint8_t key[], uint32_t offset, uint32_t length,
   return h;
 }
 
-uint64_t MurmurHash::hash2_64(uint8_t key[], uint32_t offset, uint32_t length,
+uint64_t MurmurHash::hash2_x64(uint8_t key[], uint32_t offset, uint32_t length,
                               uint64_t seed) {
   uint64_t m64 = 0xc6a4a7935bd1e995L;
   uint32_t r64 = 47;
