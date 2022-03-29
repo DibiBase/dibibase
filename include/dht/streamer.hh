@@ -1,92 +1,87 @@
+#pragma once
+
 #include <grpcpp/ext/proto_server_reflection_plugin.h>
 #include <grpcpp/grpcpp.h>
 #include <grpcpp/health_check_service_interface.h>
-#include <memory>
-#include <string>
-#include <vector>
 
-#include "catalog/record.hh"
-#include "util/logger.hh"
+#include "common.hh"
+#include "query_executer.hh"
 
 #include "streamer.grpc.pb.h"
-#include "streamer.pb.h"
 
-using dibibase::catalog::Record;
 using dibibase::grpc::Query;
 using dibibase::grpc::Result;
 using dibibase::grpc::StreamerRPC;
-using dibibase::util::Logger;
 using grpc::Server;
 using grpc::ServerBuilder;
 using grpc::ServerContext;
 using grpc::Status;
-
-Logger logger = Logger::make();
-
 namespace dibibase::dht {
 
 class StreamerServer final : public StreamerRPC::Service {
 public:
   StreamerServer() {}
-  StreamerServer(std::shared_ptr<QueryProcessor> query_processor)
-      : query_processor_(query_processor){};
 
   Status execute(ServerContext *context, const Query *request,
                  Result *response) override {
-    logger.info("Received query: {}", request);
+    logger.info("Received query: %s", request->str().c_str());
 
-    std::vector<Record> records = m_query_processor.process(request);
-    for (auto &record : records) {
-      response->add_records(record.to_string());
-    }
+    response->set_str(QueryExecuter(request->str()).execute());
 
     return Status::OK;
   }
 
 private:
-  std::shared_ptr<QueryProcessor> m_query_processor;
+  Logger logger = Logger::make();
 };
 
 class StreamerClient {
 public:
   StreamerClient(std::shared_ptr<::grpc::Channel> channel)
-      : stub_(StreamerRPC::NewStub(channel)){};
+      : stub(StreamerRPC::NewStub(channel)){};
 
-  std::vector<Record> execute(const Query &request) {
+  std::string execute(const std::string &query) {
     ::grpc::ClientContext context;
+    Query request;
     Result response;
-    Status status = stub_->execute(&context, request, &response);
+
+    request.set_str(query);
+    Status status = stub->execute(&context, request, &response);
 
     if (status.ok()) {
-      std::vector<Record> records;
-      for (auto &record : response.records()) {
-        records.push_back(Record::from(record));
-      }
-      return records;
+      return response.str();
     }
 
-    logger.info(status.error_message(), ": ", status.error_code());
-    return {};
+    logger.info("gRPC Error(%d): %s", status.error_code(),
+                status.error_message().c_str());
+    return "Error"; // TODO: change to optional
   }
 
 private:
-  std::unique_ptr<StreamerRPC::Stub> stub_;
+  std::unique_ptr<StreamerRPC::Stub> stub;
+
+  Logger logger = Logger::make();
 };
 
-void run_server(int portno) {
-  std::string server_address("0.0.0.0:" + std::to_string(portno));
-  StreamerServer service;
+class StreamerService {
+public:
+  void run_server(std::string server_str) {
+    StreamerServer service;
 
-  ::grpc::EnableDefaultHealthCheckService(true);
-  ::grpc::reflection::InitProtoReflectionServerBuilderPlugin();
-  ServerBuilder builder;
+    ::grpc::EnableDefaultHealthCheckService(true);
+    ::grpc::reflection::InitProtoReflectionServerBuilderPlugin();
+    ServerBuilder builder;
 
-  builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
-  builder.RegisterService(&service);
-  std::unique_ptr<Server> server(builder.BuildAndStart());
-  logger.info("Server listening on ", server_address);
+    builder.AddListeningPort(server_str, ::grpc::InsecureServerCredentials());
+    builder.RegisterService((::grpc::Service *)&service);
+    std::unique_ptr<Server> server(builder.BuildAndStart());
+    logger.info("Server listening on %s", server_str.c_str());
 
-  server->Wait();
-}
+    server->Wait();
+  }
 
-} // namespace dibibase::dhts
+private:
+  Logger logger = Logger::make();
+};
+
+} // namespace dibibase::dht
