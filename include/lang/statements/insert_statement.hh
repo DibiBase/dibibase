@@ -42,6 +42,10 @@ public:
     return std::nullopt;
   }
 
+  virtual std::optional<std::string> partition_key() const override {
+    return m_values[0]->print();
+  }
+
 public:
   Batch m_batch;
   std::string m_keyspace;
