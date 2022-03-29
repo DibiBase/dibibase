@@ -1,0 +1,7 @@
+ranges:
+  - start: 0
+    end: 100
+    address: "127.0.0.1:9090"
+  - start: 100
+    end: 200
+    address: "127.0.0.1:9091"
