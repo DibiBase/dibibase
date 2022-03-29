@@ -16,8 +16,8 @@ public:
 
   string execute() {
     std::shared_ptr<Statement> stmt = StatementProcessor(m_query).process();
-    std::optional<Record> resutl = StatementExecuter(stmt).execute();
-    return ResutlSerializer(resutl).serialize();
+    std::optional<Record> result = StatementExecuter(stmt).execute();
+    return ResutlSerializer(result).serialize();
   }
 
 private:
