@@ -19,6 +19,10 @@ grpc_reflection = cppc.find_library('grpc++_reflection', required: false)
 
 threadlibs = dependency('threads')
 
+cmake = import('cmake')
+yaml_cpp_proj = cmake.subproject('yaml_cpp')
+yaml_cpp = yaml_cpp_proj.dependency('yaml_cpp')
+
 if meson.version().version_compare('>=0.56.0')
   project_source_root = meson.project_source_root()
 else
@@ -38,13 +42,21 @@ grpc_gen = generator(protoc,
     '--plugin=protoc-gen-grpc=' + grpc_cpp.path(),
     '@INPUT@'])
 
-src_pb = protoc_gen.process(
+src_streamer_pb = protoc_gen.process(
   project_source_root + '/protos/streamer.proto',
   preserve_path_from : project_source_root + '/protos')
 
-src_grpc = grpc_gen.process(
+src_streamer_grpc = grpc_gen.process(
   project_source_root + '/protos/streamer.proto',
   preserve_path_from : project_source_root + '/protos')
+
+src_pb = [
+  src_streamer_pb
+]
+
+src_grpc = [
+  src_streamer_grpc
+]
 
 dep_grpc = [
   grpc,
@@ -96,6 +108,14 @@ executable('lang',
   sources: ['lang.cc'],
   include_directories : [inc, '/usr/include/antlr4-runtime'],
   dependencies: [dep_antlr4, idep_grammar],
+  link_with : [dibibaselib],
+  install : true,
+)
+
+executable('streamer',
+  sources: ['streamer.cc', src_pb, src_grpc,],
+  include_directories : [inc],
+  dependencies: [dep_grpc, yaml_cpp],
   link_with : [dibibaselib],
   install : true,
 )
