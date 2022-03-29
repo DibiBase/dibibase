@@ -5,6 +5,7 @@
 #include <unistd.h>
 
 #include "dht/partitioner.hh"
+#include "dht/query_processor.hh"
 #include "dht/state_store.hh"
 #include "dht/streamer.hh"
 
@@ -20,9 +21,12 @@ int main(int argc, char *argv[]) {
   // external queries
   while (true) {
     std::string query;
-    std::cout << ">>> ";
+    std::cout << ">>> " << std::flush;
     std::getline(std::cin, query);
-    std::cout << Partitioner().send(query) << std::endl;
+    if (query == "") {
+      continue;
+    }
+    std::cout << QueryProcessor(query).process() << std::endl;
   }
 
   // wait for server
