@@ -22,7 +22,7 @@ public:
   StatementProcessor(const string &query) : m_query(query) {}
 
   std::unique_ptr<Statement> process() {
-
+    // TODO: handle exceptions
     ANTLRInputStream input(m_query);
     CqlLexer lexer(&input);
     CommonTokenStream tokens(&lexer);
