@@ -34,5 +34,6 @@
 #include <thread>
 #include <utility>
 #include <vector>
+#include <optional>
 
 #include "util/logger.hh"
