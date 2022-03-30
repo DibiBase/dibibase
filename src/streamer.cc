@@ -7,7 +7,7 @@
 #include "dht/partitioner.hh"
 #include "dht/query_processor.hh"
 #include "dht/state_store.hh"
-#include "dht/streamer.hh"
+#include "dht/streamer/service.hh"
 
 using namespace dibibase::dht;
 
@@ -18,15 +18,22 @@ int main(int argc, char *argv[]) {
   std::thread th = std::thread(
       [local_address]() { StreamerService().run_server(local_address); });
 
+  sleep(1);
+
   // external queries
-  while (true) {
-    std::string query;
-    std::cout << ">>> " << std::flush;
+  std::ifstream stream;
+  std::string query;
+  stream.open(argv[1]);
+
+  while (!stream.eof()) {
+    std::cout << ">>> ";
     std::getline(std::cin, query);
+    // std::cout << query << std::endl;
     if (query == "") {
       continue;
     }
-    std::cout << QueryProcessor(query).process() << std::endl;
+    string result = QueryProcessor(query).process();
+    std::cout << "Result: " << result << std::endl;
   }
 
   // wait for server
