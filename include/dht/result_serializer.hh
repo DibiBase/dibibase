@@ -8,16 +8,19 @@ using namespace dibibase::catalog;
 
 namespace dibibase::dht {
 
-class DIBIBASE_PUBLIC ResutlSerializer {
+class DIBIBASE_PUBLIC ResultSerializer {
 
 public:
-  ResutlSerializer(const std::optional<Record> &record) : m_record(record) {}
+  ResultSerializer(const std::optional<Record> &record) : m_record(record) {}
 
   string serialize() {
     if (m_record.has_value()) {
-      return ""; // TODO: serialize to Rows
+      string result;
+      for (auto value : m_record.value().values())
+        result += value->print() + ", ";
+      return result; // TODO: serialize to Rows
     }
-    return ""; // TODO: Void
+    return "Get Nothing"; // TODO: Void
   }
 
 private:

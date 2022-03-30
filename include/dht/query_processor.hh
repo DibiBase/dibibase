@@ -9,7 +9,6 @@
 #include "lang/statements/statement.hh"
 #include "partitioner.hh"
 #include "statement_processor.hh"
-#include <iostream>
 
 using dibibase::catalog::Record;
 namespace dibibase::dht {
@@ -22,30 +21,36 @@ public:
   string process() {
     Partitioner partitioner;
 
-    std::unique_ptr<Statement> stmt = StatementProcessor(m_query).process();
+    std::shared_ptr<Statement> stmt = StatementProcessor(m_query).process();
 
     switch (stmt->type()) {
     case Statement::Type::CREATE_TABLE:
     case Statement::Type::DROP_TABLE:
     case Statement::Type::CREATE_INDEX:
     case Statement::Type::DROP_INDEX: {
-      // partitioner.send_all(m_query);
-      QueryExecuter(m_query).execute();
-      break;
+      partitioner.send_all(m_query);
+
+      return "All nodes have been updated";
+      // TODO: process local statement in local flow
     }
     case Statement::Type::INSERT:
     case Statement::Type::SELECT: {
       // TODO: handle partition key
       string key = stmt->partition_key().value();
-      std::cout << "Inserting into local table: " << key << std::endl;
-      QueryExecuter(m_query).execute();
-
-      break;
+      if (partitioner.is_local(key)) {
+        return process_local(stmt);
+      }
+      return partitioner.send(m_query, key);
     }
     default: {
       break;
     }
     }
+  }
+
+private:
+  string process_local(const std::shared_ptr<Statement> &stmt) {
+    return ResultSerializer(StatementExecuter(stmt).execute()).serialize();
   }
 
 private:
