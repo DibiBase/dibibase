@@ -3,9 +3,12 @@
 #include "common.hh"
 #include "range.hh"
 
-#include "streamer.hh"
+#include "db/database.hh"
+#include "streamer/client.hh"
 
 #include "yaml-cpp/yaml.h"
+
+using dibibase::db::Database;
 
 namespace dibibase::dht {
 
@@ -55,6 +58,16 @@ public:
     return it->second;
   }
 
+  std::shared_ptr<Database> get_keyspace(const std::string &keyspace) {
+    auto it = m_keyspaces.find(keyspace);
+    if (it == m_keyspaces.end()) {
+      auto keyspace_ptr = make_keyspace(keyspace);
+      m_keyspaces[keyspace] = keyspace_ptr;
+      return keyspace_ptr;
+    }
+    return it->second;
+  }
+
 private:
   StateStore() {
     logger.info("loading local configurations");
@@ -82,8 +95,13 @@ private:
         ::grpc::CreateChannel(address, ::grpc::InsecureChannelCredentials()));
   }
 
+  std::shared_ptr<Database> make_keyspace(const std::string &keyspace) {
+    return std::make_shared<Database>(keyspace);
+  }
+
 private:
   std::map<std::string, std::shared_ptr<StreamerClient>> m_streamers;
+  std::map<std::string, std::shared_ptr<Database>> m_keyspaces;
   std::string m_local_address;
   std::vector<Range> m_ranges;
 
