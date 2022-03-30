@@ -8,7 +8,7 @@
 
 #include "lang/statements/statement.hh"
 #include "partitioner.hh"
-#include "statement_processor.hh"
+#include "statement_parser.hh"
 
 using dibibase::catalog::Record;
 namespace dibibase::dht {
@@ -21,7 +21,7 @@ public:
   string process() {
     Partitioner partitioner;
 
-    std::shared_ptr<Statement> stmt = StatementProcessor(m_query).process();
+    std::shared_ptr<Statement> stmt = StatementParser(m_query).process();
 
     switch (stmt->type()) {
     case Statement::Type::CREATE_TABLE:
@@ -50,7 +50,7 @@ public:
 
 private:
   string process_local(const std::shared_ptr<Statement> &stmt) {
-    return ResultSerializer(StatementExecuter(stmt).execute()).serialize();
+    return ResultSerializer(StatementExecutor(stmt).execute()).serialize();
   }
 
 private:
