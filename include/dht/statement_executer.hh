@@ -3,13 +3,10 @@
 #include "common.hh"
 
 #include "lang/statements/statement.hh"
-#include <cstddef>
-#include <iostream>
-#include <optional>
+#include "state_store.hh"
 
 using namespace dibibase::lang;
 using dibibase::catalog::Record;
-
 namespace dibibase::dht {
 
 class DIBIBASE_PUBLIC StatementExecuter {
@@ -19,14 +16,14 @@ public:
       : m_statement(statement) {}
 
   std::optional<Record> execute() {
-    db::Database db("database");
-
     // TODO: handle exceptions
-    std::optional<Record> result = m_statement->execute(db);
+    string address = StateStore::instance().local_address();
+    auto keypace = StateStore::instance().get_keyspace(address + ":database");
+    std::optional<Record> result = m_statement->execute(*keypace);
 
     if (result.has_value())
       for (auto value : result.value().values())
-        std::cout << value->print() << std::endl;
+        // std::cout << value->print() << std::endl;
     return result;
   }
 
