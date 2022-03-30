@@ -16,10 +16,10 @@ using namespace dibibase::lang::cql3;
 
 namespace dibibase::dht {
 
-class DIBIBASE_PUBLIC StatementProcessor {
+class DIBIBASE_PUBLIC StatementParser {
 
 public:
-  StatementProcessor(const string &query) : m_query(query) {}
+  StatementParser(const string &query) : m_query(query) {}
 
   std::unique_ptr<Statement> process() {
     // TODO: handle exceptions

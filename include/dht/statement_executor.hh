@@ -9,10 +9,10 @@ using namespace dibibase::lang;
 using dibibase::catalog::Record;
 namespace dibibase::dht {
 
-class DIBIBASE_PUBLIC StatementExecuter {
+class DIBIBASE_PUBLIC StatementExecutor {
 
 public:
-  StatementExecuter(const std::shared_ptr<Statement> &statement)
+  StatementExecutor(const std::shared_ptr<Statement> &statement)
       : m_statement(statement) {}
 
   std::optional<Record> execute() {
