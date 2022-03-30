@@ -4,7 +4,7 @@ INSERT INTO race_winners (race_position, race_name, cyclist_name) VALUES ( 'Grad
 
 INSERT INTO race_winners (race_position, race_name, cyclist_name) VALUES ( 'Graduation Race 2', 2, 'Alice 2') USING TTL 86400 AND TIMESTAMP 123456789;
 
-INSERT INTO race_winners (race_position, race_name, cyclist_name) VALUES ('Graduation Race 3', 3, 'Alice 3') USING TTL 86400 AND TIMESTAMP 123456789;
+INSERT INTO race_winners (race_position, race_name, cyclist_name) VALUES ( 'Graduation Race 3', 3, 'Alice 3') USING TTL 86400 AND TIMESTAMP 123456789;
 
 INSERT INTO race_winners (race_position, race_name, cyclist_name) VALUES ( 'Graduation Race 4', 4, 'Alice 4') USING TTL 86400 AND TIMESTAMP 123456789;
 

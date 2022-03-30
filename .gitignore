@@ -17,4 +17,7 @@ grammars/ebnf/.antlr/
 .vscode/
 .cache/
 
+# databeses
+127.0.0.1*
+
 obsolete/
