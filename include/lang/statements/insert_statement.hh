@@ -43,7 +43,7 @@ public:
   }
 
   virtual std::optional<std::string> partition_key() const override {
-    return m_values[0]->print();
+    return m_values[1]->print();
   }
 
 public:
