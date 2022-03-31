@@ -29,9 +29,12 @@ public:
     body = buff;
     this->keyspace = keyspace;
   }
+  int schema_change(std::string table);
+  int create_table(std::string table);
+  int insert_record();
   int select_result(std::string table,catalog::Schema schema,std::vector<catalog::Record> record);
   char * get_buffer(){return body;}
-
+  
 private:
   int size;
   char *body={nullptr};

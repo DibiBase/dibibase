@@ -264,7 +264,7 @@ if os.path.exists(OLD_HISTORY):
 
 CQL_ERRORS = (
     cassandra.AlreadyExists, cassandra.AuthenticationFailed, cassandra.CoordinationFailure,
-    cassandra.InvalidRequest, cassandra.Timeout, cassandra.Unauthorized, cassandra.OperationTimedOut,
+    #cassandra.InvalidRequest, cassandra.Timeout, cassandra.Unauthorized, cassandra.OperationTimedOut,
     cassandra.cluster.NoHostAvailable,
     cassandra.connection.ConnectionBusy, cassandra.connection.ProtocolError, cassandra.connection.ConnectionException,
     cassandra.protocol.ErrorMessage, cassandra.protocol.InternalError, cassandra.query.TraceUnavailable
@@ -354,9 +354,6 @@ def full_cql_version(ver):
 def format_value(val, cqltype, encoding, addcolor=False, date_time_format=None,
                  float_precision=None, colormap=None, nullval=None):
     if isinstance(val, DecodeError):
-        if addcolor:
-            return colorme(repr(val.thebytes), colormap, 'error')
-        else:
             return FormattedValue(repr(val.thebytes))
     return format_by_type(val, cqltype=cqltype, encoding=encoding, colormap=colormap,
                           addcolor=addcolor, nullval=nullval, date_time_format=date_time_format,
@@ -523,7 +520,7 @@ class Shell(cmd.Cmd):
         self.serial_consistency_level = cassandra.ConsistencyLevel.SERIAL
 
         self.empty_lines = 0
-        self.statement_error = False
+
         self.single_statement = single_statement
         self.is_subshell = is_subshell
 
@@ -553,9 +550,6 @@ class Shell(cmd.Cmd):
         return self.cql_ver_tuple[:3] >= (major, minor, patch)
 
     def myformat_value(self, val, cqltype=None, **kwargs):
-        if isinstance(val, DecodeError):
-            self.decoding_errors.append(val)
-        try:
             dtformats = DateTimeFormat(timestamp_format=self.display_timestamp_format,
                                        date_format=self.display_date_format, nanotime_format=self.display_nanotime_format,
                                        timezone=self.display_timezone)
@@ -564,10 +558,7 @@ class Shell(cmd.Cmd):
             return format_value(val, cqltype=cqltype, encoding=self.output_codec.name,
                                 addcolor=self.color, date_time_format=dtformats,
                                 float_precision=precision, **kwargs)
-        except Exception as e:
-            err = FormatError(val, e)
-            self.decoding_errors.append(err)
-            return format_value(err, cqltype=cqltype, encoding=self.output_codec.name, addcolor=self.color)
+       
 
     def myformat_colname(self, name, table_meta=None):
         column_colors = COLUMN_NAME_COLORS.copy()
@@ -587,7 +578,7 @@ class Shell(cmd.Cmd):
 
     def show_host(self):
         print("Connected to {0} at {1}:{2}"
-              .format(self.applycolor(self.get_cluster_name(), BLUE),
+              .format(self.applycolor("DIBIBASE", BLUE),
                       self.hostname,
                       self.port))
 
@@ -597,7 +588,7 @@ class Shell(cmd.Cmd):
         # system.Versions['cql'] apparently does not reflect changes with
         # set_cql_version.
         vers['cql'] = self.cql_version
-        print("[cqlsh %(shver)s | Cassandra %(build)s | CQL spec %(cql)s | Native protocol v%(protocol)s]" % vers)
+        print("[cqlsh %(shver)s | Dibibase v1.0 | CQL spec %(cql)s | Native protocol v%(protocol)s]" % vers)
 
     def maybe_warn_py2(self):
         py2_suppress_warn = 'CQLSH_NO_WARN_PY2'
@@ -996,21 +987,9 @@ class Shell(cmd.Cmd):
             if parsed and not parsed.remainder:
                 # successful complete parse
                 return custom_handler(parsed)
-            else:
-                return self.handle_parse_error(cmdword, tokens, parsed, srcstr)
         return self.perform_statement(cqlruleset.cql_extract_orig(tokens, srcstr))
 
-    def handle_parse_error(self, cmdword, tokens, parsed, srcstr):
-        if cmdword.lower() in ('select', 'insert', 'update', 'delete', 'truncate',
-                               'create', 'drop', 'alter', 'grant', 'revoke',
-                               'batch', 'list'):
-            # hey, maybe they know about some new syntax we don't. type
-            # assumptions won't work, but maybe the query will.
-            return self.perform_statement(cqlruleset.cql_extract_orig(tokens, srcstr))
-        if parsed:
-            self.printerr('Improper %s command (problem at %r).' % (cmdword, parsed.remainder[0]))
-        else:
-            self.printerr('Improper %s command.' % cmdword)
+
 
     def do_use(self, parsed):
         ksname = parsed.get_binding('ksname')
@@ -1098,12 +1077,13 @@ class Shell(cmd.Cmd):
             try:
                 self.conn.refresh_schema_metadata(5)  # will throw exception if there is a schema mismatch
             except Exception:
-                self.printerr("Warning: schema version mismatch detected; check the schema versions of your "
-                              "nodes in system.local and system.peers.")
-                self.conn.refresh_schema_metadata(-1)
+                #self.printerr("Warning: schema version mismatch detected; check the schema versions of your "
+                #              "nodes in system.local and system.peers.")
+                print("New Table Created")
+                #self.conn.refresh_schema_metadata(-1)
 
         if result is None:
-            return False, None
+            return True, None
 
         if statement.query_string[:6].lower() == 'select':
             self.print_result(result, self.parse_for_select_meta(statement.query_string))
@@ -1148,12 +1128,7 @@ class Shell(cmd.Cmd):
         num_rows = print_all(result, table_meta, self.tty)
         self.writeresult("(%d rows)" % num_rows)
 
-        if self.decoding_errors:
-            for err in self.decoding_errors[:2]:
-                self.writeresult(err.message(), color=RED)
-            if len(self.decoding_errors) > 2:
-                self.writeresult('%d more decoding errors suppressed.'
-                                 % (len(self.decoding_errors) - 2), color=RED)
+       
 
     def print_static_result(self, result, table_meta, with_header, tty, row_count_offset=0):
         if not result.column_names and not table_meta:
@@ -2179,15 +2154,12 @@ def read_options(cmdlineargs, environment):
     try:
         options.connect_timeout = int(options.connect_timeout)
     except ValueError:
-        parser.error('"%s" is not a valid connect timeout.' % (options.connect_timeout,))
-        options.connect_timeout = DEFAULT_CONNECT_TIMEOUT_SECONDS
+        print('')
 
     try:
         options.request_timeout = int(options.request_timeout)
     except ValueError:
-        parser.error('"%s" is not a valid request timeout.' % (options.request_timeout,))
-        options.request_timeout = DEFAULT_REQUEST_TIMEOUT_SECONDS
-
+        print('')
     hostname = environment.get('CQLSH_HOST', hostname)
     port = environment.get('CQLSH_PORT', port)
 

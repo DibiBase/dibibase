@@ -37,11 +37,7 @@ public:
   int CreateResponse(int,std::shared_ptr<dibibase::db::Database>);
   std::string query;
   unsigned char Header[71680];
-  
-private:
-  std::string pquery;
-  enum flag { NONE = 0x00, COMPRESSED = 0x01, TRACING = 0x02 };
-  enum Opcode {
+    enum Opcode {
     ERROR = 0x00,          /**< enum value ERROR. */
     STARTUP = 0x01,        /**< enum value STARTUP. */
     READY = 0x02,          /**< enum value READY. */
@@ -59,6 +55,9 @@ private:
     AUTH_RESPONSE = 0x0F,  /**< enum value AUTH_RESPONSE. */
     AUTH_SUCCESS = 0x10    /**< enum value AUTH_SUCCESS. */
   };
+private:
+  std::string pquery;
+  enum flag { NONE = 0x00, COMPRESSED = 0x01, TRACING = 0x02 };
   enum Version { VERSION = 0x83, KEY = 0x83 };
   Frame v() {
     char q[21] = {'0', '3', '0', '0', '0', '0', '0', '0', '0',

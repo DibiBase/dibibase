@@ -54,43 +54,9 @@ dep_grpc = [
   threadlibs,
 ]
 
-antlr4 = find_program('antlr4')
 
-src_grammar = custom_target('gen-grammar',
-  input : [
-    project_source_root + '/grammars/ebnf/CqlLexer.g4',
-    project_source_root + '/grammars/ebnf/CqlParser.g4',
-  ],
-  output : [
-    'CqlLexer.h',
-    'CqlLexer.cpp',
-    'CqlParser.h',
-    'CqlParser.cpp',
-    'CqlParserVisitor.h',
-    'CqlParserBaseVisitor.h',
-  ],
-  command : [
-    antlr4,
-    '-Dlanguage=Cpp',
-    '-DexportMacro=DIBIBASE_PUBLIC',
-    '-visitor',
-    '-o', '@OUTDIR@',
-    '-package', 'dibibase::lang::cql3',
-    '-Xexact-output-dir',
-    '@INPUT0@', '@INPUT1@',
-  ]
-)
 
-libgrammar = static_library('grammar',
-  sources: [src_grammar],
-  include_directories : [inc, '/usr/include/antlr4-runtime'],
-  dependencies: [dep_antlr4],
-)
 
-idep_grammar = declare_dependency(
-  sources : [src_grammar],
-  link_with : [libgrammar],
-)
 
 executable('greeter_client',
   sources: ['greeter_client.cc', src_pb, src_grpc],
@@ -123,8 +89,7 @@ executable('lang',
 
 executable('dibibase',
   sources: 'main.cc',
-  include_directories : [inc, '/usr/include/antlr4-runtime'],
-  dependencies: [dep_antlr4, idep_grammar],
+  include_directories : inc,
   link_with : dibibaselib,
   install : true,
 )

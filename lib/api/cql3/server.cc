@@ -72,8 +72,8 @@ Server::Server(const int port) {
         int newsockfd = events[i].data.fd;
         int bytes_received = recv(newsockfd, buffer, MAX_MESSAGE_LEN, 0);
         if (bytes_received <= 0) {
-          epoll_ctl(epollfd, EPOLL_CTL_DEL, newsockfd, NULL);
-          shutdown(newsockfd, SHUT_RDWR);
+          printf("Bytes Recieved <=0 ");
+          continue;
         } else {
           int no_of_queries = 0;
           for (int i=0 ; i< bytes_received; i++){
@@ -104,8 +104,19 @@ Server::Server(const int port) {
             printf("%d ", m.Header[i]);
           }
           printf(";\n");
-          
+          int index = 0;
+          char div[1000];
+          for (int i=0;i<bytes_sent;i++){
+            if(m.Header[i]==m.Header[0] && m.Header[i+1]==m.Header[1] && m.Header[2]==255 ) index = i;
+            if (index !=0) div[i-index] = m.Header[i];
+          }
+          if(index ==0)
           send(newsockfd, m.Header , bytes_sent, 0);
+          else{
+            send(newsockfd, m.Header , index+1, 0);
+            for(int j=0;j<50;j++);
+            send(newsockfd, div , bytes_sent-index, 0);
+          }
 
           if ((strstr(query.c_str(),columns.c_str() ) ) && count == 0){
             count ++;

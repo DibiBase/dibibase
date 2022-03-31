@@ -1,11 +1,56 @@
 #include "api/cql3/query_result.hh"
+#include "api/cql3/server_responce.hh"
 #include "catalog/data.hh"
 #include "catalog/schema.hh"
 #include <memory>
 
 using namespace dibibase::api::cql3;
 using namespace dibibase::catalog;
+int QueryResult::schema_change(std::string table){
+  body[0] = 0xFF;body[1]=0xFF;
+  body[2] = ServerMsg::Opcode::EVENT;
+  int index = 7;
+  std::string sch_change = "SCHEMA_CHANGE";
+  std::string created = "CREATED";
+  std::string table_ = "TABLE";
+  index = count(body, index, 2, sch_change.length());
+  index = append_string(body, index, sch_change.length(), sch_change);
+  index = count(body, index, 2, created.length());
+  index = append_string(body, index, created.length(), created);
+  index = count(body, index, 2,table_.length());
+  index = append_string(body, index, table_.length(), table_);
 
+  index = count(body, index, 2, keyspace.size());
+  index = append_string(body, index, keyspace.size(), keyspace);
+  index = count(body, index, 2, table.size());
+  index = append_string(body, index, table.size(), table);
+  count(body, 3, 4, index-6);
+  return index;
+}
+int QueryResult::create_table(std::string table){
+  //0,0,0,5,
+  body[0] = 0;body[1] = 0;body[2]=0;body[3]=5; //Schema_change
+  int index = 4;
+
+  std::string created = "CREATED";
+  std::string table_ = "TABLE";
+  index = count(body, index, 2, created.length());
+  index = append_string(body, index, created.length(), created);
+  index = count(body, index, 2,table_.length());
+  index = append_string(body, index, table_.length(), table_);
+
+  index = count(body, index, 2, keyspace.size());
+  index = append_string(body, index, keyspace.size(), keyspace);
+  index = count(body, index, 2, table.size());
+  index = append_string(body, index, table.size(), table);
+
+  return index;
+}
+int QueryResult::insert_record(){
+  body[0] = 0;body[1]=0;body[2]=0;body[3]=4;    //prepared
+  body[4] = 0;body[5]=0;body[6]=0;body[7]=1;
+  return 8;
+}
 int QueryResult::select_result(std::string table, catalog::Schema schema,
                                std::vector<catalog::Record> record_v) {
   int rows = record_v.size();
@@ -22,9 +67,9 @@ int QueryResult::select_result(std::string table, catalog::Schema schema,
     body[2] = 0;
     body[3] = 2;
   }
-  if (rows < 10)
+  if (rows <= 10 && rows >= 1)
     body[4] = 0, body[5] = 0, body[6] = 0, body[7] = 1; // global_tables_spec
-  else
+  else if (rows > 10)
     body[4] = 0, body[5] = 0, body[6] = 0, body[7] = 2; // Has_more_pages
   size = 8;
   int index = 7;
@@ -65,9 +110,23 @@ int QueryResult::select_result(std::string table, catalog::Schema schema,
 }
 int QueryResult::count(char *body, int start, int breadth, int size) {
   if (size < 256 * 256 * 256 && size > 256 * 256) {
-
+    for (int i = start; i < start + breadth; i++) {
+      body[i] = 0;
+      if (i - start == breadth - 3)
+        body[i] = int(size/65536);
+      else if (i-start == breadth - 2)
+        body[i] = int((size - body[i-1]*65536)/256);
+      else if (i-start == breadth - 1)
+        body[i] = size - body[i-1]*256 - body[i-2]*65536;
+    }
   } else if (size < 256 * 256 && size > 256) {
-
+    for (int i = start; i < start + breadth; i++) {
+      body[i] = 0;
+      if (i - start == breadth - 2)
+        body[i] = int(size/256);
+      else if (i-start == breadth - 1)
+        body[i] = size - body[i-1]*256;
+    }
   } else if (size < 256) {
     for (int i = start; i < start + breadth; i++) {
       body[i] = 0;

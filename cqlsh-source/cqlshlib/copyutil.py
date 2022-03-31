@@ -49,7 +49,6 @@ from six.moves import configparser
 from six.moves import range
 from six.moves.queue import Queue
 
-from cassandra import OperationTimedOut
 from cassandra.cluster import Cluster, DefaultConnection
 from cassandra.cqltypes import ReversedType, UserType, BytesType, VarcharType
 from cassandra.metadata import protect_name, protect_names, protect_value
@@ -379,7 +378,7 @@ class CopyTask(object):
         copy_options['maxpendingchunks'] = int(opts.pop('maxpendingchunks', '24'))
         # set requesttimeout to a value high enough so that maxbatchsize rows will never timeout if the server
         # responds: here we set it to 1 sec per 10 rows but no less than 60 seconds
-        copy_options['requesttimeout'] = int(opts.pop('requesttimeout', max(60, 1 * copy_options['maxbatchsize'] / 10)))
+        #copy_options['requesttimeout'] = int(opts.pop('requesttimeout', max(60, 1 * copy_options['maxbatchsize'] / 10)))
         # set childtimeout higher than requesttimeout so that child processes have a chance to report request timeouts
         copy_options['childtimeout'] = int(opts.pop('childtimeout', copy_options['requesttimeout'] + 30))
 
@@ -2342,7 +2341,7 @@ class ImportProcess(ChildProcess):
         self.ttl = options.copy['ttl']
         self.max_inflight_messages = options.copy['maxinflightmessages']
         self.max_backoff_attempts = options.copy['maxbackoffattempts']
-        self.request_timeout = options.copy['requesttimeout']
+        #self.request_timeout = options.copy['requesttimeout']
 
         self.dialect_options = options.dialect
         self._session = None
@@ -2369,7 +2368,7 @@ class ImportProcess(ChildProcess):
                 connection_class=ConnectionWrapper)
 
             self._session = cluster.connect(self.ks)
-            self._session.default_timeout = self.request_timeout
+            #self._session.default_timeout = self.request_timeout
         return self._session
 
     def run(self):
@@ -2644,8 +2643,6 @@ class ImportProcess(ChildProcess):
         self.update_chunk(batch['rows'], chunk)
 
     def err_callback(self, response, batch, chunk, replicas):
-        if isinstance(response, OperationTimedOut) and chunk['imported'] == chunk['num_rows_sent']:
-            return  # occasionally the driver sends false timeouts for rows already processed (PYTHON-652)
         err_is_final = batch['attempts'] >= self.max_attempts
         self.report_error(response, chunk, batch['rows'], batch['attempts'], err_is_final)
         if not err_is_final:

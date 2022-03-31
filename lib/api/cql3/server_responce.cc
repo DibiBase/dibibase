@@ -5,6 +5,7 @@
 #include "CqlLexer.h"
 #include "CqlParser.h"
 
+#include "api/cql3/query_result.hh"
 #include "lang/cql3_visitor.hh"
 #include "lang/statements/create_table_statement.hh"
 #include "lang/statements/insert_statement.hh"
@@ -65,6 +66,7 @@ using namespace dibibase::api::cql3;
   int ServerMsg::CreateResponse(int count,std::shared_ptr<dibibase::db::Database> db) {
     int opcode = int(frame.opcode);
     int msg_length = 9;   //default minimum is 9 decimals (HEADER ONLY NO DATA)
+    
     int responce_version = frame.version + 0x80;
     std::list<std::string> versions, comp_types, cql_versions;
     //if (count >0) opcode = QUERY;
@@ -287,6 +289,27 @@ using namespace dibibase::api::cql3;
               create_table_statement != nullptr) {
             create_table_statement->execute(*db);
             std::cout << create_table_statement->m_table << std::endl;
+            int stream_id = Header[3];
+            QueryResult q(create_table_statement->m_keyspace,body);
+            int size1 = q.schema_change(create_table_statement->m_table);
+            for (int i=2;i<size1+2;i++)
+                Header[i] = body[i-2];
+            //msg_length = size1+2;
+            Header[size1+2] = 0;Header[size1+3]=1;Header[size1+4]=0;
+            Header[size1+2] = responce_version;
+            Header[size1+3] = 0;
+            Header[size1+4] = 0;Header[size1+5] = stream_id;Header[size1+6]=0x8;
+            int index = size1+7;
+            int size2 = q.create_table(create_table_statement->m_table);
+            Header[index]=0;Header[++index]=0;Header[++index]=0;Header[++index]=size2;
+            index++;
+            for (int i=index ; i<size2+index ; i++)
+              Header[i] = body[i-index];
+            std::cout << "TESTING HEADER = ";
+            for(int i=0 ; i < (size1+2+size2+11);i++)
+              printf("%d ",Header[i]);
+            std::cout << "\n\n";
+            msg_length = size1 + 2 + size2 + 12;
             }
             break;
           case lang::Statement::Type::INSERT:
@@ -295,6 +318,11 @@ using namespace dibibase::api::cql3;
               insert_statement != nullptr) {
             insert_statement->execute(*db);
             std::cout << insert_statement->m_table << std::endl;
+            QueryResult q(insert_statement->m_keyspace,body);
+            int size =q.insert_record();
+            for (int i=5;i<size+5;i++)
+              Header[i]=body[i-5];
+            msg_length = size +5;
             }
             break;
           case lang::Statement::Type::SELECT:
