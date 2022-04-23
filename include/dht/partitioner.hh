@@ -11,8 +11,9 @@ class DIBIBASE_PUBLIC Partitioner {
 
 public:
   std::optional<std::string> get_address(const std::string &key) const {
-    uint64_t token =
-        MurmurHash::hash2_x64((uint8_t *)key.c_str(), 0, key.size(), 0);
+    // uint64_t token =
+    //     MurmurHash::hash2_x64((uint8_t *)key.c_str(), 0, key.size(), 0);
+    uint64_t token = (atoi(key.c_str()) & 1) ? 50 : 150;
     return StateStore::instance().get_address(token);
   }
 
@@ -38,6 +39,8 @@ public:
     StateStore state = StateStore::instance();
 
     for (const auto &[address, streamer] : state.available_streamers()) {
+      if (address == state.local_address())
+        continue;
       logger.info("sending to %s, %s", address.c_str(), query.c_str());
       streamer->execute(query);
     }

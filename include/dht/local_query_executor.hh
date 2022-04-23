@@ -3,25 +3,24 @@
 #include "common.hh"
 
 #include "lang/statements/statement.hh"
+#include "result_serializer.hh"
 #include "statement_executor.hh"
 #include "statement_parser.hh"
-#include "result_serializer.hh"
 
 namespace dibibase::dht {
 
-class DIBIBASE_PUBLIC QueryExecutor {
+class DIBIBASE_PUBLIC LocalQueryExecutor {
 
 public:
-  QueryExecutor(const string &query) : m_query(query) {}
+  LocalQueryExecutor(const std::shared_ptr<Statement> &stmt) : m_stmt(stmt) {}
 
   string execute() {
-    std::shared_ptr<Statement> stmt = StatementParser(m_query).process();
-    std::optional<Record> result = StatementExecutor(stmt).execute();
+    std::optional<Record> result = StatementExecutor(m_stmt).execute();
     return ResultSerializer(result).serialize();
   }
 
 private:
-  const string m_query;
+  std::shared_ptr<Statement> m_stmt;
 };
 
 } // namespace dibibase::dht

@@ -5,7 +5,7 @@
 #include <grpcpp/health_check_service_interface.h>
 
 #include "common.hh"
-#include "dht/query_executor.hh"
+#include "dht/local_query_executor.hh"
 
 #include "streamer.grpc.pb.h"
 
@@ -27,7 +27,8 @@ public:
                  Result *response) override {
     logger.info("Received query: %s", request->str().c_str());
 
-    response->set_str(QueryExecutor(request->str()).execute());
+    std::shared_ptr<Statement> stmt = StatementParser(request->str()).process();
+    response->set_str(LocalQueryExecutor(stmt).execute());
 
     return Status::OK;
   }
@@ -35,6 +36,5 @@ public:
 private:
   Logger logger = Logger::make();
 };
-
 
 } // namespace dibibase::dht

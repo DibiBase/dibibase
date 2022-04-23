@@ -8,7 +8,7 @@ INSERT INTO race_winners (race_position, race_name, cyclist_name) VALUES ( 'Grad
 
 INSERT INTO race_winners (race_position, race_name, cyclist_name) VALUES ( 'Graduation Race 4', 4, 'Alice 4') USING TTL 86400 AND TIMESTAMP 123456789;
 
-SELECT race_name, race_position, cyclist_name FROM race_winners WHERE race_position = 1;
+SELECT race_position, race_name, cyclist_name FROM race_winners WHERE race_position = 1;
 
 SELECT race_name, race_position, cyclist_name FROM race_winners WHERE race_position = 2;
 
