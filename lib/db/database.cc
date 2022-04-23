@@ -9,6 +9,8 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <ftw.h>
 
 #include "catalog/data.hh"
 #include "catalog/schema.hh"
@@ -131,4 +133,23 @@ void Database::flush_metadata() {
     util::Logger::make().err("Error writing Metadata: %d", errno);
 
   delete metadata_buffer;
+}
+
+
+void Database::delete_table(std::string table_name) {
+    if (nftw((m_base_path + "/" + table_name).c_str(),
+    //its an anonymous function  and i dont know how to style it in our style 
+              [](const char *pathname, const struct stat *sbuf, int type, struct FTW *ftwb) {
+                  if(remove(pathname) < 0)
+                  {
+                      util::Logger::make().err("Error writing Metadata: %d", errno);
+                      return -1;
+                  }
+                  return 0;
+              } ,
+              10, 
+              FTW_DEPTH|FTW_MOUNT|FTW_PHYS) < 0)
+      {
+          util::Logger::make().err("Error writing Metadata: %d", errno);  
+      }    
 }

@@ -29,7 +29,8 @@ public:
   // and then store its information into the metadata file using
   // catalog::Table::bytes, and add db::TableManager for it.
   void create_table(std::string table_name, catalog::Schema);
-
+  void delete_table(std::string table_name);
+  
   catalog::Record read_record(std::string table_name,
                               std::unique_ptr<catalog::Data>);
 
