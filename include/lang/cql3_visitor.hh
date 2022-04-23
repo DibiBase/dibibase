@@ -18,6 +18,7 @@
 #include "errors.hh"
 #include "lang/statements/batch.hh"
 #include "lang/statements/create_table_statement.hh"
+#include "lang/statements/drop_table_statement.hh"
 #include "lang/statements/from_spec.hh"
 #include "lang/statements/insert_statement.hh"
 #include "lang/statements/order_spec.hh"
@@ -546,6 +547,25 @@ public:
     order_spec.m_ascending = ctx->kwDesc() == nullptr;
 
     return order_spec;
+  }
+
+  antlrcpp::Any visitDropTable(CqlParser::DropTableContext *ctx) override {
+    DropTableStatement *drop_table_statement = new DropTableStatement();
+
+    if (ctx->ifExist())
+      drop_table_statement->m_if_exists = true;
+    else
+      drop_table_statement->m_if_exists = false;
+
+    if (ctx->keyspace())
+      drop_table_statement->m_keyspace =
+          ctx->keyspace()->OBJECT_NAME()->getText();
+    else
+      drop_table_statement->m_keyspace = "";
+
+    drop_table_statement->m_table = ctx->table()->OBJECT_NAME()->getText();
+
+    return dynamic_cast<Statement *>(drop_table_statement);
   }
 };
 

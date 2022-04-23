@@ -13,14 +13,14 @@
 
 namespace dibibase::lang {
 
-class DIBIBASE_PUBLIC DrobTableStatement : public Statement {
+class DIBIBASE_PUBLIC DropTableStatement : public Statement {
 
 public:
-  DrobTableStatement() : Statement(Type:: DROP_TABLE) {}
+  DropTableStatement() : Statement(Type:: DROP_TABLE) {}
 
-  DrobTableStatement(bool if_not_exists, std::string keyspace,
+  DropTableStatement(bool if_exists, std::string keyspace,
                        std::string table)
-      : Statement(Type:: DROP_TABLE), m_if_not_exists(if_not_exists),
+      : Statement(Type:: DROP_TABLE), m_if_exists(if_exists),
         m_keyspace(keyspace), m_table(table){}
 
   std::optional<catalog::Record> execute(db::Database &db) override {
@@ -29,7 +29,7 @@ public:
   }
 
 public:
-  bool m_if_not_exists;
+  bool m_if_exists;
   std::string m_keyspace;
   std::string m_table;
 };
