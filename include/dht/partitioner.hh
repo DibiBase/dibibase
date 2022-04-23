@@ -2,7 +2,6 @@
 
 #include "common.hh"
 #include "murmur_hash.hh"
-#include "query_executor.hh"
 #include "state_store.hh"
 
 namespace dibibase::dht {
