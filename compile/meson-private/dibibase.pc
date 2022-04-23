@@ -1,0 +1,9 @@
+prefix=/usr/local
+libdir=${prefix}/lib/x86_64-linux-gnu
+includedir=${prefix}/include
+
+Name: libdibibase
+Description: A Distributed Wide-Column NoSQL Database.
+Version: 0.1.0
+Libs: -L${libdir} -ldibibase
+Cflags: -I${includedir}/dibibase

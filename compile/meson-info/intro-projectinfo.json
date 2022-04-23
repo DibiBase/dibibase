@@ -1,0 +1,1 @@
+{"version": "0.1.0", "descriptive_name": "dibibase", "subproject_dir": "subprojects", "subprojects": [{"name": "gtest", "version": "1.11.0", "descriptive_name": "gtest"}]}

@@ -1,0 +1,255 @@
+Build started at 2022-04-23T08:08:54.300605
+Main binary: /usr/bin/python3
+Build Options: 
+Python system: Linux
+The Meson build system
+Version: 0.53.2
+Source dir: /home/fancy/Desktop/study/grad-project/dibibase
+Build dir: /home/fancy/Desktop/study/grad-project/dibibase/compile
+Build type: native build
+Project name: dibibase
+Project version: 0.1.0
+No CXXFLAGS in the environment, not changing global flags.
+No LDFLAGS in the environment, not changing global flags.
+No CPPFLAGS in the environment, not changing global flags.
+Sanity testing C++ compiler: c++
+Is cross compiler: False.
+Sanity check compiler command line: c++ /home/fancy/Desktop/study/grad-project/dibibase/compile/meson-private/sanitycheckcpp.cc -o /home/fancy/Desktop/study/grad-project/dibibase/compile/meson-private/sanitycheckcpp.exe -pipe -D_FILE_OFFSET_BITS=64
+Sanity check compile stdout:
+
+-----
+Sanity check compile stderr:
+
+-----
+Running test binary command: /home/fancy/Desktop/study/grad-project/dibibase/compile/meson-private/sanitycheckcpp.exe
+C++ compiler for the build machine: c++ (gcc 9.4.0 "c++ (Ubuntu 9.4.0-1ubuntu1~20.04.1) 9.4.0")
+C++ linker for the build machine: c++ ld.bfd 2.34
+No CXXFLAGS in the environment, not changing global flags.
+No LDFLAGS in the environment, not changing global flags.
+No CPPFLAGS in the environment, not changing global flags.
+Sanity testing C++ compiler: c++
+Is cross compiler: False.
+Sanity check compiler command line: c++ /home/fancy/Desktop/study/grad-project/dibibase/compile/meson-private/sanitycheckcpp.cc -o /home/fancy/Desktop/study/grad-project/dibibase/compile/meson-private/sanitycheckcpp.exe -pipe -D_FILE_OFFSET_BITS=64
+Sanity check compile stdout:
+
+-----
+Sanity check compile stderr:
+
+-----
+Running test binary command: /home/fancy/Desktop/study/grad-project/dibibase/compile/meson-private/sanitycheckcpp.exe
+C++ compiler for the host machine: c++ (gcc 9.4.0 "c++ (Ubuntu 9.4.0-1ubuntu1~20.04.1) 9.4.0")
+C++ linker for the host machine: c++ ld.bfd 2.34
+Build machine cpu family: x86_64
+Build machine cpu: x86_64
+Host machine cpu family: x86_64
+Host machine cpu: x86_64
+Target machine cpu family: x86_64
+Target machine cpu: x86_64
+Pkg-config binary for MachineChoice.HOST is not cached.
+Pkg-config binary missing from cross or native file, or env var undefined.
+Trying a default pkg-config fallback at pkg-config
+Trying pkg-config binary pkg-config for machine MachineChoice.HOST at ['/usr/bin/pkg-config']
+Found pkg-config: /usr/bin/pkg-config (0.29.1)
+Determining dependency 'antlr4-runtime' with pkg-config executable '/usr/bin/pkg-config'
+PKG_CONFIG_PATH: 
+Called `/usr/bin/pkg-config --modversion antlr4-runtime` -> 1
+
+CMake binary for MachineChoice.HOST is not cached
+CMake binary missing from cross or native file, or env var undefined.
+Trying a default CMake fallback at cmake
+Trying CMake binary cmake for machine MachineChoice.HOST at ['/snap/bin/cmake']
+Found CMake: /snap/bin/cmake (3.23.1)
+Extracting basic cmake information
+Try CMake generator: auto
+No CFLAGS in the environment, not changing global flags.
+No LDFLAGS in the environment, not changing global flags.
+No CPPFLAGS in the environment, not changing global flags.
+Failed to find a fortran compiler for CMake. This might cause CMake to fail.
+Called `/snap/bin/cmake --trace-expand .` in /home/fancy/Desktop/study/grad-project/dibibase/compile/meson-private/cmake_antlr4-runtime -> 0
+  -- Module search paths:    ['/', '/opt', '/snap/cmake/1082', '/usr', '/usr/local']
+  -- CMake root:             /snap/cmake/1082/share/cmake-3.23
+  -- CMake architectures:    ['i386-linux-gnu', 'x86_64-linux-gnu']
+  -- CMake lib search paths: ['lib', 'lib32', 'lib64', 'libx32', 'share', 'lib/i386-linux-gnu', 'lib/x86_64-linux-gnu']
+Preliminary CMake check failed. Aborting.
+Run-time dependency antlr4-runtime found: NO (tried pkgconfig and cmake)
+Running compile:
+Working directory:  /home/fancy/Desktop/study/grad-project/dibibase/compile/meson-private/tmpnlm3xvvk
+Command line:  c++ /home/fancy/Desktop/study/grad-project/dibibase/compile/meson-private/tmpnlm3xvvk/testfile.cpp -o /home/fancy/Desktop/study/grad-project/dibibase/compile/meson-private/tmpnlm3xvvk/output.exe -pipe -D_FILE_OFFSET_BITS=64 -O0 -fpermissive -Wl,--start-group -lantlr4-runtime -Wl,--end-group -Wl,--allow-shlib-undefined 
+
+Code:
+ int main(void) { return 0; }
+Compiler stdout:
+ 
+Compiler stderr:
+ 
+Library antlr4-runtime found: YES
+
+Executing subproject gtest method meson 
+
+Project name: gtest
+Project version: 1.11.0
+C++ compiler for the build machine: c++ (gcc 9.4.0 "c++ (Ubuntu 9.4.0-1ubuntu1~20.04.1) 9.4.0")
+C++ linker for the build machine: c++ ld.bfd 2.34
+C++ compiler for the host machine: c++ (gcc 9.4.0 "c++ (Ubuntu 9.4.0-1ubuntu1~20.04.1) 9.4.0")
+C++ linker for the host machine: c++ ld.bfd 2.34
+Run-time dependency threads found: YES
+Dependency threads found: YES unknown (cached)
+Dependency threads found: YES unknown (cached)
+Dependency threads found: YES unknown (cached)
+Build targets in project: 0
+Subproject gtest finished.
+
+Running command: /bin/sh /home/fancy/Desktop/study/grad-project/dibibase/include/../scripts/grabber.sh
+--- stdout ---
+common.hh
+api/cql3/frame.hh
+api/cql3/server.hh
+catalog/data.hh
+catalog/record.hh
+catalog/table.hh
+catalog/schema.hh
+errors.hh
+lang/statements/relation_element.hh
+lang/statements/order_spec.hh
+lang/statements/from_spec.hh
+lang/statements/drob_table_statement.hh
+lang/statements/where_sepc.hh
+lang/statements/select_statement.hh
+lang/statements/timestamp_spec.hh
+lang/statements/create_table_statement.hh
+lang/statements/statement.hh
+lang/statements/select_element.hh
+lang/statements/select_elements.hh
+lang/statements/insert_statement.hh
+lang/statements/ttl_timestamp.hh
+lang/statements/batch.hh
+lang/cql3_visitor.hh
+util/factory.hh
+util/buffer.hh
+util/logger.hh
+db/database.hh
+db/table_manager.hh
+db/index_page.hh
+io/table_builder.hh
+io/disk_manager.hh
+mem/summary.hh
+
+--- stderr ---
+
+
+Program protoc found: YES (/usr/bin/protoc)
+Pkg-config binary for MachineChoice.HOST is cached.
+Determining dependency 'protobuf' with pkg-config executable '/usr/bin/pkg-config'
+PKG_CONFIG_PATH: 
+Called `/usr/bin/pkg-config --modversion protobuf` -> 0
+3.6.1
+PKG_CONFIG_PATH: 
+Called `/usr/bin/pkg-config --cflags protobuf` -> 0
+-pthread
+PKG_CONFIG_PATH: 
+Called `/usr/bin/pkg-config protobuf --libs` -> 0
+-L/usr/lib/x86_64-linux-gnu -lprotobuf -pthread
+PKG_CONFIG_PATH: 
+Called `/usr/bin/pkg-config protobuf --libs` -> 0
+-lprotobuf -pthread
+Running compile:
+Working directory:  /home/fancy/Desktop/study/grad-project/dibibase/compile/meson-private/tmp_5kyu6k7
+Command line:  c++ /home/fancy/Desktop/study/grad-project/dibibase/compile/meson-private/tmp_5kyu6k7/testfile.cpp -o /home/fancy/Desktop/study/grad-project/dibibase/compile/meson-private/tmp_5kyu6k7/output.exe -pipe -D_FILE_OFFSET_BITS=64 -O0 -fpermissive 
+
+Code:
+ #include<stdio.h>
+        
+        int main(void) {
+            printf("%ld\n", (long)(sizeof(void *)));
+            return 0;
+        };
+Compiler stdout:
+ 
+Compiler stderr:
+ 
+Program stdout:
+
+8
+
+Program stderr:
+
+
+Running compile:
+Working directory:  /home/fancy/Desktop/study/grad-project/dibibase/compile/meson-private/tmp3z5zp5ql
+Command line:  c++ /home/fancy/Desktop/study/grad-project/dibibase/compile/meson-private/tmp3z5zp5ql/testfile.cpp -o /home/fancy/Desktop/study/grad-project/dibibase/compile/meson-private/tmp3z5zp5ql/output.obj -pipe -c -D_FILE_OFFSET_BITS=64 -O0 -fpermissive --print-search-dirs 
+
+Code:
+ 
+Compiler stdout:
+ install: /usr/lib/gcc/x86_64-linux-gnu/9/
+programs: =/usr/lib/gcc/x86_64-linux-gnu/9/:/usr/lib/gcc/x86_64-linux-gnu/9/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/9/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/9/../../../../x86_64-linux-gnu/bin/x86_64-linux-gnu/9/:/usr/lib/gcc/x86_64-linux-gnu/9/../../../../x86_64-linux-gnu/bin/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/9/../../../../x86_64-linux-gnu/bin/
+libraries: =/usr/lib/gcc/x86_64-linux-gnu/9/:/usr/lib/gcc/x86_64-linux-gnu/9/../../../../x86_64-linux-gnu/lib/x86_64-linux-gnu/9/:/usr/lib/gcc/x86_64-linux-gnu/9/../../../../x86_64-linux-gnu/lib/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/9/../../../../x86_64-linux-gnu/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/9/:/usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/9/../../../../lib/:/lib/x86_64-linux-gnu/9/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/9/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/9/../../../../x86_64-linux-gnu/lib/:/usr/lib/gcc/x86_64-linux-gnu/9/../../../:/lib/:/usr/lib/
+
+Compiler stderr:
+ 
+Run-time dependency protobuf found: YES 3.6.1
+Program grpc_cpp_plugin found: YES (/usr/bin/grpc_cpp_plugin)
+Pkg-config binary for MachineChoice.HOST is cached.
+Determining dependency 'grpc' with pkg-config executable '/usr/bin/pkg-config'
+PKG_CONFIG_PATH: 
+Called `/usr/bin/pkg-config --modversion grpc` -> 0
+6.0.0
+PKG_CONFIG_PATH: 
+Called `/usr/bin/pkg-config --cflags grpc` -> 0
+
+PKG_CONFIG_PATH: 
+Called `/usr/bin/pkg-config grpc --libs` -> 0
+-L/usr/lib -lgrpc
+PKG_CONFIG_PATH: 
+Called `/usr/bin/pkg-config grpc --libs` -> 0
+-lgrpc
+Run-time dependency grpc found: YES 6.0.0
+Pkg-config binary for MachineChoice.HOST is cached.
+Determining dependency 'grpc++' with pkg-config executable '/usr/bin/pkg-config'
+PKG_CONFIG_PATH: 
+Called `/usr/bin/pkg-config --modversion grpc++` -> 0
+1.16.1
+PKG_CONFIG_PATH: 
+Called `/usr/bin/pkg-config --cflags grpc++` -> 0
+
+PKG_CONFIG_PATH: 
+Called `/usr/bin/pkg-config grpc++ --libs` -> 0
+-L/usr/lib -lgrpc++
+PKG_CONFIG_PATH: 
+Called `/usr/bin/pkg-config grpc++ --libs` -> 0
+-lgrpc++
+Run-time dependency grpc++ found: YES 1.16.1
+Running compile:
+Working directory:  /home/fancy/Desktop/study/grad-project/dibibase/compile/meson-private/tmpbogr8h76
+Command line:  c++ /home/fancy/Desktop/study/grad-project/dibibase/compile/meson-private/tmpbogr8h76/testfile.cpp -o /home/fancy/Desktop/study/grad-project/dibibase/compile/meson-private/tmpbogr8h76/output.exe -pipe -D_FILE_OFFSET_BITS=64 -O0 -fpermissive -Wl,--start-group -lgrpc++_reflection -Wl,--end-group -Wl,--allow-shlib-undefined 
+
+Code:
+ int main(void) { return 0; }
+Compiler stdout:
+ 
+Compiler stderr:
+ 
+Library grpc++_reflection found: YES
+Dependency threads found: YES unknown (cached)
+Program antlr4 found: YES (/usr/bin/antlr4)
+Adding test "cql3/server"
+Adding test "gtest"
+Build targets in project: 10
+
+dibibase 0.1.0
+
+  Subprojects
+    gtest: YES
+
+Found ninja-1.10.0 at /usr/bin/ninja
+Running compile:
+Working directory:  /tmp/tmp3yzz3vfu
+Command line:  c++ /tmp/tmp3yzz3vfu/testfile.cpp -o /tmp/tmp3yzz3vfu/output.obj -pipe -D_FILE_OFFSET_BITS=64 -c -std=c++17 
+
+Code:
+ int i = static_cast<int>(0);
+Compiler stdout:
+ 
+Compiler stderr:
+ 
+Compiler accepts -std=c++17: YES

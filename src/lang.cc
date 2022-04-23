@@ -8,6 +8,8 @@
 
 #include "lang/cql3_visitor.hh"
 #include "lang/statements/create_table_statement.hh"
+#include "lang/statements/drop_table_statement.hh"
+
 #include "lang/statements/insert_statement.hh"
 #include "lang/statements/select_statement.hh"
 #include "lang/statements/statement.hh"
@@ -66,6 +68,14 @@ int main(int argc, char *argv[]) {
             std::cout << value->print() << std::endl;
       }
       break;
+    case lang::Statement::Type::DROP_TABLE:
+      if (lang::DropTableStatement *dorp_table_statement =
+              dynamic_cast<lang::DropTableStatement *>(statement);
+          dorp_table_statement != nullptr) {
+        auto result = dorp_table_statement->execute(db);
+        std::cout << dorp_table_statement->m_table << std::endl;
+      }
+      break;  
     default:
       break;
     }
