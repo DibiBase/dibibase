@@ -13,7 +13,7 @@ std::unique_ptr<IndexPage> IndexPage::from(util::Buffer *buf) {
   auto read_type = catalog::Data::Type::from(buf);
   auto type = catalog::Data::Type(read_type->id(), read_type->length());
 
-  std::map<std::unique_ptr<catalog::Data>, off_t, catalog::DataCmp> sort_keys;
+  std::multimap<std::unique_ptr<catalog::Data>, off_t, catalog::DataCmp> sort_keys;
   for (uint8_t i = 0; i < sort_keys_length; i++) {
     auto key = catalog::Data::from(buf, type);
     auto offset = buf->get_uint64();

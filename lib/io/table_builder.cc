@@ -18,7 +18,7 @@ using namespace dibibase::mem;
 TableBuilder::TableBuilder(
     std::string &base_path, std::string &table_name, catalog::Schema &schema,
     size_t sstable_id,
-    std::map<std::shared_ptr<catalog::Data>, catalog::Record, catalog::DataCmp>
+    std::multimap<std::shared_ptr<catalog::Data>, catalog::Record, catalog::DataCmp>
         records)
     : m_base_path(base_path), m_table_name(table_name), m_schema(schema),
       m_new_sstable_id(sstable_id), m_records(records) {

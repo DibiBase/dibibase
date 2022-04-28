@@ -19,7 +19,7 @@ namespace dibibase::db {
 class DIBIBASE_PUBLIC IndexPage {
 
 public:
-  IndexPage(std::map<std::unique_ptr<catalog::Data>, off_t, catalog::DataCmp>
+  IndexPage(std::multimap<std::unique_ptr<catalog::Data>, off_t, catalog::DataCmp>
                 sort_keys,
             catalog::Data::Type type)
       : m_sort_keys(std::move(sort_keys)), m_type(type) {}
@@ -35,7 +35,7 @@ public:
   // page has enough space to store (key, offset) in bytes.
   bool push_back(catalog::Data *, off_t);
 
-  const std::map<std::unique_ptr<catalog::Data>, off_t, catalog::DataCmp> &
+  const std::multimap<std::unique_ptr<catalog::Data>, off_t, catalog::DataCmp> &
   sort_keys() const {
     return m_sort_keys;
   }
@@ -47,7 +47,7 @@ public:
 
 private:
   // Mapping each sort key to its offset in the data file.
-  std::map<std::unique_ptr<catalog::Data>, off_t, catalog::DataCmp> m_sort_keys;
+  std::multimap<std::unique_ptr<catalog::Data>, off_t, catalog::DataCmp> m_sort_keys;
   catalog::Data::Type m_type;
 };
 
