@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package dibibase.grpc;
+
+message Query {
+  string str = 1;
+}
+
+message Result {
+  string str = 1;
+}
+
+service StreamerRPC {
+  rpc execute (Query) returns (Result) {}
+}

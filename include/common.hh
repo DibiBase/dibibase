@@ -17,3 +17,23 @@
 // clang-format on
 
 #define DIBIBASE_PACKED __attribute__((packed))
+
+// include common headers
+#include <cstddef>
+#include <cstdint>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <iostream>
+#include <limits>
+#include <map>
+#include <memory>
+#include <set>
+#include <sstream>
+#include <string>
+#include <thread>
+#include <utility>
+#include <vector>
+#include <optional>
+
+#include "util/logger.hh"

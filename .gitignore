@@ -12,3 +12,12 @@ subprojects/*
 
 # ANTLR4
 grammars/ebnf/.antlr/
+
+# vs-code
+.vscode/
+.cache/
+
+# databeses
+127.0.0.1*
+
+obsolete/

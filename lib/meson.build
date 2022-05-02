@@ -1,7 +1,6 @@
 dibibaselib_api_cql3_srcs = [
   'api/cql3/server.cc',
 ]
-dibibaselib_api_srcs = [dibibaselib_api_cql3_srcs]
 
 dibibaselib_catalog_srcs = [
   'catalog/data.cc',
@@ -25,6 +24,14 @@ dibibaselib_mem_srcs = [
   'mem/summary.cc',
 ]
 
+dibibaselib_api_srcs = [
+  dibibaselib_api_cql3_srcs,
+]
+
+dibibaselib_dht_srcs = [
+  'dht/murmur_hash.cc',
+]
+
 dibibaselib_util_srcs = [
   'util/logger.cc',
   'util/buffer.cc',
@@ -37,6 +44,7 @@ dibibaselib_srcs = [
   dibibaselib_io_srcs,
   dibibaselib_mem_srcs,
   dibibaselib_util_srcs,
+  dibibaselib_dht_srcs,
 ]
 
 dibibaselib = shared_library('dibibase',
