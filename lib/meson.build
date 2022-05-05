@@ -2,7 +2,8 @@ dibibaselib_api_cql3_srcs = [
   'api/cql3/server.cc',
   'api/cql3/frame.cc',
   'api/cql3/server_responce.cc',
-  'api/cql3/query_result.cc'
+  'api/cql3/query_result.cc',
+  'api/cql3/fake_meta.cc'
 ]
 dibibaselib_api_srcs = [dibibaselib_api_cql3_srcs]
 

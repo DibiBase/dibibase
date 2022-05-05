@@ -2,6 +2,7 @@
 
 #include "api/cql3/frame.hh"
 #include "api/cql3/query_result.hh"
+#include "api/cql3/fake_meta.hh"
 #include "common.hh"
 #include <arpa/inet.h>
 #include <cerrno>
@@ -34,7 +35,7 @@ public:
   ServerMsg(Frame f);
   int SupportedMessage(std::map<std::string, std::list<std::string>>,
                        unsigned char *);
-  int CreateResponse(int,std::shared_ptr<dibibase::db::Database>);
+  int CreateResponse(std::shared_ptr<dibibase::db::Database>);
   std::string query;
   unsigned char Header[71680];
     enum Opcode {
@@ -57,6 +58,21 @@ public:
   };
 private:
   std::string pquery;
+  std::string peers = "peers";
+  std::string local = "system.local";
+  std::string system_keyspaces = "system_schema.keyspaces";
+  std::string aggregates = "aggregates";
+  std::string functions = "functions";
+  std::string triggers = "triggers";
+  std::string tables = "system_schema.tables";
+  std::string columns = "system_schema.columns";
+  std::string views = "views";
+  std::string types = "types";
+  std::string indexes = "indexes";
+  std::string system_virual_schema = "system_virtual_schema.columns";
+  std::string v_keyspaces = "system_virtual_schema.keyspaces";
+  std::string v_columns = "system_virtual_schema.columns";
+  std::string v_tables = "system_virtual_schema.tables";
   enum flag { NONE = 0x00, COMPRESSED = 0x01, TRACING = 0x02 };
   enum Version { VERSION = 0x83, KEY = 0x83 };
   Frame v() {

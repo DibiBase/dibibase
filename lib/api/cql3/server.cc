@@ -12,6 +12,7 @@ Server::Server(const int port) {
   socklen_t client_len = sizeof(client_addr);
 
   char buffer[MAX_MESSAGE_LEN];
+  char new_buffer[MAX_MESSAGE_LEN];
   memset(buffer, 0, sizeof(buffer));
 
   sock_listen_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -72,31 +73,33 @@ Server::Server(const int port) {
         int newsockfd = events[i].data.fd;
         int bytes_received = recv(newsockfd, buffer, MAX_MESSAGE_LEN, 0);
         if (bytes_received <= 0) {
-          printf("Bytes Recieved <=0 ");
+          db->flush_metadata();
           continue;
         } else {
+          std::vector<int> indeces;
           int no_of_queries = 0;
           for (int i=0 ; i< bytes_received; i++){
-            if(buffer[i] == buffer[0] && buffer[i+1] == buffer[1]) no_of_queries++;
+            if((buffer[i] == buffer[0] && buffer[i+1] == buffer[1]) ) {
+              no_of_queries++; 
+              indeces.push_back(i);
+              }
           }
-          //printf("no_of_Queries : %d \n",no_of_queries);
-          for (int mq=0 ; mq< no_of_queries;mq++){
-          Frame f(buffer, bytes_received);
-          f.parse();
+          indeces.push_back(bytes_received-1);
 
-          ServerMsg m(f);
-          std::string columns = "system_schema.columns";
-          int bytes_sent = m.CreateResponse(mq,db);
-          /*
-          printf("Received: ");
-          for (int i = 0; i < bytes_received; i++) {
-            printf("%d ", buffer[i]);
+
+          for (int mq=0; mq < int(indeces.size())-1 ; mq++) {
+          for(int j = indeces[mq] ;j<indeces[mq+1] ;j++){
+            new_buffer[j-indeces[mq]] = buffer[j];
           }
-          printf(";\n");
-          */
+
+          Frame f(new_buffer, indeces[mq+1]-indeces[mq]);
+          f.parse();
+          ServerMsg m(f); 
+          int bytes_sent = m.CreateResponse(db);
+          std::string columns = "system_schema.columns";
           if(m.query != ""){
             query = m.query;
-            std::cout<< " from server.cpp query = "<< query << "\n";
+            std::cout<< " from server.cpp query = "<< query << "\n\n";
           }
           
           printf("SENT: ");
@@ -123,7 +126,10 @@ Server::Server(const int port) {
             flag = 1;
           }
           else if (flag==1) count ++;
-          }//no-of_q loop :)
+
+          }
+
+
         }
       }
     }
