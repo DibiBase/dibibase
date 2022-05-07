@@ -34,7 +34,7 @@ public:
   // and perform binary search on this IndexPage so that it gets the exact
   // offset within the data file. Finally it gets the exact record from
   // io::DiskManager and returns it.
-  catalog::Record read_record(std::unique_ptr<catalog::Data>);
+  std::vector<catalog::Record> read_record(std::unique_ptr<catalog::Data>);
 
   // Check if memtable has enough space to store new record, otherwise flush the
   // memtable into disk and clear the memtable then store the new one. Check the

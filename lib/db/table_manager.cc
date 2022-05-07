@@ -16,14 +16,17 @@ TableManager::TableManager(std::string base_path, std::string table_name,
       m_schema(std::move(schema)), m_current_sstable_id(summary.size()),
       m_summaries(std::move(summary)) {}
 
-catalog::Record
+std::vector<catalog::Record>
 TableManager::read_record(std::unique_ptr<catalog::Data> sort_key) {
   // Searching in memtable.
   std::shared_ptr<catalog::Data> shared_sort_key = std::move(sort_key);
-
+  std::vector<catalog::Record> res;
   auto find_key = m_memtable.find(shared_sort_key);
   if (find_key != m_memtable.end())
-    return find_key->second;
+    {
+      res.push_back(find_key->second);
+      return res;
+    }
 
   // Finding page number in summary which contains the record key.
   uint8_t page_number;
@@ -44,12 +47,19 @@ TableManager::read_record(std::unique_ptr<catalog::Data> sort_key) {
         index_page->find_offset(catalog::Data::from(shared_sort_key.get()));
 
     if (key_offset != -1)
-      return disk_manager.get_record_from_data(
-          m_base_path, m_table_name, sstable_id, *m_schema, key_offset);
+      {
+        res.push_back(disk_manager.get_record_from_data(
+          m_base_path, m_table_name, sstable_id, *m_schema, key_offset));
+     }
 
     sstable_id--;
   }
+  
 
+  if(res.size())
+  {
+    return res;
+  }
   throw non_existent_record_error("");
 }
 
