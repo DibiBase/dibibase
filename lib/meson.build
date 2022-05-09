@@ -1,3 +1,7 @@
+dibibaselib_api_prom_srcs = [
+  'api/prom_endp/http_server.cc',
+  'api/prom_endp/http_message.cc'
+]
 dibibaselib_api_cql3_srcs = [
   'api/cql3/server.cc',
   'api/cql3/frame.cc',
@@ -5,7 +9,7 @@ dibibaselib_api_cql3_srcs = [
   'api/cql3/query_result.cc',
   'api/cql3/fake_meta.cc'
 ]
-dibibaselib_api_srcs = [dibibaselib_api_cql3_srcs]
+dibibaselib_api_srcs = [dibibaselib_api_prom_srcs,dibibaselib_api_cql3_srcs]
 
 dibibaselib_catalog_srcs = [
   'catalog/data.cc',
