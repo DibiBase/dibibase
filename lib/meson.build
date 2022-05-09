@@ -88,11 +88,14 @@ idep_grammar = declare_dependency(
   sources : [src_grammar],
   link_with : [libgrammar],
 )
+
+thread_dep = dependency('threads')
+
 dibibaselib = shared_library('dibibase',
   sources: dibibaselib_srcs,
   cpp_args : ['-DBUILDING_DIBIBASE'],
   include_directories : [inc, '/usr/include/antlr4-runtime'],
-  dependencies: [dep_antlr4, idep_grammar],
+  dependencies: [dep_antlr4, idep_grammar, thread_dep],
   gnu_symbol_visibility : 'hidden',
   install : true,
 )

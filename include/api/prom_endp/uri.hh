@@ -6,12 +6,12 @@
 #include <cctype>
 #include <string>
 #include <utility>
-
+#include "common.hh"
 namespace dibibase::api::prom_endp {
 
 // A Uri object will contain a valid scheme (for example: HTTP), host,
 // port, and the actual URI path
-class Uri {
+class DIBIBASE_PUBLIC Uri {
 public:
   Uri() = default;
   explicit Uri(const std::string& path) : path_(path) {

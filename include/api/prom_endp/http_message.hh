@@ -1,17 +1,22 @@
 #pragma once
 
 #define HTTP_MESSAGE_H_
-
+#include <algorithm>
+#include <cctype>
+#include <iterator>
+#include <stdexcept>
+#include <sstream>
+#include <type_traits>
 #include <map>
 #include <string>
 #include <utility>
-
+#include "common.hh"
 #include "api/prom_endp/uri.hh"
 
 namespace dibibase::api::prom_endp {
 
 
-enum class HttpMethod {
+enum class DIBIBASE_PUBLIC HttpMethod {
   GET,
   HEAD,
   POST,
@@ -23,13 +28,13 @@ enum class HttpMethod {
   PATCH
 };
 //  HTTP_1.1 is supported ((only))
-enum class HttpVersion {
+enum class DIBIBASE_PUBLIC HttpVersion {
   HTTP_0_9 = 9,
   HTTP_1_0 = 10,
   HTTP_1_1 = 11,
   HTTP_2_0 = 20
 };
-enum class HttpStatusCode {
+enum class DIBIBASE_PUBLIC HttpStatusCode {
   Continue = 100,
   SwitchingProtocols = 101,
   EarlyHints = 103,
@@ -69,7 +74,7 @@ HttpVersion string_to_version(const std::string& version_string);
 /*
 *  HttpMessageInterface class is used to handle HTTP headers 
 */
-class HttpMessageInterface {
+class DIBIBASE_PUBLIC HttpMessageInterface {
 public:
   HttpMessageInterface() : version_(HttpVersion::HTTP_1_1) {}
   virtual ~HttpMessageInterface() = default;
@@ -109,7 +114,7 @@ protected:
  It has (HTTP_method ,URI)
  the corresponding resource and action 
 */
-class HttpRequest : public HttpMessageInterface {
+class DIBIBASE_PUBLIC HttpRequest : public HttpMessageInterface {
 public:
   HttpRequest() : method_(HttpMethod::GET) {}
   ~HttpRequest() = default;
@@ -130,7 +135,7 @@ private:
 
 //HTTPResponse object is the same as HttpRequest object including (HTTP headers,content)
 
-class HttpResponse : public HttpMessageInterface {
+class DIBIBASE_PUBLIC HttpResponse : public HttpMessageInterface {
 public:
   HttpResponse() : status_code_(HttpStatusCode::Ok) {}
   HttpResponse(HttpStatusCode status_code) : status_code_(status_code) {}

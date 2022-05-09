@@ -1,7 +1,9 @@
 #include "api/cql3/server.hh"
 #include "db/database.hh"
 #include <memory>
-
+#include "api/prom_endp/uri.hh"
+#include "api/prom_endp/http_message.hh"
+#include "api/prom_endp/http_server.hh"
 using std::cout;
 
 using namespace dibibase::api::cql3;

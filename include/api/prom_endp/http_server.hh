@@ -37,7 +37,7 @@ using HttpRequestHandler_t = std::function<HttpResponse(const HttpRequest&)>;
 // - 1 listener thread that is responsible for accepting new connections
 // - Possibly many threads that process HTTP messages and communicate with clients via socket.
 //   The number of workers is defined by a constant
-class HttpServer {
+class DIBIBASE_PUBLIC HttpServer {
 public:
   explicit HttpServer(const std::string& host, std::uint16_t port);
   ~HttpServer() = default;
