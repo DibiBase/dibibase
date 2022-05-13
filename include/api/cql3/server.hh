@@ -17,7 +17,9 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
-
+#include "api/prom_endp/uri.hh"
+#include "api/prom_endp/http_message.hh"
+#include "api/prom_endp/http_server.hh"
 #define BACKLOG 512
 #define MAX_EVENTS 128
 #define MAX_MESSAGE_LEN 2048
@@ -33,14 +35,14 @@ class DIBIBASE_PUBLIC Server {
 
 public:
   std::string query;
-  Server(int port);
+  Server(int port,std::string *met);
   Server(const Server &) = delete;
   Server &operator=(const Server &) = delete;
   Server(Server &&) = delete;
   Server &operator=(Server &&) = delete;
-
 private:
   int sock_listen_fd;
+  int maxevents = 128;
   struct epoll_event ev;
   int epollfd;
 };

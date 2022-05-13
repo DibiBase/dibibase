@@ -56,7 +56,7 @@ dep_grpc = [
 
 
 
-
+thread_dep = dependency('threads')
 
 executable('greeter_client',
   sources: ['greeter_client.cc', src_pb, src_grpc],
@@ -91,5 +91,6 @@ executable('dibibase',
   sources: 'main.cc',
   include_directories : inc,
   link_with : dibibaselib,
+  dependencies: [thread_dep],
   install : true,
 )

@@ -1,14 +1,12 @@
 #include "api/cql3/server.hh"
 #include "db/database.hh"
 #include <memory>
-#include "api/prom_endp/uri.hh"
-#include "api/prom_endp/http_message.hh"
-#include "api/prom_endp/http_server.hh"
+#include <thread>
 using std::cout;
 
 using namespace dibibase::api::cql3;
 
-Server::Server(const int port) {
+Server::Server(const int port,std::string *met) {
   std::shared_ptr<db::Database> db = std::make_shared<db::Database>("database");
   struct sockaddr_in server_addr, client_addr;
   socklen_t client_len = sizeof(client_addr);
@@ -52,7 +50,13 @@ Server::Server(const int port) {
             int count = 0;
             int flag =0;
   while (1) {
+    /* 
+    * epoll_wait should be in another worker thread
+    */
     new_events = epoll_wait(epollfd, events, MAX_EVENTS, -1);
+
+
+
 
     if (new_events == -1) {
       error("Error in epoll_wait..\n");
@@ -103,7 +107,7 @@ Server::Server(const int port) {
             query = m.query;
             std::cout<< " from server.cpp query = "<< query << "\n\n";
           }
-          
+
           printf("SENT: ");
           for (int i = 0; i <bytes_sent; i++) {
             printf("%d ", m.Header[i]);
