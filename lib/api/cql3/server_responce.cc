@@ -4,7 +4,7 @@
 
 #include "CqlLexer.h"
 #include "CqlParser.h"
-
+#include <chrono>
 #include "api/cql3/fake_meta.hh"
 #include "api/cql3/query_result.hh"
 #include "lang/cql3_visitor.hh"
@@ -19,6 +19,7 @@ using namespace dibibase;
 using namespace dibibase::lang::cql3;
 
 using namespace dibibase::api::cql3;
+using namespace std::chrono;
 ServerMsg::ServerMsg(Frame f) { frame = f; }
 int ServerMsg::SupportedMessage(
     std::map<std::string, std::list<std::string>> supportedOptions,
@@ -62,10 +63,9 @@ int ServerMsg::SupportedMessage(
   return index;
 }
 
-int ServerMsg::CreateResponse(std::shared_ptr<dibibase::db::Database> db) {
+int ServerMsg::CreateResponse(std::shared_ptr<dibibase::db::Database> db,int met[]) {
   int opcode = int(frame.opcode);
   int msg_length = 9; // default minimum is 9 decimals (HEADER ONLY NO DATA)
-
   int responce_version = frame.version + 0x80;
   std::list<std::string> versions, comp_types, cql_versions;
   Header[0] = responce_version;
@@ -166,7 +166,7 @@ int ServerMsg::CreateResponse(std::shared_ptr<dibibase::db::Database> db) {
                   dynamic_cast<lang::CreateTableStatement *>(statement);
               create_table_statement != nullptr) {
             create_table_statement->execute(*db);
-
+            met[0] += 1;
             int stream_id = Header[3];
             QueryResult q(create_table_statement->m_keyspace, body);
             int size1 = q.schema_change(create_table_statement->m_table);
@@ -198,10 +198,15 @@ int ServerMsg::CreateResponse(std::shared_ptr<dibibase::db::Database> db) {
           if (lang::InsertStatement *insert_statement =
                   dynamic_cast<lang::InsertStatement *>(statement);
               insert_statement != nullptr) {
+            auto start = high_resolution_clock::now();
             insert_statement->execute(*db);
 
             QueryResult q(insert_statement->m_keyspace, body);
             int size = q.insert_record();
+            auto stop = high_resolution_clock::now();
+            auto duration = duration_cast<microseconds>(stop - start);
+            met[3] = duration.count();
+            met[1] += 1;
             for (int i = 5; i < size + 5; i++)
               Header[i] = body[i - 5];
             msg_length = size + 5;
@@ -211,18 +216,25 @@ int ServerMsg::CreateResponse(std::shared_ptr<dibibase::db::Database> db) {
           if (lang::SelectStatement *select_statement =
                   dynamic_cast<lang::SelectStatement *>(statement);
               select_statement != nullptr) {
-
+            auto start = high_resolution_clock::now();
             auto result = select_statement->execute(*db);
-
+            
+            
+            
             std::vector<catalog::Record> record_v;
             record_v.push_back(result.value());
-
+            
             const std::unique_ptr<catalog::Schema> &s =
                 db->read_schema(select_statement->m_from_spec.m_table);
             QueryResult q(select_statement->m_from_spec.m_keyspace, body);
             int size = q.select_result(select_statement->m_from_spec.m_table,
                                        *s, record_v);
+            
+            auto stop = high_resolution_clock::now();
 
+            auto duration = duration_cast<microseconds>(stop - start);
+            met[4] = duration.count();
+            met[2] += 1;
             Header[5] = 0;
             Header[6] = 0;
             Header[7] = 0;

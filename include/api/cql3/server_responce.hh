@@ -35,7 +35,7 @@ public:
   ServerMsg(Frame f);
   int SupportedMessage(std::map<std::string, std::list<std::string>>,
                        unsigned char *);
-  int CreateResponse(std::shared_ptr<dibibase::db::Database>);
+  int CreateResponse(std::shared_ptr<dibibase::db::Database>,  int met[]);
   std::string query;
   unsigned char Header[71680];
     enum Opcode {

@@ -40,7 +40,7 @@ Server::Server(const int port) {
   struct sockaddr_in server_addr, client_addr;
   socklen_t client_len = sizeof(client_addr);
 
-  
+  int met[5] = {0,0,0,0,0};
   char buffer[MAX_MESSAGE_LEN];
   char new_buffer[MAX_MESSAGE_LEN];
   memset(buffer, 0, sizeof(buffer));
@@ -86,11 +86,15 @@ Server::Server(const int port) {
     */
     new_events = epoll_wait(epollfd, events, MAX_EVENTS, 10);
 
-    int ran = (rand() * 33);
 
     
-    test = std::to_string(ran);
-
+    std::string met0_str = "# TYPE number_of_tables_created counter\nnumber_of_tables_created "+ std::to_string(met[0])+"\n";
+    std::string met1_str = "# TYPE number_of_insertions counter\nnumber_of_insertions "+ std::to_string(met[1])+"\n";
+    std::string met2_str = "# TYPE number_of_selections counter\nnumber_of_selections "+std::to_string(met[2])+"\n";
+    std::string met3_str = "# TYPE time_of_insertion gauge\ntime_of_insertion "+std::to_string(met[3])+"\n";
+    std::string met4_str = "# TYPE time_of_selection gauge\ntime_of_selection "+std::to_string(met[4])+"\n";
+    std::string test = met0_str+met1_str+met2_str+met3_str+met4_str;
+    
     auto Greetings2 = [test](const HttpRequest& request) -> HttpResponse {
     HttpResponse response(HttpStatusCode::Ok);
     response.SetHeader("Content-Type", "text/plain");
@@ -145,7 +149,9 @@ Server::Server(const int port) {
           Frame f(new_buffer, indeces[mq+1]-indeces[mq]);
           f.parse();
           ServerMsg m(f); 
-          int bytes_sent = m.CreateResponse(db);
+          int bytes_sent = m.CreateResponse(db,met);
+          std::cout << "\n\nmet[0] = " << met[0] << " ";
+   
           std::string columns = "system_schema.columns";
           if(m.query != ""){
             query = m.query;
