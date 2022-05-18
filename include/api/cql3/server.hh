@@ -35,7 +35,7 @@ class DIBIBASE_PUBLIC Server {
 
 public:
   std::string query;
-  Server(int port,std::string *met);
+  Server(int port);
   Server(const Server &) = delete;
   Server &operator=(const Server &) = delete;
   Server(Server &&) = delete;
@@ -43,6 +43,7 @@ public:
 private:
   int sock_listen_fd;
   int maxevents = 128;
+  int timeout = 5;
   struct epoll_event ev;
   int epollfd;
 };

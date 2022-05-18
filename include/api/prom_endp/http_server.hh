@@ -51,13 +51,11 @@ public:
   void RegisterHttpRequestHandler(const std::string& path, HttpMethod method, const HttpRequestHandler_t callback) {
     const Uri uri(path);
     using namespace std;
-    map lol = request_handlers_[uri];
-    
+
   // alloc then dealloc then alloc .......
-    //request_handlers_.erase(uri);
+    request_handlers_.erase(uri);
     
-  // moshkla de ybro :"(())
-    request_handlers_.insert(make_pair(uri, std::map<HttpMethod, HttpRequestHandler_t>()));
+    //request_handlers_.insert(make_pair(uri, std::map<HttpMethod, HttpRequestHandler_t>()));
     request_handlers_[uri].insert(std::make_pair(method, std::move(callback)));
   }
   void RegisterHttpRequestHandler(const Uri& uri, HttpMethod method, const HttpRequestHandler_t callback) {

@@ -2,15 +2,45 @@
 #include "db/database.hh"
 #include <memory>
 #include <thread>
+#include <cstring>
+#include <string>
+#include <stdexcept>
+#include <ctime>
+#include <chrono>
+#include "api/cql3/server.hh"
+#include "api/prom_endp/uri.hh"
+#include "api/prom_endp/http_message.hh"
+#include "api/prom_endp/http_server.hh"
 using std::cout;
 
 using namespace dibibase::api::cql3;
+using namespace dibibase::api::prom_endp;
 
-Server::Server(const int port,std::string *met) {
+
+
+Server::Server(const int port) {
   std::shared_ptr<db::Database> db = std::make_shared<db::Database>("database");
+  std::string test="INIT";  
+  std::string host = "0.0.0.0";
+  HttpServer prom_server(host, 8080);
+
+  std::string ex_metric = "# TYPE process_max_fds gauge\nprocess_max_fds 1024.0\n";
+  auto Greetings = [ex_metric](const HttpRequest& request) -> HttpResponse {
+    HttpResponse response(HttpStatusCode::Ok);
+    response.SetHeader("Content-Type", "text/plain");
+    response.SetContent(ex_metric);
+    return response;
+  };
+  prom_server.RegisterHttpRequestHandler("/", HttpMethod::HEAD, Greetings);
+  prom_server.RegisterHttpRequestHandler("/", HttpMethod::GET, Greetings);
+  std::cout << "Starting the web prom_server.." << std::endl;
+  prom_server.Start();
+  std::cout << "prom_server listening on " << host << ":" << port << std::endl;
+
   struct sockaddr_in server_addr, client_addr;
   socklen_t client_len = sizeof(client_addr);
 
+  
   char buffer[MAX_MESSAGE_LEN];
   char new_buffer[MAX_MESSAGE_LEN];
   memset(buffer, 0, sizeof(buffer));
@@ -49,12 +79,26 @@ Server::Server(const int port,std::string *met) {
   }
             int count = 0;
             int flag =0;
+
   while (1) {
     /* 
-    * epoll_wait should be in another worker thread
+    * epoll_wait waits fininte time (10 ms)
     */
-    new_events = epoll_wait(epollfd, events, MAX_EVENTS, -1);
+    new_events = epoll_wait(epollfd, events, MAX_EVENTS, 10);
 
+    int ran = (rand() * 33);
+
+    
+    test = std::to_string(ran);
+
+    auto Greetings2 = [test](const HttpRequest& request) -> HttpResponse {
+    HttpResponse response(HttpStatusCode::Ok);
+    response.SetHeader("Content-Type", "text/plain");
+    response.SetContent(test);
+    return response;
+    };
+    prom_server.RegisterHttpRequestHandler("/metrics",HttpMethod::HEAD, Greetings2);
+    prom_server.RegisterHttpRequestHandler("/metrics", HttpMethod::GET, Greetings2);
 
 
 
@@ -109,6 +153,8 @@ Server::Server(const int port,std::string *met) {
           }
 
           printf("SENT: ");
+
+
           for (int i = 0; i <bytes_sent; i++) {
             printf("%d ", m.Header[i]);
           }
@@ -132,9 +178,7 @@ Server::Server(const int port,std::string *met) {
             flag = 1;
           }
           else if (flag==1) count ++;
-
           }
-
 
         }
       }
