@@ -76,6 +76,14 @@ int main(int argc, char *argv[]) {
         std::cout << dorp_table_statement->m_table << std::endl;
       }
       break;  
+    case lang::Statement::Type::DELETE:
+  if (lang::DeleteStatement *delete_statement =
+          dynamic_cast<lang::DeleteStatement *>(statement);
+      delete_statement != nullptr) {
+    auto result = delete_statement->execute(db);
+    std::cout << delete_statement->m_table << std::endl;
+  }
+  break; 
     default:
       break;
     }
