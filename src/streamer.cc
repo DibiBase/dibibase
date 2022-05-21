@@ -4,6 +4,7 @@
 #include <thread>
 #include <unistd.h>
 
+#include "config/config.hh"
 #include "dht/partitioner.hh"
 #include "dht/query_processor.hh"
 #include "dht/state_store.hh"
@@ -12,13 +13,11 @@
 using namespace dibibase::dht;
 
 int main(int argc, char *argv[]) {
-  std::string local_address = StateStore::instance().local_address();
+  std::string local_address = Config::instance().local_address();
 
   // server for internal communications
   std::thread th = std::thread(
       [local_address]() { StreamerService().run_server(local_address); });
-
-  sleep(1);
 
   // external queries
   std::ifstream stream;
