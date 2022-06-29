@@ -29,7 +29,7 @@ public:
         m_where_spec(where_spec), m_order_sepc(order_spec), m_limit(limit),
         m_allow_filtering(allow_filtering) {}
 
-  std::optional<vector<catalog::Record>> execute(db::Database &db) override {
+  std::optional<catalog::Record> execute(db::Database &db) override {
     return db.read_record(
         m_from_spec.m_table,
         catalog::Data::from(m_where_spec.m_relation_elements[0].m_operand));

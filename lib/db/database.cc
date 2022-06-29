@@ -85,7 +85,7 @@ void Database::create_table(std::string table_name, catalog::Schema schema) {
   m_table_managers.insert({table_name, std::move(table_manager)});
 }
 
-std::vector<Record> Database::read_record(std::string table_name,
+Record Database::read_record(std::string table_name,
                              std::unique_ptr<catalog::Data> data) {
   auto table_managers_it = m_table_managers.find(table_name);
 
