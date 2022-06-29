@@ -567,35 +567,6 @@ public:
 
     return dynamic_cast<Statement *>(drop_table_statement);
   }
-
-  antlrcpp::Any visitDelete(CqlParser::DropTableContext *ctx) override {
-    DeleteStatement *delete_statement = new DeleteStatement();
-
-    if (ctx->beginBatch())
-      delete_statement->m_batch =
-          visitBeginBatch(ctx->beginBatch()).as<Batch>();
-
-    if (ctx->keyspace())
-      delete_statement->m_keyspace = ctx->keyspace()->OBJECT_NAME()->getText();
-
-    delete_statement->m_table = ctx->table()->OBJECT_NAME()->getText();
-
-    if (ctx->insertColumnSpec())
-      delete_statement->m_columns =
-          visitInsertColumnSpec(ctx->insertColumnSpec())
-              .as<std::vector<std::string>>();
-
-    // Remove later
-    delete_statement->m_values = visitInsertValuesSpec(ctx->insertValuesSpec())
-                                     .as<std::vector<catalog::Data *>>();
-
-    delete_statement->m_if_not_exists = ctx->ifNotExist() != nullptr;
-
-    delete_statement->m_ttl_timestamp =
-        visitUsingTtlTimestamp(ctx->usingTtlTimestamp()).as<TtlTimestamp>();
-
-    return dynamic_cast<Statement *>(delete_statement);
-  }
 };
 
 } // namespace dibibase::lang::cql3
