@@ -23,7 +23,7 @@ class DIBIBASE_PUBLIC TableBuilder {
 public:
   TableBuilder(std::string &base_path, std::string &table_name,
                catalog::Schema &schema, size_t sstable_id,
-               std::map<std::shared_ptr<catalog::Data>, catalog::Record,
+               std::multimap<std::shared_ptr<catalog::Data>, catalog::Record,
                         catalog::DataCmp> records);
 
   std::unique_ptr<mem::Summary> get_new_summary() {
@@ -44,7 +44,7 @@ private:
   catalog::Schema &m_schema;
   size_t m_new_sstable_id;
 
-  std::map<std::shared_ptr<catalog::Data>, catalog::Record, catalog::DataCmp>
+  std::multimap<std::shared_ptr<catalog::Data>, catalog::Record, catalog::DataCmp>
       m_records;
 
   int m_summary_fd;

@@ -64,7 +64,7 @@ private:
   // the index represents the sstable_id.
   std::vector<std::unique_ptr<mem::Summary>> m_summaries;
 
-  std::map<std::shared_ptr<catalog::Data>, catalog::Record, catalog::DataCmp>
+  std::multimap<std::shared_ptr<catalog::Data>, catalog::Record, catalog::DataCmp>
       m_memtable;
 };
 

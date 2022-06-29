@@ -41,7 +41,7 @@ public:
 
 private:
   std::string m_base_path;
-  std::map<std::string, TableManager> m_table_managers;
+  std::multimap<std::string, TableManager> m_table_managers;
 };
 
 } // namespace dibibase::db
