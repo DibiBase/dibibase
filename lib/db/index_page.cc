@@ -38,7 +38,7 @@ bool IndexPage::push_back(catalog::Data *key, off_t offset) {
   if (size() + m_type.length() + sizeof(offset) > 4096)
     return false;
 
-  m_sort_keys.insert({catalog::Data::from(key) , offset});
+  m_sort_keys.insert({std::move(catalog::Data::from(key)) , offset});
   return true;
 }
 
