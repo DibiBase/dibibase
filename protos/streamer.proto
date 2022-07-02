@@ -1,6 +1,9 @@
 syntax = "proto3";
 
-package dibibase.grpc;
+package dibibase.streamer;
+
+message Nothing {
+}
 
 message Query {
   string str = 1;
@@ -10,6 +13,24 @@ message Result {
   string str = 1;
 }
 
+message Health {
+  bool ok = 1;
+  bool ready = 2;
+}
+
+enum Command {
+  SELECT = 0;
+  INSERT = 1;
+  UPDATE = 2;
+  DELETE = 3;
+}
+
+message Action {
+  Command command = 1;
+  string data = 2;
+}
+
 service StreamerRPC {
+  rpc health_check (Nothing) returns (Health) {}
   rpc execute (Query) returns (Result) {}
 }

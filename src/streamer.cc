@@ -22,18 +22,26 @@ int main(int argc, char *argv[]) {
   // external queries
   std::ifstream stream;
   std::string query;
-  stream.open(argv[1]);
+  // stream.open(argv[1]);
 
-  while (!stream.eof()) {
-    std::cout << ">>> ";
-    std::getline(std::cin, query);
-    // std::cout << query << std::endl;
-    if (query == "") {
-      continue;
-    }
-    string result = QueryProcessor(query).process();
-    std::cout << "Result: " << result << std::endl;
+  // while (!stream.eof()) {
+    // std::cout << ">>> ";
+    // std::getline(std::cin, query);
+    // // std::cout << query << std::endl;
+    // if (query == "") {
+    //   continue;
+    // }
+    // string result = QueryProcessor(query).process();
+    // std::cout << "Result: " << result << std::endl;
+  // }
+
+  while(true) {
+    string address;
+    std::cin >> address;
+    std::make_shared<StreamerClient>(
+          ::grpc::CreateChannel(address, ::grpc::InsecureChannelCredentials()))->health_check();
   }
+
 
   // wait for server
   th.join();

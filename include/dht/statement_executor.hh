@@ -18,7 +18,7 @@ public:
   std::optional<Record> execute() {
     // TODO: handle exceptions
     string address = Config::instance().local_address();
-    auto keyspace = StateStore::instance().get_keyspace(address + ":database");
+    auto keyspace = StateStore::instance().get_keyspace("data/" + address + ":database");
     std::optional<Record> result = m_statement->execute(*keyspace);
 
     if (result.has_value())
