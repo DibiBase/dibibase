@@ -17,7 +17,7 @@ std::unique_ptr<IndexPage> IndexPage::from(util::Buffer *buf) {
   for (uint8_t i = 0; i < sort_keys_length; i++) {
     auto key = catalog::Data::from(buf, type);
     auto offset = buf->get_uint64();
-    sort_keys.insert({std::move(key) , offset});
+    sort_keys.insert(std::make_pair(std::move(key) , offset));
   }
 
   return std::make_unique<IndexPage>(std::move(sort_keys), type);
@@ -38,7 +38,7 @@ bool IndexPage::push_back(catalog::Data *key, off_t offset) {
   if (size() + m_type.length() + sizeof(offset) > 4096)
     return false;
 
-  m_sort_keys.insert({std::move(catalog::Data::from(key)) , offset});
+  m_sort_keys.insert(std::make_pair(std::move(catalog::Data::from(key)) , offset));
   return true;
 }
 
