@@ -8,10 +8,8 @@
 
 #include "streamer.grpc.pb.h"
 
-using dibibase::grpc::Query;
-using dibibase::grpc::Result;
-using dibibase::grpc::StreamerRPC;
-using grpc::Status;
+using namespace dibibase::streamer;
+using namespace grpc;
 
 namespace dibibase::dht {
 
@@ -32,9 +30,25 @@ public:
       return response.str();
     }
 
-    logger.info("gRPC Error(%d): %s", status.error_code(),
+    logger.err("gRPC Error(%d): %s", status.error_code(),
                 status.error_message().c_str());
     return "Error"; // TODO: change to optional
+  }
+
+  bool health_check() {
+    ::grpc::ClientContext context;
+    Nothing request;
+    Health response;
+
+    Status status = stub->health_check(&context, request, &response);
+
+    if (status.ok()) {
+      return response.ready();
+    }
+
+    logger.info("gRPC Error(%d): %s, HealthCheck Failed: %s", status.error_code(),
+                status.error_message().c_str(), context.peer().c_str());
+    return false;
   }
 
 private:
