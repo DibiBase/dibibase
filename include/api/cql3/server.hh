@@ -12,6 +12,11 @@
 #include <cstdio>
 #include <cstring>
 #include <iostream>
+#include <memory>
+#include <thread>
+#include <stdexcept>
+#include <ctime>
+#include <chrono>
 #include <netinet/in.h>
 #include <sys/epoll.h>
 #include <sys/socket.h>
@@ -46,6 +51,8 @@ private:
   int timeout = 5;
   struct epoll_event ev;
   int epollfd;
+  std::string columns = "system_schema.columns";
+  bool prom_started = false;
 };
 
 } // namespace dibibase::api::cql3

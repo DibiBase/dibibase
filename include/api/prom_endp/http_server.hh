@@ -12,6 +12,13 @@
 #include <thread>
 #include <utility>
 #include <iostream>
+#include <unistd.h>
+#include <arpa/inet.h>
+#include <cerrno>
+#include <cstring>
+#include <stdexcept>
+#include <sstream>
+
 #include "api/prom_endp/http_message.hh"
 #include "api/prom_endp/uri.hh"
 

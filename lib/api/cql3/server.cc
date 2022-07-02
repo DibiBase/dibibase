@@ -1,17 +1,10 @@
 #include "api/cql3/server.hh"
 #include "db/database.hh"
-#include <memory>
-#include <thread>
-#include <cstring>
-#include <string>
-#include <stdexcept>
-#include <ctime>
-#include <chrono>
 #include "api/cql3/server.hh"
 #include "api/prom_endp/uri.hh"
 #include "api/prom_endp/http_message.hh"
 #include "api/prom_endp/http_server.hh"
-using std::cout;
+
 
 using namespace dibibase::api::cql3;
 using namespace dibibase::api::prom_endp;
@@ -24,7 +17,7 @@ Server::Server(const int port) {
   std::string host = "0.0.0.0";
   HttpServer prom_server(host, 8080);
 
-  std::string ex_metric = "# TYPE process_max_fds gauge\nprocess_max_fds 1024.0\n";
+  std::string ex_metric = "GOTO /metrics";
   auto Greetings = [ex_metric](const HttpRequest& request) -> HttpResponse {
     HttpResponse response(HttpStatusCode::Ok);
     response.SetHeader("Content-Type", "text/plain");
@@ -35,7 +28,7 @@ Server::Server(const int port) {
   prom_server.RegisterHttpRequestHandler("/", HttpMethod::GET, Greetings);
   std::cout << "Starting the web prom_server.." << std::endl;
   prom_server.Start();
-  std::cout << "prom_server listening on " << host << ":" << port << std::endl;
+  std::cout << "prom_server listening on " << host << ":8080" << std::endl;
 
   struct sockaddr_in server_addr, client_addr;
   socklen_t client_len = sizeof(client_addr);
@@ -57,19 +50,19 @@ Server::Server(const int port) {
 
   if (bind(sock_listen_fd, (struct sockaddr *)&server_addr,
            sizeof(server_addr)) < 0)
-    error("Error binding socket..\n");
+    error("Error binding socket (CQL Server).. \n");
 
   if (listen(sock_listen_fd, BACKLOG) < 0) {
     error("Error listening..\n");
   }
-  printf("server listening for connections on port: %d\n", port);
+  printf("CQL server listening for connections on port: %d\n", port);
 
   struct epoll_event events[MAX_EVENTS];
   int new_events, sock_conn_fd;
 
   epollfd = epoll_create(MAX_EVENTS);
   if (epollfd < 0) {
-    error("Error creating epoll..\n");
+    error("Error creating epoll (CQL Server).. \n");
   }
   ev.events = EPOLLIN;
   ev.data.fd = sock_listen_fd;
@@ -77,8 +70,9 @@ Server::Server(const int port) {
   if (epoll_ctl(epollfd, EPOLL_CTL_ADD, sock_listen_fd, &ev) == -1) {
     error("Error adding new listeding socket to epoll..\n");
   }
-            int count = 0;
-            int flag =0;
+  printf("\n # Connection established (CQL Server) # \n");
+  int count = 0;
+  int flag =0;
 
   while (1) {
     /* 
@@ -87,7 +81,7 @@ Server::Server(const int port) {
     new_events = epoll_wait(epollfd, events, MAX_EVENTS, 10);
 
 
-    
+    // prometheus metrics at /metrics
     std::string met0_str = "# TYPE number_of_tables_created counter\nnumber_of_tables_created "+ std::to_string(met[0])+"\n";
     std::string met1_str = "# TYPE number_of_insertions counter\nnumber_of_insertions "+ std::to_string(met[1])+"\n";
     std::string met2_str = "# TYPE number_of_selections counter\nnumber_of_selections "+std::to_string(met[2])+"\n";
@@ -103,11 +97,15 @@ Server::Server(const int port) {
     };
     prom_server.RegisterHttpRequestHandler("/metrics",HttpMethod::HEAD, Greetings2);
     prom_server.RegisterHttpRequestHandler("/metrics", HttpMethod::GET, Greetings2);
+    if(!prom_started) {
+      printf("\n # Prometheus Endpoint is Up # \n");
+      prom_started = true;
+    }
 
 
-
+    
     if (new_events == -1) {
-      error("Error in epoll_wait..\n");
+      error("Error in epoll_wait (CQL Server)..\n");
     }
 
     for (int i = 0; i < new_events; ++i) {
@@ -115,13 +113,13 @@ Server::Server(const int port) {
         sock_conn_fd = accept4(sock_listen_fd, (struct sockaddr *)&client_addr,
                                &client_len, SOCK_NONBLOCK);
         if (sock_conn_fd == -1) {
-          error("Error accepting new connection..\n");
+          error("Error accepting new connection (CQL Server)..\n");
         }
 
         ev.events = EPOLLIN | EPOLLET;
         ev.data.fd = sock_conn_fd;
         if (epoll_ctl(epollfd, EPOLL_CTL_ADD, sock_conn_fd, &ev) == -1) {
-          error("Error adding new event to epoll..\n");
+          error("Error adding new event to epoll (CQL Server)..\n");
         }
       } else {
         int newsockfd = events[i].data.fd;
@@ -150,21 +148,7 @@ Server::Server(const int port) {
           f.parse();
           ServerMsg m(f); 
           int bytes_sent = m.CreateResponse(db,met);
-          std::cout << "\n\nmet[0] = " << met[0] << " ";
-   
-          std::string columns = "system_schema.columns";
-          if(m.query != ""){
-            query = m.query;
-            std::cout<< " from server.cpp query = "<< query << "\n\n";
-          }
 
-          printf("SENT: ");
-
-
-          for (int i = 0; i <bytes_sent; i++) {
-            printf("%d ", m.Header[i]);
-          }
-          printf(";\n");
           int index = 0;
           char div[1000];
           for (int i=0;i<bytes_sent;i++){

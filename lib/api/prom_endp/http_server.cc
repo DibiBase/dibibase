@@ -6,14 +6,6 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 
-#include <chrono>
-#include <cerrno>
-#include <cstring>
-#include <functional>
-#include <map>
-#include <stdexcept>
-#include <string>
-#include <sstream>
 
 #include "api/prom_endp/http_message.hh"
 #include "api/prom_endp/uri.hh"
@@ -30,7 +22,7 @@ void HttpServer::Start() {
   sockaddr_in server_address;
 
   if (setsockopt(sock_fd_, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)) < 0) {
-    throw std::runtime_error("Failed to set socket options");
+    throw std::runtime_error("Failed to set socket options (Prometheus Server)");
   }
 
   server_address.sin_family = AF_INET;
@@ -39,12 +31,12 @@ void HttpServer::Start() {
   server_address.sin_port = htons(port_);
 
   if (bind(sock_fd_, (sockaddr *)&server_address, sizeof(server_address)) < 0) {
-    throw std::runtime_error("Failed to bind to socket");
+    throw std::runtime_error("Failed to bind to socket (Prometheus Server)");
   }
 
   if (listen(sock_fd_, kBacklogSize) < 0) {
     std::ostringstream msg;
-    msg << "Failed to listen on port " << port_;
+    msg << "Failed to listen on port (Prometheus Server)" << port_;
     throw std::runtime_error(msg.str());
   }
 
@@ -70,14 +62,14 @@ void HttpServer::Stop() {
 
 void HttpServer::CreateSocket() {
   if ((sock_fd_ = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0)) < 0) {
-    throw std::runtime_error("Failed to create a TCP socket");
+    throw std::runtime_error("Failed to create a TCP socket (Prometheus Server)");
   }
 }
 
 void HttpServer::SetUpEpoll() {
   for (int i = 0; i < kThreadPoolSize; i++) {
     if ((worker_epoll_fd_[i] = epoll_create1(0)) < 0) {
-      throw std::runtime_error("Failed to create epoll file descriptor for worker");
+      throw std::runtime_error("Failed to create epoll file descriptor for worker (Prometheus Server)");
     }
   }
 }
@@ -222,14 +214,14 @@ HttpResponse HttpServer::HandleHttpRequest(const HttpRequest& request) {
 void HttpServer::control_epoll_event(int epoll_fd, int op, int fd, std::uint32_t events, void *data) {
   if (op == EPOLL_CTL_DEL) {
     if (epoll_ctl(epoll_fd, op, fd, nullptr) < 0) {
-      throw std::runtime_error("Failed to remove file descriptor");
+      throw std::runtime_error("Failed to remove file descriptor (Prometheus Server)");
     }
   } else {
     epoll_event ev;
     ev.events = events;
     ev.data.ptr = data;
     if (epoll_ctl(epoll_fd, op, fd, &ev) < 0) {
-      throw std::runtime_error("Failed to add file descriptor");
+      throw std::runtime_error("Failed to add file descriptor (Prometheus Server)");
     }
   }
 }
