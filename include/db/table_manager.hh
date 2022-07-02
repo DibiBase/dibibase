@@ -15,11 +15,13 @@
 #include "io/disk_manager.hh"
 #include "io/table_builder.hh"
 #include "mem/summary.hh"
+#include "predicate.hh"
 
 namespace dibibase::db {
 
 DEFINE_ERROR(schema_mismatch_error);
 DEFINE_ERROR(non_existent_record_error);
+DEFINE_ERROR(non_existent_predicate_error);
 
 class DIBIBASE_PUBLIC TableManager {
 
@@ -35,6 +37,9 @@ public:
   // offset within the data file. Finally it gets the exact record from
   // io::DiskManager and returns it.
   catalog::Record read_record(std::unique_ptr<catalog::Data>);
+
+  std::vector<catalog::Record> query(std::unique_ptr<catalog::Data> sort_key,
+                                     int predicate);
 
   // Check if memtable has enough space to store new record, otherwise flush the
   // memtable into disk and clear the memtable then store the new one. Check the
@@ -57,8 +62,6 @@ private:
   std::unique_ptr<catalog::Schema> m_schema;
 
   size_t m_current_sstable_id;
-
-  // TODO: adding a vector of bloom filters.
 
   // Storing summary for sort key offsets for each sstable, in which
   // the index represents the sstable_id.
