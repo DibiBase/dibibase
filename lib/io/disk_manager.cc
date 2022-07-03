@@ -86,6 +86,7 @@ catalog::Record io::DiskManager::get_record_from_data(
   if (rc < 0)
     util::Logger::make().err("Error reading Data file: %d", errno);
   else if (rc != static_cast<int>(schema.record_size()))
+    //  Can't handle this case 😪
     util::Logger::make().err("Malformed Data file: File is truncated");
 
   util::Buffer *record_buffer =

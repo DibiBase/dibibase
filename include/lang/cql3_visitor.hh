@@ -211,10 +211,7 @@ public:
   antlrcpp::Any
   visitDataTypeName(CqlParser::DataTypeNameContext *ctx) override {
     if (ctx->K_ASCII()) {
-      return catalog::Data::Type(
-          catalog::Data::Type::ASCII,
-          strtoll(ctx->decimalLiteral()->DECIMAL_LITERAL()->getText().c_str(),
-                  nullptr, 10));
+      return catalog::Data::Type(catalog::Data::Type::ASCII, -1);
     } else if (ctx->K_BIGINT()) {
       return catalog::Data::Type(catalog::Data::Type::BIGINT, sizeof(int64_t));
     } else if (ctx->K_BOOLEAN()) {
