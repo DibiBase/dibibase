@@ -100,6 +100,32 @@ void Database::write_record(std::string table_name, catalog::Record record) {
     table_managers_it->second.write_record(record);
 }
 
+std::vector<Record> Database::query(std::string table_name,
+                                    std::unique_ptr<catalog::Data> sort_key,
+                                    std::string op) {
+  Predicate predicate;
+
+  if(op == "<") {
+    predicate = LESSTHAN;
+  }
+  else if(op == "<=") {
+    predicate = LESSTHANOREQUAL;
+  }
+  else if(op == ">") {
+    predicate = GREATERTHAN;
+  }
+  else if(op == ">=") {
+    predicate = GREATERTHANOREQUAL;
+  }
+  
+  auto table_managers_it = m_table_managers.find(table_name);
+
+  if (table_managers_it != m_table_managers.end())
+    return table_managers_it->second.query(std::move(sort_key), predicate);
+
+  throw uncomparable_type_error("");
+}
+
 void Database::flush_metadata() {
   std::vector<catalog::Table> tables;
 

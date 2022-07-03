@@ -2,6 +2,7 @@
 
 #include "catalog/record.hh"
 #include "catalog/schema.hh"
+#include "predicate.hh"
 #include "table_manager.hh"
 
 #include <dirent.h>
@@ -34,6 +35,10 @@ public:
                               std::unique_ptr<catalog::Data>);
 
   void write_record(std::string table_name, catalog::Record);
+
+  std::vector<catalog::Record> query(std::string table_name,
+                                     std::unique_ptr<catalog::Data> sort_key,
+                                     std::string op);
 
   void flush_metadata();
 

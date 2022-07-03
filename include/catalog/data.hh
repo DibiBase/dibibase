@@ -66,6 +66,8 @@ public:
   static std::unique_ptr<Data> from(catalog::Data *);
 
   virtual bool compare(Data *other) = 0;
+  virtual bool is_equal(Data *other) = 0;
+
   virtual std::string print() = 0;
 
   Type type() const { return m_type; }
@@ -90,6 +92,8 @@ public:
   explicit ASCIIData(std::string data);
 
   bool compare(Data *other) override;
+  bool is_equal(Data *other) override;
+
   std::string print() override { return data(); }
 
   std::string data() const { return m_data; }
@@ -107,7 +111,9 @@ public:
   explicit BigIntData(int64_t data);
 
   bool compare(Data *other) override;
-  std::string print() override {}
+  bool is_equal(Data *other) override;
+
+  std::string print() override { return std::to_string(data()); }
 
   int64_t data() const { return m_data; }
   void set_data(int64_t data) { m_data = data; }
@@ -124,7 +130,9 @@ public:
   explicit BooleanData(bool data);
 
   bool compare(Data *other) override;
-  std::string print() override {}
+  bool is_equal(Data *other) override;
+
+  std::string print() override { return std::to_string(data()); }
 
   bool data() const { return m_data; }
   void set_data(bool data) { m_data = data; }
@@ -141,7 +149,9 @@ public:
   explicit DoubleData(double data);
 
   bool compare(Data *other) override;
-  std::string print() override {}
+  bool is_equal(Data *other) override;
+
+  std::string print() override { return std::to_string(data()); }
 
   double data() const { return m_data; }
   void set_data(double data) { m_data = data; }
@@ -158,7 +168,9 @@ public:
   explicit FloatData(float data);
 
   bool compare(Data *other) override;
-  std::string print() override {}
+  bool is_equal(Data *other) override;
+
+  std::string print() override { return std::to_string(data()); }
 
   float data() const { return m_data; }
   void set_data(float data) { m_data = data; }
@@ -175,6 +187,8 @@ public:
   explicit IntData(int32_t data);
 
   bool compare(Data *other) override;
+  bool is_equal(Data *other) override;
+
   std::string print() override { return std::to_string(data()); }
 
   int32_t data() const { return m_data; }
@@ -192,7 +206,9 @@ public:
   explicit SmallIntData(int16_t data);
 
   bool compare(Data *other) override;
-  std::string print() override {}
+  bool is_equal(Data *other) override;
+
+  std::string print() override { return std::to_string(data()); }
 
   int16_t data() const { return m_data; }
   void set_data(int16_t data) { m_data = data; }
@@ -209,7 +225,9 @@ public:
   explicit TinyIntData(int8_t data);
 
   bool compare(Data *other) override;
-  std::string print() override {}
+  bool is_equal(Data *other) override;
+
+  std::string print() override { return std::to_string(data()); }
 
   int8_t data() const { return m_data; }
   void set_data(int8_t data) { m_data = data; }
@@ -226,6 +244,8 @@ public:
   explicit BlobData(std::unique_ptr<unsigned char[]>, size_t);
 
   bool compare(Data *other) override;
+  bool is_equal(Data *other) override;
+
   std::string print() override {}
 
   std::unique_ptr<unsigned char[]> data() const;

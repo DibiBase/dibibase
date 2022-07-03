@@ -1,0 +1,8 @@
+#pragma once
+
+enum Predicate {
+  LESSTHAN,
+  LESSTHANOREQUAL,
+  GREATERTHAN,
+  GREATERTHANOREQUAL
+};
