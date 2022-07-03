@@ -29,11 +29,9 @@ std::unique_ptr<Summary> Summary::from(util::Buffer *buf) {
 uint8_t Summary::find_page_number(catalog::Data *key) {
   if (m_sort_keys.size() == 0)
     throw std::invalid_argument("Summary is empty");
-
   // In case having only one page in summary.
   if (m_sort_keys.size() == 1)
     return 0;
-
   // CHECK: Maybe the logic is wrong. (perform binary search instead)
   for (std::vector<std::unique_ptr<catalog::Data>>::size_type i = 0;
        i <= m_sort_keys.size() - 1; i++) {

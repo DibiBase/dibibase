@@ -22,7 +22,9 @@ io::DiskManager::load_summary(std::string &database_path,
                  std::to_string(sstable_id) + ".db")
                     .c_str(),
                 O_RDONLY);
-
+  if (fd < 0)
+    util::Logger::make().err("Error reading Summary file: %d", errno);
+    
   std::unique_ptr<unsigned char[]> buf =
       std::unique_ptr<unsigned char[]>(new unsigned char[4096]);
   int rc = read(fd, buf.get(), 4096);
