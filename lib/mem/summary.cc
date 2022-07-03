@@ -34,11 +34,12 @@ uint8_t Summary::find_page_number(catalog::Data *key) {
   if (m_sort_keys.size() == 1)
     return 0;
 
-  // CHECK: Maybe the logic is wrong. (perform binary search instead)
-  for (std::vector<std::unique_ptr<catalog::Data>>::size_type i = 0;
+  for (std::vector<std::unique_ptr<catalog::Data>>::size_type i = 1;
        i <= m_sort_keys.size() - 1; i++) {
-    if (m_sort_keys[i]->compare(key))
+    std::cout << "i: " << i << std::endl;
+    if (m_sort_keys[i]->compare(key)) {
       return i - 1;
+    }
   }
 
   return m_sort_keys.size() - 1;
