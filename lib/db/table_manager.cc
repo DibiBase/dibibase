@@ -21,7 +21,13 @@ TableManager::read_record(std::unique_ptr<catalog::Data> sort_key) {
   // Searching in memtable.
   std::shared_ptr<catalog::Data> shared_sort_key = std::move(sort_key);
 
-  auto find_key = m_memtable.find(shared_sort_key);
+  auto eq_range = m_memtable.equal_range(shared_sort_key);
+  std::multimap<std::shared_ptr<dibibase::catalog::Data>, dibibase::catalog::Record, dibibase::catalog::DataCmp>::iterator find_key = m_memtable.end();
+  for(auto it = eq_range.first; it!=eq_range.second;it++)
+  {
+    find_key =it;
+  }
+  
   if (find_key != m_memtable.end())
     return find_key->second;
 
@@ -60,7 +66,6 @@ void TableManager::write_record(catalog::Record record) {
 
   auto sort_index = m_schema->sort_key_index();
   m_memtable.insert({record[sort_index], record});
-
   // Assuming that (record key size + offset in data file) = 48 bytes.
   // and IndexPage max size is 4096, then we can store 100 record key per single
   // page. then memtable can store up to 10000 keys, which will be stored in 100

@@ -24,7 +24,12 @@ std::unique_ptr<IndexPage> IndexPage::from(util::Buffer *buf) {
 }
 
 off_t IndexPage::find_offset(std::unique_ptr<catalog::Data> key) {
-  auto find_key = m_sort_keys.find(key);
+  auto eq_range = m_sort_keys.equal_range(key);
+  std::multimap<std::unique_ptr<dibibase::catalog::Data>, off_t, dibibase::catalog::DataCmp>::iterator find_key = m_sort_keys.end();
+  for(auto it = eq_range.first; it!=eq_range.second;it++)
+  {
+    find_key = it;
+  }
 
   if (find_key == m_sort_keys.end())
     return -1;

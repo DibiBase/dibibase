@@ -21,7 +21,7 @@ using namespace dibibase;
 using namespace dibibase::lang::cql3;
 
 int main() {
-    db::Database my_db("database");
+    db::Database my_db("/home/ahmed/database");
     
     catalog::Field id_field("id", catalog::Data::Type(catalog::Data::Type::Id::INT, 4));
     catalog::Field employee_name_field("employee_name", catalog::Data::Type(catalog::Data::Type::ASCII,5));
@@ -53,6 +53,6 @@ int main() {
     auto last_written_record_values = my_db.read_record("my_table" , std::make_unique<catalog::IntData>(id)).values();
 
 
-    printf("%s" , last_written_record_values[1].get()->print());
+    printf("%s" , last_written_record_values[1].get()->print().c_str());
   return EXIT_SUCCESS;
 }
