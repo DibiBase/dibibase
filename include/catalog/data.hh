@@ -67,7 +67,7 @@ public:
 
   virtual bool compare(Data *other) = 0;
   virtual std::string print() = 0;
-
+  virtual int size();
   Type type() const { return m_type; }
 
   virtual void bytes(util::Buffer *) = 0;
@@ -111,6 +111,7 @@ public:
 
   int64_t data() const { return m_data; }
   void set_data(int64_t data) { m_data = data; }
+  int size() { return sizeof(int64_t); }
 
   void bytes(util::Buffer *) override;
 
@@ -128,7 +129,7 @@ public:
 
   bool data() const { return m_data; }
   void set_data(bool data) { m_data = data; }
-
+  int size() { return sizeof(bool); }
   void bytes(util::Buffer *) override;
 
 private:
@@ -145,6 +146,7 @@ public:
 
   double data() const { return m_data; }
   void set_data(double data) { m_data = data; }
+  int size() { return sizeof(double); }
 
   void bytes(util::Buffer *) override;
 
@@ -162,6 +164,7 @@ public:
 
   float data() const { return m_data; }
   void set_data(float data) { m_data = data; }
+  int size() { return sizeof(float); }
 
   void bytes(util::Buffer *) override;
 
@@ -176,6 +179,7 @@ public:
 
   bool compare(Data *other) override;
   std::string print() override { return std::to_string(data()); }
+  int size() { return sizeof(int32_t); }
 
   int32_t data() const { return m_data; }
   void set_data(int32_t data) { m_data = data; }
@@ -196,6 +200,7 @@ public:
 
   int16_t data() const { return m_data; }
   void set_data(int16_t data) { m_data = data; }
+  int size() { return sizeof(int16_t); }
 
   void bytes(util::Buffer *) override;
 
@@ -213,6 +218,7 @@ public:
 
   int8_t data() const { return m_data; }
   void set_data(int8_t data) { m_data = data; }
+  int size() { return sizeof(int8_t); }
 
   void bytes(util::Buffer *) override;
 
@@ -230,6 +236,7 @@ public:
 
   std::unique_ptr<unsigned char[]> data() const;
   void set_data(unsigned char *, size_t);
+  int size() { return m_size*sizeof(u_char); }
 
   size_t length() const;
 

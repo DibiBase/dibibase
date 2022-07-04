@@ -68,21 +68,8 @@ Schema &Schema::push_back(Field field) {
   return *this;
 }
 
-size_t Schema::record_size() const {
-  size_t size = 0;
-  for (const auto &field : m_fields)
-    {
-      auto field_size = field.type().length();
-      printf("field-size: %d " , field_size);
-      if(field_size==-1)
-       {
-        // size += Size of the string which is variable for each record 😥;
-        }
-      else 
-      size += field.type().length();
-    }
-
-  return size;
+size_t Schema::record_size(Record record) const {
+  return record.size();
 }
 
 size_t Schema::size() const {

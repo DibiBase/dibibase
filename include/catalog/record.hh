@@ -29,6 +29,7 @@ public:
   }
 
   void bytes(util::Buffer *);
+  size_t size();
 
 private:
   std::vector<std::shared_ptr<catalog::Data>> m_values;
