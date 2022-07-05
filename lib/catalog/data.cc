@@ -11,7 +11,7 @@ std::unique_ptr<Data> Data::from(util::Buffer *buf, Type type) {
 
   switch (id) {
   case Type::ASCII: {
-    uint8_t number_of_bytes = buf->get_uint8();
+    uint8_t number_of_bytes = buf->get_uint16();
     std::string data = buf->get_string(number_of_bytes);
     return std::make_unique<ASCIIData>(data);
   }
@@ -128,7 +128,7 @@ bool ASCIIData::compare(Data *other) {
 }
 
 void ASCIIData::bytes(util::Buffer *buf) { 
-  buf->put_uint8(m_data.size());
+  buf->put_uint16(m_data.size());
   buf->put_string(m_data);
 }
 

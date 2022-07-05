@@ -48,16 +48,12 @@ bool Schema::verify(const catalog::Record &record) const {
 
   if (values.size() != m_fields.size())
     return false;
-  printf("verifying\n");
   for (std::vector<std::unique_ptr<catalog::Data>>::size_type i = 0;
        i < values.size(); i++) {
-    if ( values[i]->type() == m_fields[i].type() || m_fields[i].type().id() == catalog::Data::Type::Id::ASCII)
-    {
+    if ( values[i]->type() == m_fields[i].type()) {
       continue;
     }
-    else {
-      return false;
-    }
+    return false;
   }
 
   return true;
@@ -68,9 +64,6 @@ Schema &Schema::push_back(Field field) {
   return *this;
 }
 
-size_t Schema::record_size(Record record) const {
-  return record.size();
-}
 
 size_t Schema::size() const {
   size_t fields_size = 0;

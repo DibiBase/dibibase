@@ -73,19 +73,23 @@ io::DiskManager::load_index_page(std::string &database_path,
 catalog::Record io::DiskManager::get_record_from_data(
     std::string &database_path, std::string &table_name, size_t sstable_id,
     catalog::Schema &schema, off_t offset) {
-  int record_prefix_size = 16; 
+  int record_prefix_size = 4; 
   int fd = open((database_path + "/" + table_name + "/data_" +
                  std::to_string(sstable_id) + ".db")
                     .c_str(),
                 O_RDONLY);
   lseek(fd, offset, SEEK_SET);
   util::Buffer *record_size_buffer = new util::MemoryBuffer(record_prefix_size);
+  // std::unique_ptr<unsigned char[]> s_buf =
+  //     std::unique_ptr<unsigned char[]>(new unsigned char[record_size]);
+
   int rc = read(fd, record_size_buffer, record_prefix_size);
+  delete record_size_buffer;
 
   if (rc < 0)
     util::Logger::make().err("Error reading Data file: %d", errno);
 
-  auto record_size = record_size_buffer->get_int32();
+  auto record_size = record_size_buffer->get_uint32();
 
   std::unique_ptr<unsigned char[]> buf =
       std::unique_ptr<unsigned char[]>(new unsigned char[record_size]);

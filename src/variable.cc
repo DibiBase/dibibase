@@ -32,7 +32,7 @@ int main() {
     catalog::IntData id1(1);
     catalog::IntData id2(2);
     catalog::ASCIIData name1 ("ahmed");
-    catalog::ASCIIData name2 ("essam");
+    catalog::ASCIIData name2 ("DoesItWork?");
     
     std::vector<std::shared_ptr<catalog::Data>> values1;
     values1.push_back(std::make_shared<catalog::IntData>(id1));
@@ -56,8 +56,8 @@ int main() {
     auto second_record_values = my_db.read_record("my_table" , std::make_unique<catalog::IntData>(id2)).values();
 
     printf("First record: \n");
-    printf("%s\n" , first_record_values[1].get()->print().c_str());
+    printf("id: %s , name: %s\n" ,first_record_values[0].get()->print().c_str() ,first_record_values[1].get()->print().c_str());
     printf("Second record: \n");
-    printf("%s\n" , second_record_values[1].get()->print().c_str());
+    printf("id: %s , name: %s\n" ,second_record_values[0].get()->print().c_str() ,second_record_values[1].get()->print().c_str());
   return EXIT_SUCCESS;
 }
