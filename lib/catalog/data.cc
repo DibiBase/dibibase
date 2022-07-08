@@ -11,7 +11,8 @@ std::unique_ptr<Data> Data::from(util::Buffer *buf, Type type) {
 
   switch (id) {
   case Type::ASCII: {
-    std::string data = buf->get_string(type.length());
+    uint8_t number_of_bytes = buf->get_uint16();
+    std::string data = buf->get_string(number_of_bytes);
     return std::make_unique<ASCIIData>(data);
   }
   case Type::BIGINT: {
@@ -126,7 +127,10 @@ bool ASCIIData::compare(Data *other) {
   throw incompatible_data_types_error("");
 }
 
-void ASCIIData::bytes(util::Buffer *buf) { buf->put_string(m_data); }
+void ASCIIData::bytes(util::Buffer *buf) { 
+  buf->put_uint16(m_data.size());
+  buf->put_string(m_data);
+}
 
 BigIntData::BigIntData(int64_t data)
     : Data(Type(Type::BIGINT, sizeof(int64_t))), m_data(data) {}

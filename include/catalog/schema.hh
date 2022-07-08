@@ -61,8 +61,6 @@ public:
     m_sort_key_index = sort_key_index;
   }
 
-  size_t record_size() const;
-
   size_t size() const;
   void bytes(util::Buffer *);
 

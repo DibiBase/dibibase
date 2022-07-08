@@ -68,14 +68,37 @@ void TableBuilder::construct_sstable_files() {
   m_summary->push_back(record_iterator->first.get());
 
   while (record_iterator != m_records.end()) {
+    auto record = record_iterator->second;
+    auto record_size = record.size();
+    int record_prefix_size = 4;
+
+    /*
+        ----------------------------------------------------
+       |   SIZE (4 bytes)   |       RECORD (any length)    |
+       ----------------------------------------------------
+    */
+
     // Storing record bytes in a buffer.
     util::Buffer *record_buffer =
-        new util::MemoryBuffer(m_schema.record_size());
+        new util::MemoryBuffer(record_size);
     record_iterator->second.bytes(record_buffer);
+
+    util::Buffer *record_size_buffer = new util::MemoryBuffer(record_prefix_size);
+    record_size_buffer->put_uint32(record_size);
+
+    std::unique_ptr<unsigned char[]> s_buf = record_size_buffer->bytes();
+    int prefix_wc = write(m_data_fd, s_buf.get(), record_prefix_size);
+    delete record_size_buffer;
+
+
+    if(prefix_wc < 0 ) {
+      util::Logger::make().err("Error writing in Data file: %d", errno);
+      return;
+    }
 
     // Storing record bytes in data file.
     std::unique_ptr<unsigned char[]> r_buf = record_buffer->bytes();
-    int data_wc = write(m_data_fd, r_buf.get(), m_schema.record_size());
+    int data_wc = write(m_data_fd, r_buf.get(), record_size);
     delete record_buffer;
 
     if (data_wc < 0) {
@@ -94,7 +117,7 @@ void TableBuilder::construct_sstable_files() {
       m_index_page->push_back(record_iterator->first.get(), key_offset);
     }
 
-    key_offset += m_schema.record_size();
+    key_offset += record_size + record_prefix_size;
     record_iterator++;
   }
 

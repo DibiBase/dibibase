@@ -796,7 +796,7 @@ dataTypeName
    : OBJECT_NAME
    | K_TIMESTAMP
    | K_SET
-   | K_ASCII '(' decimalLiteral ')'
+   | K_ASCII
    | K_BIGINT
    | K_BLOB '(' decimalLiteral ')'
    | K_BOOLEAN

@@ -21,3 +21,12 @@ void Record::bytes(util::Buffer *buf) {
   for (auto &value : m_values)
     value->bytes(buf);
 }
+
+size_t Record::size()
+{
+  size_t record_size=0;
+  for (auto &value : m_values)
+    record_size+=value->size();
+  
+  return record_size;
+}

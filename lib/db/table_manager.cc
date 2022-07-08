@@ -66,7 +66,7 @@ void TableManager::write_record(catalog::Record record) {
   // page. then memtable can store up to 10000 keys, which will be stored in 100
   // pages when flushing into disk.
   // TODO: supporting dynamic size for the record key.
-  if (m_memtable.size() >= 2) {
+  if (m_memtable.size() >= 4) {
     // TODO: It is supposed that flushing memtable into disk is asynchronous,
     // it is running in the background. Memtable must be ready to store new
     // records while flushing.
