@@ -45,6 +45,8 @@ public:
   const std::unique_ptr<catalog::Schema> &schema() { return m_schema; }
   size_t current_sstable_id() { return m_current_sstable_id; }
 
+  void delete_record(catalog::Record);
+
 private:
   // Flushing memtable into disk by creating an instance of io::TableBuilder
   // then calling TableBuilder::construct_sstable_files(), then getting the new

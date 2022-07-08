@@ -37,6 +37,9 @@ public:
 
   void flush_metadata();
 
+  void delete_record(std::string table_name,
+                              catalog::Record);
+
   ~Database() { flush_metadata(); }
 
 private:

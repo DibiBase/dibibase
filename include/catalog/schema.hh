@@ -36,9 +36,10 @@ class DIBIBASE_PUBLIC Schema {
 
 public:
   Schema(size_t sort_key_index, size_t partition_key_index,
-         std::vector<Field> fields = {})
-      : m_sort_key_index(sort_key_index),
-        m_partition_key_index(partition_key_index), m_fields(fields) {}
+         std::vector<Field> fields = {}){m_sort_key_index=sort_key_index;
+         m_partition_key_index = partition_key_index;
+         m_fields=fields;
+         m_fields.push_back(Field("deleted",catalog::Data::Type(catalog::Data::Type::BOOLEAN, 1)));}
 
   static std::unique_ptr<Schema> from(util::Buffer *);
 
