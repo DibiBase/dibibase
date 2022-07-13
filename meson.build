@@ -35,10 +35,3 @@ pkg_mod.generate(
   version : '0.1.0',
 )
 
-dibibaselib = shared_library('dibibase',
-  sources: dibibaselib_srcs,
-  cpp_args : ['-DBUILDING_DIBIBASE'],
-  include_directories : inc,
-  gnu_symbol_visibility : 'hidden',
-  install : true,
-)

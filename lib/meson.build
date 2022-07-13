@@ -56,8 +56,10 @@ dibibaselib_srcs = [
 
 dibibaselib = shared_library('dibibase',
   sources: dibibaselib_srcs,
+  dependencies: [threadlibs],
   cpp_args : ['-DBUILDING_DIBIBASE'],
   include_directories : inc,
   gnu_symbol_visibility : 'hidden',
   install : true,
 )
+
