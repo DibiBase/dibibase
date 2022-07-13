@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <string>
 #include <memory>
+#include <cstring>
 
 /**
  * Commitlog file header (33 bytes)

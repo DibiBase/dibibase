@@ -133,3 +133,11 @@ executable('dibibase',
   dependencies: dep_grpc,
   install : true,
 )
+
+executable('Commitlog',
+  sources: ['commitlog.cc'],
+  include_directories : [inc, '/usr/include/antlr4-runtime'],
+  dependencies: [threadlibs, dep_antlr4, idep_grammar],
+  link_with : [dibibaselib],
+  install : true,
+)

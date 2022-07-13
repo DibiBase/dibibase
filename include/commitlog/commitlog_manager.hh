@@ -12,11 +12,12 @@
 #include <dirent.h>
 #include <cstring>
 #include <chrono>
+#include <pthread.h>
 
 #include "commitlog.hh"
 #include "log_record.hh"
 // TODO: INTEGRATION: include DibibaseInstance ------------
-// #include "DibibaseInstance.hh"
+#include "../db/database.hh"
 
 
 /**
@@ -81,7 +82,7 @@ public:
 
   // TODO: INTEGRATION: Change into a DB instance.
   // register the DibibaseInstance as an observer
-  void register_db(DibibaseInstance *database) { db = database; };
+  void register_db(dibibase::db::Database *database) { db = database; };
 private:
   std::unique_ptr<Commitlog> commitlog; // The current log file to which we're appending records
   SyncMode sync_mode;   // Either synchronous or batched record flushes
@@ -108,9 +109,9 @@ private:
 
   std::string default_directory;
 
-  // TODO: INTEGRATION: Change this. ---------------------
   // instance of the database
-  DibibaseInstance *db;
+  // TODO: INTEGRATION: Change this. ---------------------
+  dibibase::db::Database *db;
 };
 
 

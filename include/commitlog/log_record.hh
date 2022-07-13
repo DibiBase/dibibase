@@ -3,6 +3,7 @@
 #ifndef COMMITLOG_PROTOTYPE_LOG_RECORD_HH
 #define COMMITLOG_PROTOTYPE_LOG_RECORD_HH
 #include <memory>
+#include <cstring>
 #include <sstream>
 #include <string>
 

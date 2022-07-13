@@ -1,6 +1,6 @@
 #pragma once
 
-#include "commitlog.hh"
+#include "commitlog/commitlog.hh"
 
 // A set of global variables to be replaced with a proper config file
 // TODO: get these values from the config.yml file
@@ -31,6 +31,7 @@ Commitlog::Commitlog(const char *filename) : max_size(COMMITLOG_MAX_SIZE_IN_MEGA
       // log creating new file to main log
     }
   }
+}
 }
 
 Commitlog::Commitlog() : Commitlog(DEFAULT_COMMITLOG_LOCATION) {};

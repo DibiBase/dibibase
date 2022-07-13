@@ -1,6 +1,7 @@
 
 #include <utility>
-#include "log_record.hh"
+
+#include "commitlog/log_record.hh"
 
 
 // Constructor for INSERT type log records

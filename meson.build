@@ -10,7 +10,7 @@ if not dep_antlr4.found()
   # find the lib without pkg-config
   dep_antlr4 = cppc.find_library('antlr4-runtime')
 endif
-
+# threadlibs = dependency('threads')
 gtest_proj = subproject('gtest')
 
 inc = include_directories('include')
@@ -33,4 +33,12 @@ pkg_mod.generate(
   subdirs : 'dibibase',
   libraries : dibibaselib,
   version : '0.1.0',
+)
+
+dibibaselib = shared_library('dibibase',
+  sources: dibibaselib_srcs,
+  cpp_args : ['-DBUILDING_DIBIBASE'],
+  include_directories : inc,
+  gnu_symbol_visibility : 'hidden',
+  install : true,
 )

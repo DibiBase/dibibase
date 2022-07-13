@@ -1,4 +1,4 @@
-#include "CommitlogManager.hh"
+#include "commitlog/commitlog_manager.hh"
 
 
 CommitlogManager::CommitlogManager(SyncMode mode)
@@ -175,7 +175,10 @@ void CommitlogManager::apply_logs_queue(std::queue<std::unique_ptr<Commitlog>> &
       std::unique_ptr<char[]> temp_buffer(new char[2000]);
       std::swap(temp_buffer, buffer);
       LogRecord record = LogRecord(move(temp_buffer));
-      db->handle_record(record);
+      // -----------------------------------
+      // TODO: Handle the record
+      // -----------------------------------
+      // db->handle_record(record);
     }
     mark_archived(move(log)); // archived log records are no longer needed
     logs_to_delete.push(move(log));
