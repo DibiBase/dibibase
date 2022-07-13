@@ -10,7 +10,6 @@ using namespace dibibase::api::cql3;
 using namespace dibibase::api::prom_endp;
 
 
-
 Server::Server(const int port) {
   std::shared_ptr<db::Database> db = std::make_shared<db::Database>("database");
   std::string test="INIT";  

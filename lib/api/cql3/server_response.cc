@@ -10,7 +10,7 @@
 #include "api/cql3/fake_meta.hh"
 #include "api/cql3/query_result.hh"
 #include "db/table_manager.hh"
-#include "lang/cql3_visitor.hh"
+#include "dht/query_processor.hh"
 #include "lang/statements/create_table_statement.hh"
 #include "lang/statements/insert_statement.hh"
 #include "lang/statements/select_statement.hh"
@@ -164,7 +164,10 @@ int ServerMsg::CreateResponse(std::shared_ptr<dibibase::db::Database> db,int met
       CQL3Visitor visitor;
       std::vector<lang::Statement *> statements =
           visitor.visitRoot(tree).as<std::vector<lang::Statement *>>();
-
+     
+      dht::QueryProcessor qp(query);
+      string result = qp.process();
+      std::cout << "Result: " << result << std::endl;
       for (auto statement : statements) {
         switch (statement->type()) {
           
