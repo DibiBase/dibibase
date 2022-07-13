@@ -166,8 +166,8 @@ int ServerMsg::CreateResponse(std::shared_ptr<dibibase::db::Database> db,int met
           visitor.visitRoot(tree).as<std::vector<lang::Statement *>>();
      
       dht::QueryProcessor qp(query);
-      string result = qp.process();
-      std::cout << "Result: " << result << std::endl;
+      string record_str_result = qp.process();
+      
       for (auto statement : statements) {
         switch (statement->type()) {
           
@@ -176,7 +176,7 @@ int ServerMsg::CreateResponse(std::shared_ptr<dibibase::db::Database> db,int met
           if (lang::CreateTableStatement *create_table_statement =
                   dynamic_cast<lang::CreateTableStatement *>(statement);
               create_table_statement != nullptr) {
-            create_table_statement->execute(*db);
+            //create_table_statement->execute(*db);
             met[0] += 1;
             int stream_id = Header[3];
             QueryResult q(create_table_statement->m_keyspace, body);
@@ -213,7 +213,7 @@ int ServerMsg::CreateResponse(std::shared_ptr<dibibase::db::Database> db,int met
                   dynamic_cast<lang::InsertStatement *>(statement);
               insert_statement != nullptr) {
             auto start = high_resolution_clock::now();
-            insert_statement->execute(*db);
+            //insert_statement->execute(*db);
 
             QueryResult q(insert_statement->m_keyspace, body);
             int size = q.insert_record();
@@ -233,18 +233,15 @@ int ServerMsg::CreateResponse(std::shared_ptr<dibibase::db::Database> db,int met
                   dynamic_cast<lang::SelectStatement *>(statement);
               select_statement != nullptr) {
             auto start = high_resolution_clock::now();
-            auto result = select_statement->execute(*db);  
-            
-            
-            
-            std::vector<catalog::Record> record_v;
-            record_v.push_back(result.value());
+            //auto result = select_statement->execute(*db);  (Deprecated)
+            std::vector<catalog::Record> record_v; 
+            //record_v.push_back(result.value());   (Deprecated)
             
             const std::unique_ptr<catalog::Schema> &s =
                 db->read_schema(select_statement->m_from_spec.m_table);
             QueryResult q(select_statement->m_from_spec.m_keyspace, body);
             int size = q.select_result(select_statement->m_from_spec.m_table,
-                                       *s, record_v);
+                                       *s, record_v, record_str_result);
             
             auto stop = high_resolution_clock::now();
 

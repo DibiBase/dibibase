@@ -52,9 +52,11 @@ int QueryResult::insert_record(){
   return 8;
 }
 int QueryResult::select_result(std::string table, catalog::Schema schema,
-                               std::vector<catalog::Record> record_v) {
+                               std::vector<catalog::Record> record_v,std::string record_str) {
   int rows = record_v.size();
-  if (rows < 1) {
+
+
+  if (rows < 1 && record_str == "") {
     body[0] = 0;
     body[1] = 0;
     body[2] = 0;
@@ -67,7 +69,7 @@ int QueryResult::select_result(std::string table, catalog::Schema schema,
     body[2] = 0;
     body[3] = 2;
   }
-  if (rows <= 10 && rows >= 1)
+  if (rows <= 10 && rows >= 0)
     body[4] = 0, body[5] = 0, body[6] = 0, body[7] = 1; // global_tables_spec
   else if (rows > 10)
     body[4] = 0, body[5] = 0, body[6] = 0, body[7] = 2; // Has_more_pages
@@ -90,9 +92,30 @@ int QueryResult::select_result(std::string table, catalog::Schema schema,
     index = count(body, index, 2, f.name().length());
     index = append_field(body, index, f.name().length(), f.name(), t);
   }
-  // records serializatio //
-  index = count(body, index, 4, rows);
+  // records serialization //
+  index = count(body, index, 4, rows+1);
 
+  std::string delimiter = "|"; //between each value inside one record
+  std::vector<std::string> values;
+  values = split(record_str,delimiter);
+  for (auto val : values){
+      if (val.length()>0){
+      delimiter = ",";
+      std::vector<std::string> attributes;
+      attributes = split(val,delimiter);
+      std:: cout << attributes[0] << "-" << attributes[1] << "-" << attributes[2]<<std::endl;
+      index = count(body, index, 4, stoi(attributes[2]));
+      index = append_record(body, index, stoi(attributes[2]), attributes[0],
+                            stoi(attributes[1]));
+
+      }
+  }      
+      
+
+
+
+  //Depricated (local installation)
+  /*
   for (auto &record : record_v) {
     std::vector<std::shared_ptr<catalog::Data>> d = record.values();
     for (auto &data : d) {
@@ -103,7 +126,7 @@ int QueryResult::select_result(std::string table, catalog::Schema schema,
                             data->type().id());
     }
   }
-
+  */
   index--;
   size = index + 1;
   return size;
@@ -197,7 +220,7 @@ int QueryResult::append_field(char *buffer, int start, int size,
 }
 
 int QueryResult::append_record(char *buffer, int start, int size,
-                               std::string record_str, Data::Type::Id id) {
+                               std::string record_str, int id) {
 
   switch (id) {
   case Data::Type::Id::ASCII: {
@@ -242,4 +265,20 @@ int QueryResult::append_record(char *buffer, int start, int size,
   }
 
   return start + size;
+}
+
+std::vector<std::string> QueryResult::split(std::string str, std::string token){
+    std::vector<std::string> result;
+    while(str.size()){
+        int index = str.find(token);
+        if(index!=std::string::npos){
+            result.push_back(str.substr(0,index));
+            str = str.substr(index+token.size());
+            if(str.size()==0)result.push_back(str);
+        }else{
+            result.push_back(str);
+            str = "";
+        }
+    }
+    return result;
 }

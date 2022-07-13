@@ -32,7 +32,7 @@ public:
   int schema_change(std::string table);
   int create_table(std::string table);
   int insert_record();
-  int select_result(std::string table,catalog::Schema schema,std::vector<catalog::Record> record);
+  int select_result(std::string table,catalog::Schema schema,std::vector<catalog::Record> record,std::string);
   char * get_buffer(){return body;}
   
 private:
@@ -40,9 +40,10 @@ private:
   char *body={nullptr};
   std::string keyspace;
   int count(char *,int start,int breadth,int size);
+  std::vector<std::string> split(std::string str, std::string token);
   int append_string(char*,int start,int size,std::string);
   int append_field(char *,int start,int size,std::string,catalog::Data::Type);
-  int append_record(char *,int start,int size,std::string,catalog::Data::Type::Id);
+  int append_record(char *,int start,int size,std::string,int);
   enum kind {
     Void = 0x0001,
     Rows = 0x0002,
