@@ -21,7 +21,7 @@
 #include <unistd.h>
 #include <utility>
 #include <vector>
-
+#include "util/logger.hh"
 #include "lang/statements/create_table_statement.hh"
 #include "lang/statements/insert_statement.hh"
 #include "lang/statements/select_statement.hh"

@@ -1,5 +1,5 @@
 #include "api/cql3/query_result.hh"
-#include "api/cql3/server_responce.hh"
+#include "api/cql3/server_response.hh"
 #include "catalog/data.hh"
 #include "catalog/schema.hh"
 #include <memory>

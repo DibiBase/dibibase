@@ -33,7 +33,7 @@ Server::Server(const int port) {
   struct sockaddr_in server_addr, client_addr;
   socklen_t client_len = sizeof(client_addr);
 
-  int met[5] = {0,0,0,0,0};
+  int met[8] = {0,0,0,0,0,0,0,0};
   char buffer[MAX_MESSAGE_LEN];
   char new_buffer[MAX_MESSAGE_LEN];
   memset(buffer, 0, sizeof(buffer));
@@ -87,7 +87,10 @@ Server::Server(const int port) {
     std::string met2_str = "# TYPE number_of_selections counter\nnumber_of_selections "+std::to_string(met[2])+"\n";
     std::string met3_str = "# TYPE time_of_insertion gauge\ntime_of_insertion "+std::to_string(met[3])+"\n";
     std::string met4_str = "# TYPE time_of_selection gauge\ntime_of_selection "+std::to_string(met[4])+"\n";
-    std::string test = met0_str+met1_str+met2_str+met3_str+met4_str;
+    std::string met5_str = "# TYPE number_of_deletetions counter\nnumber_of_deletions "+std::to_string(met[5])+"\n";
+    std::string met6_str = "# TYPE time_of_deletion gauge\ntime_of_deletion "+std::to_string(met[6])+"\n";
+    std::string met7_str = "# TYPE number_of_exceptions counter\nnumber_of_exceptions "+std::to_string(met[7])+"\n";
+    std::string test = met0_str+met1_str+met2_str+met3_str+met4_str+met5_str+met6_str + met7_str;
     
     auto Greetings2 = [test](const HttpRequest& request) -> HttpResponse {
     HttpResponse response(HttpStatusCode::Ok);

@@ -1,5 +1,7 @@
-#include "api/cql3/server_responce.hh"
+#include "api/cql3/server_response.hh"
 
+#include "Exceptions.h"
+#include "InputMismatchException.h"
 #include "antlr4-runtime.h"
 
 #include "CqlLexer.h"
@@ -7,11 +9,13 @@
 #include <chrono>
 #include "api/cql3/fake_meta.hh"
 #include "api/cql3/query_result.hh"
+#include "db/table_manager.hh"
 #include "lang/cql3_visitor.hh"
 #include "lang/statements/create_table_statement.hh"
 #include "lang/statements/insert_statement.hh"
 #include "lang/statements/select_statement.hh"
 #include "lang/statements/statement.hh"
+#include <exception>
 #include <tuple>
 
 using namespace antlr4;
@@ -141,15 +145,17 @@ int ServerMsg::CreateResponse(std::shared_ptr<dibibase::db::Database> db,int met
 
     else if (query != "" && query.back() == ';') {
       // Handling sliced user queries (in a bad way)
-      if (query[0] == 'N' || query[0] == 'n')
+      if (tolower(query[0]) == 'n')
         query = "I" + query;
-      else if (query[0] == 'R' || query[0] == 'r')
+      else if (tolower(query[0]) == 'r')
         query = "C" + query;
-      else if (query[0] == 'E' || query[0] == 'e')
+      else if (tolower(query[0]) == 'e'&&tolower(query[4]) == 'c')
         query = "S" + query;
+      else if (tolower(query[0]) == 'e'&&tolower(query[4])=='t')
+        query = "D" + query;
 
-      char body[1500];
-
+      char body[3500];
+      try{
       ANTLRInputStream input(query);
       CqlLexer lexer(&input);
       CommonTokenStream tokens(&lexer);
@@ -161,7 +167,9 @@ int ServerMsg::CreateResponse(std::shared_ptr<dibibase::db::Database> db,int met
 
       for (auto statement : statements) {
         switch (statement->type()) {
+          
         case lang::Statement::Type::CREATE_TABLE:
+        try{
           if (lang::CreateTableStatement *create_table_statement =
                   dynamic_cast<lang::CreateTableStatement *>(statement);
               create_table_statement != nullptr) {
@@ -193,8 +201,11 @@ int ServerMsg::CreateResponse(std::shared_ptr<dibibase::db::Database> db,int met
 
             msg_length = size1 + 2 + size2 + 12;
           }
+        }
+        catch(unspported_cql_statement){met[7]++;}
           break;
         case lang::Statement::Type::INSERT:
+        try{
           if (lang::InsertStatement *insert_statement =
                   dynamic_cast<lang::InsertStatement *>(statement);
               insert_statement != nullptr) {
@@ -211,13 +222,15 @@ int ServerMsg::CreateResponse(std::shared_ptr<dibibase::db::Database> db,int met
               Header[i] = body[i - 5];
             msg_length = size + 5;
           }
+        }
+        catch(dibibase::db::schema_mismatch_error){met[7]++;}
           break;
         case lang::Statement::Type::SELECT:
           if (lang::SelectStatement *select_statement =
                   dynamic_cast<lang::SelectStatement *>(statement);
               select_statement != nullptr) {
             auto start = high_resolution_clock::now();
-            auto result = select_statement->execute(*db);
+            auto result = select_statement->execute(*db);  
             
             
             
@@ -251,6 +264,12 @@ int ServerMsg::CreateResponse(std::shared_ptr<dibibase::db::Database> db,int met
 
         delete statement;
       }
+
+    } //
+     catch(dibibase::db::non_existent_record_error){
+        util::Logger::make().err("code=2200 [Invalid query] message=\"record couldn't be found\"");
+       met[7]++;} 
+     catch(unspported_cql_statement){met[7]++;}
     }
     break;
   }

@@ -6,7 +6,7 @@
 #include <string>
 #include "common.hh"
 #include "api/cql3/frame.hh"
-#include "api/cql3/server_responce.hh"
+#include "api/cql3/server_response.hh"
 #include <arpa/inet.h>
 #include <cerrno>
 #include <cstdio>
