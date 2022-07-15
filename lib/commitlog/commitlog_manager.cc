@@ -1,11 +1,18 @@
 #include "commitlog/commitlog_manager.hh"
+Test::Test() {
+    std::cout << "Constructor called" << std::endl;
+}
 
+Test::~Test() {
+    std::cout << "Destructor called" << std::endl;
+}
 
 CommitlogManager::CommitlogManager(SyncMode mode)
     : commitlog(nullptr), sync_mode{mode}, need_flush(false),
       lsn(0), persistent_lsn(0), flush_thread(nullptr),
       default_directory("../" + DEFAULT_COMMITLOG_DIRECTORY + "/"), db(nullptr) {
   // scanning all the files in the given directory TODO: get the directory from the yml config file
+  std::cout<<"\nconstructor called\n\n";
   DIR *d;
   struct dirent *dir;
   d = opendir(default_directory.c_str());

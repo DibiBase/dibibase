@@ -135,9 +135,9 @@ executable('dibibase',
 )
 
 executable('Commitlog',
-  sources: ['commitlog.cc'],
-  include_directories : [inc, '/usr/include/antlr4-runtime'],
-  dependencies: [threadlibs, dep_antlr4, idep_grammar],
-  link_with : [dibibaselib],
+  sources: ['commitlog_driver.cc'],
+  include_directories : inc,
+  dependencies: threadlibs,
+  link_with : dibibaselib,
   install : true,
 )

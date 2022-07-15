@@ -14,10 +14,14 @@
 #include <chrono>
 #include <pthread.h>
 
-#include "commitlog.hh"
-#include "log_record.hh"
-// TODO: INTEGRATION: include DibibaseInstance ------------
+#include "commitlog/commitlog.hh"
+#include "commitlog/log_record.hh"
 #include "../db/database.hh"
+class Test{
+public:
+    Test();
+    ~Test();
+};
 
 
 /**
