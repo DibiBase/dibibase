@@ -19,15 +19,16 @@
 
 
 int main(int argc, char *argv[]) {
-  if (argc < 2) {
-    std::cout << "usage: " << argv[0] << " <CQL port>" << std::endl;
+  if (argc < 3) {
+    std::cout << "usage: " << argv[0] << " <CQL port>" << argv[1] << " <Prometheus Port>"<<std::endl;
     exit(EXIT_SUCCESS);
   }
 
   int portno = strtol(argv[1], NULL, 10);
+  int prom_port = strtol(argv[2], NULL, 10);
   
   using namespace dibibase::api::cql3;
-  Server server(portno);
+  Server server(portno,prom_port);
 
 
 

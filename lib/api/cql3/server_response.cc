@@ -1,7 +1,7 @@
 #include "api/cql3/server_response.hh"
 
-#include "Exceptions.h"
-#include "InputMismatchException.h"
+
+
 #include "antlr4-runtime.h"
 
 #include "CqlLexer.h"
@@ -176,7 +176,7 @@ int ServerMsg::CreateResponse(std::shared_ptr<dibibase::db::Database> db,int met
           if (lang::CreateTableStatement *create_table_statement =
                   dynamic_cast<lang::CreateTableStatement *>(statement);
               create_table_statement != nullptr) {
-            //create_table_statement->execute(*db);
+            create_table_statement->execute(*db);
             met[0] += 1;
             int stream_id = Header[3];
             QueryResult q(create_table_statement->m_keyspace, body);
@@ -233,7 +233,7 @@ int ServerMsg::CreateResponse(std::shared_ptr<dibibase::db::Database> db,int met
                   dynamic_cast<lang::SelectStatement *>(statement);
               select_statement != nullptr) {
             auto start = high_resolution_clock::now();
-            //auto result = select_statement->execute(*db);  (Deprecated)
+            //auto result = select_statement->execute(*db); 
             std::vector<catalog::Record> record_v; 
             //record_v.push_back(result.value());   (Deprecated)
             

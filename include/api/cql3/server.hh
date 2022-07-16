@@ -40,7 +40,7 @@ class DIBIBASE_PUBLIC Server {
 
 public:
   std::string query;
-  Server(int port);
+  Server(int port,int prom_port);
   Server(const Server &) = delete;
   Server &operator=(const Server &) = delete;
   Server(Server &&) = delete;

@@ -103,7 +103,6 @@ int QueryResult::select_result(std::string table, catalog::Schema schema,
       delimiter = ",";
       std::vector<std::string> attributes;
       attributes = split(val,delimiter);
-      std:: cout << attributes[0] << "-" << attributes[1] << "-" << attributes[2]<<std::endl;
       index = count(body, index, 4, stoi(attributes[2]));
       index = append_record(body, index, stoi(attributes[2]), attributes[0],
                             stoi(attributes[1]));

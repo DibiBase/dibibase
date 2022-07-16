@@ -4,17 +4,26 @@
 #include "api/prom_endp/uri.hh"
 #include "api/prom_endp/http_message.hh"
 #include "api/prom_endp/http_server.hh"
-
-
+#include "dht/state_store.hh"
+#include "dht/streamer/service.hh"
 using namespace dibibase::api::cql3;
 using namespace dibibase::api::prom_endp;
 
 
-Server::Server(const int port) {
+dibibase::api::cql3::Server::Server(const int port,const int prom_port) {
   std::shared_ptr<db::Database> db = std::make_shared<db::Database>("database");
   std::string test="INIT";  
   std::string host = "0.0.0.0";
-  HttpServer prom_server(host, 8080);
+  HttpServer prom_server(host, prom_port);
+
+
+  std::string local_address = dibibase::dht::StateStore::instance().local_address();
+
+  // server for internal communications
+  std::thread th = std::thread(
+      [local_address]() { dibibase::dht::StreamerService().run_server(local_address); });
+  sleep(1);
+
 
   std::string ex_metric = "GOTO /metrics";
   auto Greetings = [ex_metric](const HttpRequest& request) -> HttpResponse {
