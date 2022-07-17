@@ -21,7 +21,7 @@ class DIBIBASE_PUBLIC StatementParser {
 public:
   StatementParser(const string &query) : m_query(query) {}
 
-  std::unique_ptr<Statement> process() {
+  std::unique_ptr<Statement> parse() {
     // TODO: handle exceptions
     ANTLRInputStream input(m_query);
     CqlLexer lexer(&input);

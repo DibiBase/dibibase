@@ -4,6 +4,8 @@
 #include "murmur_hash.hh"
 #include "state_store.hh"
 
+#include <future>
+
 namespace dibibase::dht {
 
 class DIBIBASE_PUBLIC Partitioner {
@@ -18,8 +20,7 @@ public:
 
   bool is_local(const std::string &key) const {
     std::optional<std::string> address = get_address(key);
-    return !address.has_value() ||
-           address == config.local_address();
+    return !address.has_value() || address == config.local_address();
   }
 
   string send(const string &query, const string &key) {
@@ -33,11 +34,17 @@ public:
   }
 
   void send_all(const string &query) const {
+    std::vector<std::future<string>> results;
     for (const auto &[address, streamer] : state_store.available_streamers()) {
       if (address == config.local_address())
         continue;
       logger.info("sending to %s, %s", address.c_str(), query.c_str());
-      streamer->execute(query);
+      results.push_back(std::async(std::launch::async,
+                                   [&] { return streamer->execute(query); }));
+    }
+
+    for (auto &result : results) {
+      logger.info(result.get());
     }
   }
 

@@ -22,7 +22,7 @@ public:
 
   string process() {
 
-    std::shared_ptr<Statement> stmt = StatementParser(m_query).process();
+    std::shared_ptr<Statement> stmt = StatementParser(m_query).parse();
 
     switch (stmt->type()) {
     case Statement::Type::CREATE_TABLE:

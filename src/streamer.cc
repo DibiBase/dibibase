@@ -24,23 +24,23 @@ int main(int argc, char *argv[]) {
   std::string query;
   // stream.open(argv[1]);
 
-  // while (!stream.eof()) {
-    // std::cout << ">>> ";
-    // std::getline(std::cin, query);
-    // // std::cout << query << std::endl;
-    // if (query == "") {
-    //   continue;
-    // }
-    // string result = QueryProcessor(query).process();
-    // std::cout << "Result: " << result << std::endl;
-  // }
-
-  while(true) {
-    string address;
-    std::cin >> address;
-    std::make_shared<StreamerClient>(
-          ::grpc::CreateChannel(address, ::grpc::InsecureChannelCredentials()))->health_check();
+  while (!stream.eof()) {
+    std::cout << ">>> ";
+    std::getline(std::cin, query);
+    // std::cout << query << std::endl;
+    if (query == "") {
+      continue;
+    }
+    string result = QueryProcessor(query).process();
+    std::cout << "Result: " << result << std::endl;
   }
+
+  // while(true) {
+  //   string address;
+  //   std::cin >> address;
+  //   std::make_shared<StreamerClient>(
+  //         ::grpc::CreateChannel(address, ::grpc::InsecureChannelCredentials()))->health_check();
+  // }
 
 
   // wait for server

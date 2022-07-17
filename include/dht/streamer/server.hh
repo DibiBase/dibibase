@@ -22,7 +22,7 @@ public:
                  Result *response) override {
     logger.info("Received query: %s", request->str().c_str());
 
-    std::shared_ptr<Statement> stmt = StatementParser(request->str()).process();
+    std::shared_ptr<Statement> stmt = StatementParser(request->str()).parse();
     response->set_str(LocalQueryExecutor(stmt).execute());
 
     return Status::OK;
