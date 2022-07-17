@@ -10,7 +10,7 @@ if not dep_antlr4.found()
   # find the lib without pkg-config
   dep_antlr4 = cppc.find_library('antlr4-runtime')
 endif
-
+# threadlibs = dependency('threads')
 gtest_proj = subproject('gtest')
 
 inc = include_directories('include')
@@ -34,3 +34,4 @@ pkg_mod.generate(
   libraries : dibibaselib,
   version : '0.1.0',
 )
+

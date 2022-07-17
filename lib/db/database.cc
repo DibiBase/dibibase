@@ -17,11 +17,13 @@
 #include "io/disk_manager.hh"
 #include "mem/summary.hh"
 #include "util/logger.hh"
+#include "commitlog/commitlog_manager.hh"
 
 using namespace dibibase::db;
 using namespace dibibase::catalog;
 using namespace dibibase::util;
 using namespace dibibase::mem;
+using namespace commitlog;
 
 Database::Database(std::string base_path) : m_base_path(base_path) {
   DIR *dir = opendir(base_path.c_str());
@@ -67,7 +69,17 @@ Database::Database(std::string base_path) : m_base_path(base_path) {
     m_table_managers.insert({table_name, std::move(table_manager)});
   }
 
+  // initializing clm
+  // TODO: obtain the syncmode from config
+  // the default mode should be batched, but we decided to disable multi-threading for now
+  m_commitlog_manager = new commitlog::CommitlogManager(SyncMode::SYNC); 
+  m_commitlog_manager->register_db(this);
+
   delete metadata_buffer;
+}
+
+void Database::recover(int32_t lsn) {
+  m_commitlog_manager->apply_logs_from_lsn(lsn);
 }
 
 void Database::create_table(std::string table_name, catalog::Schema schema) {
@@ -96,8 +108,17 @@ Record Database::read_record(std::string table_name,
 void Database::write_record(std::string table_name, catalog::Record record) {
   auto table_managers_it = m_table_managers.find(table_name);
 
-  if (table_managers_it != m_table_managers.end())
+  if (table_managers_it != m_table_managers.end()){
+    // log the write operation
+    if (commitlog::CommitlogManager::ENABLE_LOGGING == true){
+      util::MemoryBuffer buffer(2000); // TODO: make this dynamic
+      record.bytes(&buffer);
+      m_commitlog_manager->append_log_record(table_name, &buffer, buffer.offset());
+    }
+
+    // write the record to the database
     table_managers_it->second.write_record(record);
+    }
 }
 
 void Database::flush_metadata() {

@@ -133,3 +133,11 @@ executable('dibibase',
   dependencies: dep_grpc,
   install : true,
 )
+
+executable('Commitlog',
+  sources: ['commitlog_driver.cc'],
+  include_directories : inc,
+  dependencies: threadlibs,
+  link_with : dibibaselib,
+  install : true,
+)

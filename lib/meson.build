@@ -37,6 +37,12 @@ dibibaselib_util_srcs = [
   'util/buffer.cc',
 ]
 
+dibibaselib_commitlog_srcs = [
+  'commitlog/commitlog_manager.cc',
+  'commitlog/log_record.cc',
+  'commitlog/commitlog.cc',
+]
+threadlibs = dependency('threads')
 dibibaselib_srcs = [
   dibibaselib_api_srcs,
   dibibaselib_catalog_srcs,
@@ -45,12 +51,15 @@ dibibaselib_srcs = [
   dibibaselib_mem_srcs,
   dibibaselib_util_srcs,
   dibibaselib_dht_srcs,
+  dibibaselib_commitlog_srcs,
 ]
 
 dibibaselib = shared_library('dibibase',
   sources: dibibaselib_srcs,
+  dependencies: [threadlibs],
   cpp_args : ['-DBUILDING_DIBIBASE'],
   include_directories : inc,
   gnu_symbol_visibility : 'hidden',
   install : true,
 )
+
