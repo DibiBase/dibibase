@@ -6,6 +6,7 @@
 #include "api/prom_endp/http_server.hh"
 #include "dht/state_store.hh"
 #include "dht/streamer/service.hh"
+#include "config/config.hh"
 using namespace dibibase::api::cql3;
 using namespace dibibase::api::prom_endp;
 
@@ -17,7 +18,7 @@ dibibase::api::cql3::Server::Server(const int port,const int prom_port) {
   HttpServer prom_server(host, prom_port);
 
 
-  std::string local_address = dibibase::dht::StateStore::instance().local_address();
+  std::string local_address = Config::instance().local_address();
 
   // server for internal communications
   std::thread th = std::thread(
