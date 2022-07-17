@@ -8,7 +8,13 @@
 #include <memory>
 #include <unistd.h>
 
+
+namespace commitlog{
+  class DIBIBASE_PUBLIC CommitlogManager;
+}
+
 namespace dibibase::db {
+
 
 class DIBIBASE_PUBLIC Database {
 
@@ -35,13 +41,32 @@ public:
 
   void write_record(std::string table_name, catalog::Record);
 
+  // used for recovery calls to database, since using the original write_data
+  // would log the write operation thus creating a circular function calls.
+  // TODO: implement a ENABLE_LOGGING flag that can be used to stop logging records
+  // until recorvery is done
+  // void write_record_without_logging(std::string table_name, catalog::Record);
+
   void flush_metadata();
 
-  ~Database() { flush_metadata(); }
+  const std::unique_ptr<catalog::Schema> &get_table_schema(std::string table_name) {
+    auto table_managers_it = m_table_managers.find(table_name);
+    if (table_managers_it != m_table_managers.end())
+      return table_managers_it->second.schema();
+  };
+
+  // recover from a specific LSN after a crash
+  void recover(int32_t lsn);
+
+  ~Database() { 
+    flush_metadata(); 
+    delete m_commitlog_manager;
+    }
 
 private:
   std::string m_base_path;
   std::map<std::string, TableManager> m_table_managers;
+  commitlog::CommitlogManager *m_commitlog_manager;
 };
 
 } // namespace dibibase::db

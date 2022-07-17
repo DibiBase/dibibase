@@ -11,6 +11,9 @@
 #include <memory>
 #include <cstring>
 
+#include "common.hh"
+#include "util/buffer.hh"
+
 /**
  * Commitlog file header (33 bytes)
  * -----------------------------------------------------------------------------------------------------
@@ -18,8 +21,8 @@
  * | 17 bytes           | 2 bytes  | 4 bytes  |    1 byte    | 1 byte      | 4 bytes | 4 bytes         |
  * -----------------------------------------------------------------------------------------------------
  */
-
-class Commitlog {
+namespace commitlog{
+class DIBIBASE_PUBLIC Commitlog {
 public:
   explicit Commitlog();
 
@@ -29,6 +32,9 @@ public:
 
   //write a buffer to disk
   void flush(std::unique_ptr<char[]> buffer, int32_t size);
+  
+  // overloaded flush that takes an std::unique_ptr<unsigned char[]>
+  void flush(std::unique_ptr<unsigned char[]> buffer, int32_t size);
 
   // writes the file header to the log file
   // returns true if successfully constructed
@@ -87,5 +93,5 @@ private:
   const char *log_file_name;
 };
 
-
+} // namespace commitlog
 #endif //COMMITLOG_PROTOTYPE_COMMITLOG_HH

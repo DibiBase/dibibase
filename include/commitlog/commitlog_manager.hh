@@ -12,25 +12,18 @@
 #include <dirent.h>
 #include <cstring>
 #include <chrono>
-#include <pthread.h>
+// #include <pthread.h>
 
+#include "common.hh"
 #include "commitlog/commitlog.hh"
 #include "commitlog/log_record.hh"
-#include "../db/database.hh"
-class Test{
-public:
-    Test();
-    ~Test();
-};
+#include "db/database.hh"
+#include "catalog/record.hh"
+
+using namespace dibibase;
 
 
-/**
- * A set of global variable to act as config
- * TODO: change this into a proper config.yml file
- */
-std::string DEFAULT_COMMITLOG_DIRECTORY = "logs";
-long int LOG_BUFFER_SIZE = 2000;
-std::chrono::duration<long long int, std::milli> LOG_TIMEOUT = std::chrono::milliseconds(1000);
+namespace commitlog {
 
 
 enum class SyncMode {
@@ -38,14 +31,14 @@ enum class SyncMode {
   BATCHED   // entries are kept in memory until the buffer is full or after a timeout
 };
 
-class CommitlogManager {
+class DIBIBASE_PUBLIC CommitlogManager {
 public:
   explicit CommitlogManager(SyncMode mode);
 
   ~CommitlogManager();
 
   // append a log into log buffer
-  int32_t append_log_record(LogRecord &record);
+  int32_t append_log_record(std::string table_name, dibibase::util::Buffer *buf, int32_t buf_size);
 
   // getters and setters
   inline int32_t get_persistent_lsn() { return persistent_lsn; }
@@ -84,9 +77,22 @@ public:
   // a wrapper around the commitlog update_archived status method
   static void mark_archived(std::unique_ptr<Commitlog> log) { log->update_archived_status(true); };
 
-  // TODO: INTEGRATION: Change into a DB instance.
-  // register the DibibaseInstance as an observer
+  // recover a single record 
+  void recover_record(dibibase::util::Buffer *buf, int32_t buf_size);
+
+
+  // register the Dibibase Instance as an observer
   void register_db(dibibase::db::Database *database) { db = database; };
+
+  // bool used to disable logging temporarily while recovering
+  static bool ENABLE_LOGGING;
+
+  // variables that are to be imported from config
+  static const auto LOG_BUFFER_SIZE = 2000;
+//  const static auto DEFAULT_COMMITLOG_DIRECTORY = 'logs';
+//  const static std::chrono::duration<long long int, std::milli> LOG_TIMEOUT;
+
+
 private:
   std::unique_ptr<Commitlog> commitlog; // The current log file to which we're appending records
   SyncMode sync_mode;   // Either synchronous or batched record flushes
@@ -101,7 +107,7 @@ private:
   std::atomic<int32_t> persistent_lsn;
 
   // used to buffer records until flushing
-  std::unique_ptr<char[]> log_buffer = std::make_unique<char[]>(LOG_BUFFER_SIZE);
+  std::unique_ptr<char[]> log_buffer = std::make_unique<char[]>(CommitlogManager::LOG_BUFFER_SIZE);
 
   // the contents of log buffer is put here to flush, so flushing doesn't block appending
   // new records to log_buffer
@@ -114,9 +120,8 @@ private:
   std::string default_directory;
 
   // instance of the database
-  // TODO: INTEGRATION: Change this. ---------------------
   dibibase::db::Database *db;
 };
 
-
+} // namespace commitlog
 #endif //COMMITLOG_PROTOTYPE_COMMITLOGMANAGER_HH
