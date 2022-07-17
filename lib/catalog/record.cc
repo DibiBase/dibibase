@@ -20,4 +20,5 @@ std::unique_ptr<Record> Record::from(util::Buffer *buf, Schema schema) {
 void Record::bytes(util::Buffer *buf) {
   for (auto &value : m_values)
     value->bytes(buf);
+  deleted->bytes(buf);  
 }

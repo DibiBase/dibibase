@@ -93,12 +93,9 @@ Record Database::read_record(std::string table_name,
   throw uncomparable_type_error("");
 }
 
+
 void Database::write_record(std::string table_name, catalog::Record record) {
   auto table_managers_it = m_table_managers.find(table_name);
-
-    catalog::BooleanData deleted(false);
-    std::vector<std::shared_ptr<catalog::Data>> x=record.values();
-    x.push_back(std::make_shared<catalog::BooleanData>(deleted));
 
   if (table_managers_it != m_table_managers.end())
     table_managers_it->second.write_record(record);
@@ -107,9 +104,7 @@ void Database::write_record(std::string table_name, catalog::Record record) {
 void Database::delete_record(std::string table_name, catalog::Record record) {
   auto table_managers_it = m_table_managers.find(table_name);
 
-  catalog::BooleanData deleted(true);
-    std::vector<std::shared_ptr<catalog::Data>> x=record.values();
-    x.push_back(std::make_shared<catalog::BooleanData>(deleted));
+  record.set_deleted();
 
   if (table_managers_it != m_table_managers.end())
     table_managers_it->second.write_record(record);

@@ -46,18 +46,25 @@ int main() {
 
     catalog::Record first_record(values1);
     catalog::Record second_record(values2);
-    printf("1");
+    // printf("1");
     my_db.write_record("my_table" , first_record);
-    printf("2");
+    // printf("2");
     my_db.write_record("my_table" , second_record);
+    my_db.write_record("my_table" , second_record);
+        my_db.write_record("my_table" , second_record);
+            my_db.write_record("my_table" , second_record);
 
     auto last_written_record_values = my_db.read_record("my_table" , std::make_unique<catalog::IntData>(id)).values();
 
-
     printf("%s" , last_written_record_values[1].get()->print().c_str());
+    // std::cout<<last_written_record_values.is_deleted();
 
     my_db.delete_record("my_table" , second_record);
-
-    printf("%s" , last_written_record_values[1].get()->print().c_str());
+    auto last_written_record_values1 = my_db.read_record("my_table" , std::make_unique<catalog::IntData>(id));
+    std::cout<<last_written_record_values1.is_deleted();
+    // if (!last_written_record_values.is_deleted()){
+    //   // printf("%s" , last_written_record_values[1].get()->print().c_str());
+        // printf("isdeleted");
+    // }
   return EXIT_SUCCESS;
 }
