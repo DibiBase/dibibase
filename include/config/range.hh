@@ -2,7 +2,7 @@
 
 #include "common.hh"
 
-namespace dibibase::dht {
+namespace dibibase::config {
 
 class DIBIBASE_PUBLIC Range {
 

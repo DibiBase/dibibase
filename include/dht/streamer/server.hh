@@ -9,13 +9,8 @@
 
 #include "streamer.grpc.pb.h"
 
-using dibibase::grpc::Query;
-using dibibase::grpc::Result;
-using dibibase::grpc::StreamerRPC;
-using grpc::Server;
-using grpc::ServerBuilder;
-using grpc::ServerContext;
-using grpc::Status;
+using namespace dibibase::streamer;
+using namespace grpc;
 
 namespace dibibase::dht {
 
@@ -29,6 +24,16 @@ public:
 
     std::shared_ptr<Statement> stmt = StatementParser(request->str()).process();
     response->set_str(LocalQueryExecutor(stmt).execute());
+
+    return Status::OK;
+  }
+
+  Status health_check(ServerContext *context, const Nothing *request,
+                 Health *response) override {
+    logger.info("Health Check: %s", context->peer().c_str());
+
+    response->set_ok(true);
+    response->set_ready(true);
 
     return Status::OK;
   }

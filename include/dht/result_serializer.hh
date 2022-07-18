@@ -17,10 +17,10 @@ public:
     if (m_record.has_value()) {
       string result;
       for (auto value : m_record.value().values())
-        result += value->print() + ", ";
+        result += value->print() + "," + std::to_string(value->type().id()) + "," + std::to_string(value->type().length()) + "|";
       return result; // TODO: serialize to Rows
     }
-    return "Get Nothing"; // TODO: Void
+    return ""; // TODO: Void
   }
 
 private:
